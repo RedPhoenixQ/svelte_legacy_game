@@ -9,7 +9,18 @@ const trpcHandle: Handle = createTRPCHandle({ router, createContext });
 
 export async function handle({ event, resolve }) {
 	event.locals.pb = new PocketBase(PUBLIC_PB_URL);
+	event.locals.pb.authStore.loadFromCookie(event.request.headers.get('cookie') ?? '');
+	console.debug('HAS AUTH', event.locals.pb.authStore.isValid);
 
 	const response = await trpcHandle({ event, resolve });
+
+	response.headers.append(
+		'Set-Cookie',
+		event.locals.pb.authStore.exportToCookie({
+			path: '/',
+			httpOnly: true
+		})
+	);
+
 	return response;
 }
