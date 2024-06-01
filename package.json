@@ -31,6 +31,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"pocketbase": "^0.21.3"
+		"@trpc/client": "^10.45.2",
+		"@trpc/server": "^10.45.2",
+		"pocketbase": "^0.21.3",
+		"trpc-sveltekit": "^3.6.1"
 	}
 }
