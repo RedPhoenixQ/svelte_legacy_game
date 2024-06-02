@@ -53,11 +53,7 @@
 		clearTimeout(longPressTimeout);
 
 		if (moving) {
-			const pos: XYPos = {
-				x: event.pageX,
-				y: event.pageY
-			};
-			dispatch('endMove', pos);
+			dispatch('endMove', { x, y });
 		}
 		reset();
 	}
