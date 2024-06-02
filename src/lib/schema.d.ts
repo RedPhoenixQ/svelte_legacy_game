@@ -36,9 +36,7 @@ export interface BaseCollectionCreate {
 }
 
 // https://pocketbase.io/docs/api-records/#update-record
-export interface BaseCollectionUpdate {
-	test?: null;
-}
+export interface BaseCollectionUpdate {}
 
 // https://pocketbase.io/docs/collections/#auth-collection
 export interface AuthCollectionResponse extends BaseCollectionResponse {
@@ -163,6 +161,8 @@ export interface UsersCollection {
 	relations: {
 		'games(dms)': GamesCollection[];
 		'games(players)': GamesCollection[];
+		'characters(owner)': CharactersCollection[];
+		'chat(sender)': ChatCollection[];
 	};
 }
 
@@ -201,6 +201,8 @@ export interface GamesCollection {
 	relations: {
 		dms: UsersCollection[];
 		players: UsersCollection[];
+		'characters(game)': CharactersCollection[];
+		'chat(game)': ChatCollection[];
 	};
 }
 
@@ -238,15 +240,24 @@ export interface Test1Collection {
 
 export interface CharactersResponse extends BaseCollectionResponse {
 	collectionName: 'characters';
+	game: string;
+	owner: string;
 	name: string;
+	race: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
 }
 
 export interface CharactersCreate extends BaseCollectionCreate {
+	game?: string;
+	owner?: string;
 	name?: string;
+	race: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
 }
 
 export interface CharactersUpdate extends BaseCollectionUpdate {
+	game?: string;
+	owner?: string;
 	name?: string;
+	race?: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
 }
 
 export interface CharactersCollection {
@@ -256,7 +267,44 @@ export interface CharactersCollection {
 	response: CharactersResponse;
 	create: CharactersCreate;
 	update: CharactersUpdate;
-	relations: Record<string, never>;
+	relations: {
+		game: GamesCollection;
+		owner: UsersCollection;
+	};
+}
+
+// ===== chat =====
+
+export interface ChatResponse extends BaseCollectionResponse {
+	collectionName: 'chat';
+	game: string;
+	sender: string;
+	content: string;
+}
+
+export interface ChatCreate extends BaseCollectionCreate {
+	game?: string;
+	sender?: string;
+	content?: string;
+}
+
+export interface ChatUpdate extends BaseCollectionUpdate {
+	game?: string;
+	sender?: string;
+	content?: string;
+}
+
+export interface ChatCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'chat';
+	response: ChatResponse;
+	create: ChatCreate;
+	update: ChatUpdate;
+	relations: {
+		game: GamesCollection;
+		sender: UsersCollection;
+	};
 }
 
 // ===== Schema =====
@@ -266,4 +314,5 @@ export type Schema = {
 	games: GamesCollection;
 	test1: Test1Collection;
 	characters: CharactersCollection;
+	chat: ChatCollection;
 };

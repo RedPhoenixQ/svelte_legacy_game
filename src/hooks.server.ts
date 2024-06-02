@@ -4,7 +4,7 @@ import { router } from '$lib/trpc/router';
 import type { Handle } from '@sveltejs/kit';
 import { createTRPCHandle } from 'trpc-sveltekit';
 import { TypedPocketBase } from 'typed-pocketbase';
-import type { Schema } from './pocketbase_schema';
+import type { Schema } from '$lib/schema';
 
 const trpcHandle: Handle = createTRPCHandle({ router, createContext });
 

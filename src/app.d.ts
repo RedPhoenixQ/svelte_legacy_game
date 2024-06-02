@@ -1,5 +1,5 @@
 import { TypedPocketBase } from 'typed-pocketbase';
-import type { Schema } from './pocketbase_schema';
+import type { Schema } from './lib/schema';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
