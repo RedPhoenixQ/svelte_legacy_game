@@ -7,7 +7,8 @@ export async function load({ params, locals }) {
 			select: {
 				expand: {
 					dms: true,
-					players: true
+					players: true,
+					active_board: true
 				}
 			}
 		});
@@ -17,7 +18,13 @@ export async function load({ params, locals }) {
 			message: 'The game does not exist or you do not have access to it'
 		});
 	}
-	return {
-		game
+
+	const data = {
+		game,
+		dms: game.expand!.dms,
+		players: game.expand!.players,
+		active_board: game.expand!['active_board']
 	};
+	delete game.expand;
+	return data;
 }
