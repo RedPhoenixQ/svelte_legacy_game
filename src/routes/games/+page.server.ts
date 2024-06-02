@@ -1,9 +1,8 @@
-import { error } from '@sveltejs/kit';
+import { authError } from '$lib/error.js';
 
 export async function load({ locals }) {
 	if (!locals.pb.authStore.isValid) {
-		// TODO: reroute to some login page
-		error(403, 'You must be logged in to view games');
+		authError('You must be logged in to view games');
 	}
 
 	const games = await locals.pb.from('games').getFullList();

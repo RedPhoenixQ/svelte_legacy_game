@@ -1,6 +1,11 @@
+import { authError } from '$lib/error.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, locals }) {
+	if (!locals.pb.authStore.isValid) {
+		authError('You must be logged in to play a game');
+	}
+
 	let game;
 	try {
 		game = await locals.pb.from('games').getOne(params.game_id, {
@@ -14,9 +19,7 @@ export async function load({ params, locals }) {
 		});
 	} catch (err) {
 		console.error(err);
-		error(403, {
-			message: 'The game does not exist or you do not have access to it'
-		});
+		error(403, 'The game does not exist or you do not have access to it');
 	}
 
 	const data = {

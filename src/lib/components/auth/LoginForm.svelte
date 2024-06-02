@@ -2,6 +2,12 @@
 	import { page } from '$app/stores';
 	import { pb } from '$lib/pb';
 	import { trpc } from '$lib/trpc/client';
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher<{
+		login: undefined
+	}>();
+
 
 	async function handleLogin(event: SubmitEvent) {
 		const form = event.target as HTMLFormElement;
@@ -15,6 +21,7 @@
 		});
 		pb.authStore.save(auth.token, auth.record);
 		console.debug('AuthStore after login', pb.authStore);
+		dispatch("login")
 		form.reset();
 	}
 </script>
