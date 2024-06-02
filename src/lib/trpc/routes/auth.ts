@@ -15,5 +15,8 @@ export const authRouter = t.router({
 		console.log('Logged in as ', ctx.event.locals.pb.authStore.model);
 
 		return auth;
+	}),
+	logout: t.procedure.mutation(({ ctx }) => {
+		ctx.event.locals.pb.authStore.clear();
 	})
 });
