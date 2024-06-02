@@ -163,6 +163,7 @@ export interface UsersCollection {
 		'games(players)': GamesCollection[];
 		'characters(owner)': CharactersCollection[];
 		'chat(sender)': ChatCollection[];
+		'dice_roll(rolled_by)': DiceRollCollection[];
 	};
 }
 
@@ -203,6 +204,7 @@ export interface GamesCollection {
 		players: UsersCollection[];
 		'characters(game)': CharactersCollection[];
 		'chat(game)': ChatCollection[];
+		'dice_roll(game)': DiceRollCollection[];
 	};
 }
 
@@ -307,6 +309,47 @@ export interface ChatCollection {
 	};
 }
 
+// ===== dice_roll =====
+
+export interface DiceRollResponse extends BaseCollectionResponse {
+	collectionName: 'dice_roll';
+	game: string;
+	rolled_by: string;
+	sides: number;
+	roll: number;
+}
+
+export interface DiceRollCreate extends BaseCollectionCreate {
+	game: string;
+	rolled_by: string;
+	sides: number;
+	roll?: number;
+}
+
+export interface DiceRollUpdate extends BaseCollectionUpdate {
+	game?: string;
+	rolled_by?: string;
+	sides?: number;
+	'sides+'?: number;
+	'sides-'?: number;
+	roll?: number;
+	'roll+'?: number;
+	'roll-'?: number;
+}
+
+export interface DiceRollCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'dice_roll';
+	response: DiceRollResponse;
+	create: DiceRollCreate;
+	update: DiceRollUpdate;
+	relations: {
+		game: GamesCollection;
+		rolled_by: UsersCollection;
+	};
+}
+
 // ===== Schema =====
 
 export type Schema = {
@@ -315,4 +358,5 @@ export type Schema = {
 	test1: Test1Collection;
 	characters: CharactersCollection;
 	chat: ChatCollection;
+	dice_roll: DiceRollCollection;
 };
