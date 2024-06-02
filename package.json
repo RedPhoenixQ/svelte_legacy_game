@@ -37,6 +37,7 @@
 	"dependencies": {
 		"@trpc/client": "^10.45.2",
 		"@trpc/server": "^10.45.2",
+		"panzoom": "^9.4.3",
 		"pocketbase": "^0.21.3",
 		"trpc-sveltekit": "^3.6.1",
 		"typed-pocketbase": "^0.1.1",
