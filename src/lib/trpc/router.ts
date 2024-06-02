@@ -2,9 +2,11 @@ import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 import { test } from './routes/test';
 import { t } from './t';
 import { authRouter } from './routes/auth';
+import { dice } from './routes/dice';
 
 export const router = t.router({
 	auth: authRouter,
+	dice,
 	test,
 	greeting: t.procedure.query(async () => {
 		return `Hello tRPC v11 @ ${new Date().toLocaleTimeString()}`;
