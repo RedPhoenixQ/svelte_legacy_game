@@ -1,4 +1,5 @@
 import { PUBLIC_PB_URL } from '$env/static/public';
-import PocketBase from 'pocketbase';
+import { TypedPocketBase } from 'typed-pocketbase';
+import type { Schema } from '../pocketbase_schema';
 
-export const pb = new PocketBase(PUBLIC_PB_URL);
+export const pb = new TypedPocketBase<Schema>(PUBLIC_PB_URL);

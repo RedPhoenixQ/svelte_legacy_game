@@ -36,3 +36,11 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+## Generating Schema
+
+To generate the schema for `typed-pocketbase` run `npm run schema`.
+Make sure that the environment variables `PUBLIC_PB_URL`, `POCKETBASE_EMAIL`
+and `POCKETBASE_PASSWORD` are available and lead to a admin account.
+
+To easily load a .env file, use `npx @dotenvx/dotenvx run -- npm run schema`
