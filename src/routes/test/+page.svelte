@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { pb } from '$lib/pb';
 	import { onMount } from 'svelte';
-	import type { Test1 } from './+page';
 
 	export let data;
 
 	let test1 = data.test1;
 	onMount(() => {
-		pb.collection<Test1>('test1').subscribe(
+		pb.from('test1').subscribe(
 			'*',
 			(args) => {
 				console.log(args);
