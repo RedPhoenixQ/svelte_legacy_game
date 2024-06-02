@@ -4,6 +4,7 @@
 	import { trpc } from '$lib/trpc/client';
 
 	async function logout() {
+		// TODO: Handle error. Show message or send event
 		await trpc($page).auth.logout.mutate();
 		pb.authStore.clear();
 		console.log('Logged out successfully');

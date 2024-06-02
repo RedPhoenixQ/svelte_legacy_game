@@ -8,6 +8,7 @@
 		const data = new FormData(form);
 		const username = data.get('username')?.toString() ?? '';
 		const password = data.get('password')?.toString() ?? '';
+		// TODO: Handle error. Show message or send event
 		const auth = await trpc($page).auth.login.mutate({
 			username,
 			password
