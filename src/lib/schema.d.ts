@@ -174,12 +174,14 @@ export interface GamesResponse extends BaseCollectionResponse {
 	dms: Array<string>;
 	players: Array<string>;
 	name: string;
+	active_board: string;
 }
 
 export interface GamesCreate extends BaseCollectionCreate {
 	dms: MaybeArray<string>;
 	players?: MaybeArray<string>;
 	name: string;
+	active_board?: string;
 }
 
 export interface GamesUpdate extends BaseCollectionUpdate {
@@ -190,6 +192,7 @@ export interface GamesUpdate extends BaseCollectionUpdate {
 	'players+'?: MaybeArray<string>;
 	'players-'?: MaybeArray<string>;
 	name?: string;
+	active_board?: string;
 }
 
 export interface GamesCollection {
@@ -202,9 +205,11 @@ export interface GamesCollection {
 	relations: {
 		dms: UsersCollection[];
 		players: UsersCollection[];
+		active_board: BoardCollection;
 		'characters(game)': CharactersCollection[];
 		'chat(game)': ChatCollection[];
 		'dice_roll(game)': DiceRollCollection[];
+		'board(game)': BoardCollection[];
 	};
 }
 
@@ -350,6 +355,72 @@ export interface DiceRollCollection {
 	};
 }
 
+// ===== board =====
+
+export interface BoardResponse extends BaseCollectionResponse {
+	collectionName: 'board';
+	game: string;
+}
+
+export interface BoardCreate extends BaseCollectionCreate {
+	game: string;
+}
+
+export interface BoardUpdate extends BaseCollectionUpdate {
+	game?: string;
+}
+
+export interface BoardCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'board';
+	response: BoardResponse;
+	create: BoardCreate;
+	update: BoardUpdate;
+	relations: {
+		'games(active_board)': GamesCollection[];
+		game: GamesCollection;
+		'token(board)': TokenCollection[];
+	};
+}
+
+// ===== token =====
+
+export interface TokenResponse extends BaseCollectionResponse {
+	collectionName: 'token';
+	board: string;
+	x: number;
+	y: number;
+}
+
+export interface TokenCreate extends BaseCollectionCreate {
+	board: string;
+	x?: number;
+	y?: number;
+}
+
+export interface TokenUpdate extends BaseCollectionUpdate {
+	board?: string;
+	x?: number;
+	'x+'?: number;
+	'x-'?: number;
+	y?: number;
+	'y+'?: number;
+	'y-'?: number;
+}
+
+export interface TokenCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'token';
+	response: TokenResponse;
+	create: TokenCreate;
+	update: TokenUpdate;
+	relations: {
+		board: BoardCollection;
+	};
+}
+
 // ===== Schema =====
 
 export type Schema = {
@@ -359,4 +430,6 @@ export type Schema = {
 	characters: CharactersCollection;
 	chat: ChatCollection;
 	dice_roll: DiceRollCollection;
+	board: BoardCollection;
+	token: TokenCollection;
 };
