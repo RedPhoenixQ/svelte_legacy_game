@@ -83,16 +83,20 @@
 	}
 
 	$: if (browser) attachBoard(game.active_board);
+
+	let isGrabbing = false;
 </script>
 
-<div class="h-screen overflow-hidden bg-blue-400">
-	<PanZoom class="bg-gray-400 size-64" bounds={true} autocenter={true}>
+<div class="h-screen overflow-hidden bg-blue-400" style={isGrabbing ? 'cursor : grabbing;' : ''}>
+	<PanZoom class="size-64 bg-gray-400" bounds={true} autocenter={true}>
 		{#each tokens as token}
 			<Movable
 				x={token.x}
 				y={token.y}
 				class="size-10 bg-red-500"
+				on:startMove={() => (isGrabbing = true)}
 				on:endMove={(event) => {
+					isGrabbing = false;
 					pb.from('token').update(token.id, event.detail);
 				}}>{token.id}</Movable
 			>

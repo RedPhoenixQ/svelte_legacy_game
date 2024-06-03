@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
-	import { getPanZoomCtx, pageToBoard, type XYPos } from '.';
+	import { createEventDispatcher } from 'svelte';
+	import { getPanZoomCtx, type XYPos } from '.';
 
 	let className: string = '';
 	export { className as class };
 	export let x: number;
 	export let y: number;
+	export let disabled = false;
 
 	const panzoom = getPanZoomCtx();
 
@@ -30,6 +31,7 @@
 	}
 
 	function handlePointerDown(event: PointerEvent) {
+		if (disabled) return;
 		event.preventDefault();
 		console.debug(event);
 
@@ -94,6 +96,7 @@
 	class="absolute {className}"
 	style:top="{y}px"
 	style:left="{x}px"
+	style={disabled ? '' : moving ? 'cursor : grabbing;' : 'cursor : grab;'}
 	on:pointerdown={handlePointerDown}
 	{...$$restProps}
 >
