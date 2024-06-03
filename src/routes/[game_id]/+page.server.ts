@@ -13,7 +13,7 @@ export async function load({ params, locals }) {
 				expand: {
 					dms: true,
 					players: true,
-					active_board: true
+					'characters(game)': true
 				}
 			}
 		});
@@ -24,9 +24,9 @@ export async function load({ params, locals }) {
 
 	const data = {
 		game,
-		dms: game.expand!.dms,
-		players: game.expand!.players,
-		active_board: game.expand!['active_board']
+		dms: game.expand!.dms ?? [],
+		players: game.expand!.players ?? [],
+		characters: game.expand!['characters(game)'] ?? []
 	};
 	delete game.expand;
 	return data;
