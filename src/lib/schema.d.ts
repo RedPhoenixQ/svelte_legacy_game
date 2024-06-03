@@ -256,7 +256,7 @@ export interface CharactersResponse extends BaseCollectionResponse {
 export interface CharactersCreate extends BaseCollectionCreate {
 	game?: string;
 	owner?: string;
-	name?: string;
+	name: string;
 	race: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
 }
 
@@ -277,6 +277,7 @@ export interface CharactersCollection {
 	relations: {
 		game: GamesCollection;
 		owner: UsersCollection;
+		'token(character)': TokenCollection[];
 	};
 }
 
@@ -389,18 +390,21 @@ export interface BoardCollection {
 export interface TokenResponse extends BaseCollectionResponse {
 	collectionName: 'token';
 	board: string;
+	character: string;
 	x: number;
 	y: number;
 }
 
 export interface TokenCreate extends BaseCollectionCreate {
 	board: string;
+	character?: string;
 	x?: number;
 	y?: number;
 }
 
 export interface TokenUpdate extends BaseCollectionUpdate {
 	board?: string;
+	character?: string;
 	x?: number;
 	'x+'?: number;
 	'x-'?: number;
@@ -418,6 +422,7 @@ export interface TokenCollection {
 	update: TokenUpdate;
 	relations: {
 		board: BoardCollection;
+		character: CharactersCollection;
 	};
 }
 
