@@ -1,35 +1,27 @@
 <script lang="ts">
 	import { pb } from '$lib/pb';
+	import { lt } from 'typed-pocketbase';
 	import { onMount } from 'svelte';
 
 	export let data;
 
-	let test1 = data.test1;
+	let test1 = new Map(data.test1.map((t) => [t.id, t]));
 	onMount(() => {
 		pb.from('test1').subscribe(
 			'*',
 			(args) => {
 				console.log(args);
-				switch (args.action) {
-					case 'create':
-						test1 = [...test1, args.record];
-						break;
-					case 'delete':
-						test1 = test1.filter((v) => v.id !== args.record.id);
-						break;
-					case 'update': {
-						const index = test1.findIndex((v) => v.id === args.record.id);
-						if (index <= 0) {
-							test1[index] = args.record;
-							test1 = test1;
-						}
-						break;
-					}
+				if (args.action === 'delete') {
+					test1.delete(args.record.id);
+				} else {
+					// Create and update
+					test1.set(args.record.id, args.record);
 				}
+				test1 = test1;
 			},
 			{
 				query: {
-					filter: 'number < 1000'
+					filter: lt('number', 1000)
 				}
 			}
 		);
@@ -42,8 +34,9 @@
 <form
 	on:submit|preventDefault={function (event) {
 		event.preventDefault();
-		pb.collection('test1').create({ text, number });
-		// this.reset();
+		pb.from('test1').create({ text, number });
+		// @ts-expect-error: this will be HTMLFormElement
+		this.reset();
 	}}
 >
 	<input type="text" bind:value={text} />
@@ -52,8 +45,10 @@
 </form>
 
 <ul>
-	{#each test1 as t}
+	{#each test1 as [id, t] (id)}
 		<li>
+			<hr />
+			{id}
 			<form
 				on:change|preventDefault={() => {
 					pb.collection('test1').update(t.id, t);
