@@ -13,6 +13,11 @@ export async function load({ params, locals }) {
 				expand: {
 					dms: true,
 					players: true,
+					active_board: {
+						expand: {
+							'token(board)': true
+						}
+					},
 					'characters(game)': true
 				}
 			}
@@ -26,6 +31,7 @@ export async function load({ params, locals }) {
 		game,
 		dms: game.expand!.dms ?? [],
 		players: game.expand!.players ?? [],
+		active_board: game.expand?.active_board,
 		characters: game.expand!['characters(game)'] ?? []
 	};
 	delete game.expand;
