@@ -284,6 +284,7 @@ export interface CharactersCollection {
 		game: GamesCollection;
 		owner: UsersCollection;
 		'token(character)': TokenCollection[];
+		'actionItem(character)': ActionItemCollection[];
 	};
 }
 
@@ -465,12 +466,14 @@ export interface ActionItemResponse extends BaseCollectionResponse {
 	tempName: string;
 	actionValue: number;
 	board: string;
+	character: string;
 }
 
 export interface ActionItemCreate extends BaseCollectionCreate {
 	tempName?: string;
 	actionValue?: number;
 	board?: string;
+	character?: string;
 }
 
 export interface ActionItemUpdate extends BaseCollectionUpdate {
@@ -479,6 +482,7 @@ export interface ActionItemUpdate extends BaseCollectionUpdate {
 	'actionValue+'?: number;
 	'actionValue-'?: number;
 	board?: string;
+	character?: string;
 }
 
 export interface ActionItemCollection {
@@ -490,6 +494,7 @@ export interface ActionItemCollection {
 	update: ActionItemUpdate;
 	relations: {
 		board: BoardCollection;
+		character: CharactersCollection;
 	};
 }
 
