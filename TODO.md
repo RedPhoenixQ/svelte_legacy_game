@@ -1,0 +1,6 @@
+- [ ] Create a serverside game instance
+  - This should probably work similar to the client side with subscribers
+    - Getting all needed value for every action will be to expensive
+    - Maybe use writable stores here to make game class client and server side
+- Structure game class with Character classes and make game responsible for updating class data on the correct class
+  - a Character can have their own effects, actions and position (related to token)
