@@ -3,9 +3,11 @@ import { test } from './routes/test';
 import { t } from './t';
 import { authRouter } from './routes/auth';
 import { dice } from './routes/dice';
+import { combat } from './routes/combat';
 
 export const router = t.router({
 	auth: authRouter,
+	combat,
 	dice,
 	test,
 	greeting: t.procedure.query(async () => {

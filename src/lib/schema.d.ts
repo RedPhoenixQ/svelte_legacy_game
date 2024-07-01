@@ -372,6 +372,7 @@ export interface BoardResponse extends BaseCollectionResponse {
 	gridSize: number;
 	width: number;
 	height: number;
+	time: number;
 }
 
 export interface BoardCreate extends BaseCollectionCreate {
@@ -380,6 +381,7 @@ export interface BoardCreate extends BaseCollectionCreate {
 	gridSize: number;
 	width: number;
 	height: number;
+	time?: number;
 }
 
 export interface BoardUpdate extends BaseCollectionUpdate {
@@ -394,6 +396,9 @@ export interface BoardUpdate extends BaseCollectionUpdate {
 	height?: number;
 	'height+'?: number;
 	'height-'?: number;
+	time?: number;
+	'time+'?: number;
+	'time-'?: number;
 }
 
 export interface BoardCollection {

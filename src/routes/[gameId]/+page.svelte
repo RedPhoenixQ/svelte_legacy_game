@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import Board from '../../lib/components/board/Board.svelte';
 	import ActionList from './ActionList.svelte';
+	import ActionButtons from './ActionButtons.svelte';
 	import { initStores, deinitStores, game, board, characters, tokens, isDm } from './stores';
 	import * as Resizable from '$lib/components/ui/resizable';
 
@@ -27,7 +28,9 @@
 					<ActionList />
 				</Resizable.Pane>
 				<Resizable.Handle withHandle />
-				<Resizable.Pane collapsible defaultSize={40} minSize={20}>Actions</Resizable.Pane>
+				<Resizable.Pane collapsible defaultSize={40} minSize={20}>
+					<ActionButtons />
+				</Resizable.Pane>
 			</Resizable.PaneGroup>
 		</Resizable.Pane>
 		<Resizable.Handle withHandle />
