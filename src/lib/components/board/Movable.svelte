@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { DEFAULT_GRID_SIZE, getPanZoomCtx, type XYPos } from '.';
+	import { tweened } from 'svelte/motion';
+	import { cubicInOut } from 'svelte/easing';
 
 	let className: string = '';
 	export { className as class };
-	export let x: number;
-	export let y: number;
+	export let position: XYPos;
 	export let disabled = false;
 
 	const panzoom = getPanZoomCtx();
@@ -23,6 +24,14 @@
 	let moving = false;
 	let canceled = false;
 	let prevPos: XYPos = { x: 0, y: 0 };
+	let currentPos: XYPos = { ...position };
+	let x = tweened(position.x, { easing: cubicInOut, duration: 0 });
+	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
+
+	$: {
+		x.set(position.x, { duration: 500 });
+		y.set(position.y, { duration: 500 });
+	}
 
 	function reset() {
 		hasClicked = false;
@@ -57,11 +66,14 @@
 		if (moving) {
 			if (!event.shiftKey) {
 				// Snap to grid
-				x = Math.round(x / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
-				y = Math.round(y / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
+				currentPos.x = Math.round(currentPos.x / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
+				currentPos.y = Math.round(currentPos.y / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
 			}
 
-			dispatch('endMove', { x, y });
+			$x = currentPos.x;
+			$y = currentPos.y;
+
+			dispatch('endMove', { ...currentPos });
 		}
 		reset();
 	}
@@ -73,17 +85,20 @@
 
 		const transform = $panzoom.instance.getTransform();
 
-		x += (event.pageX - prevPos.x) / transform.scale;
-		y += (event.pageY - prevPos.y) / transform.scale;
+		currentPos.x += (event.pageX - prevPos.x) / transform.scale;
+		currentPos.y += (event.pageY - prevPos.y) / transform.scale;
+
+		$x = currentPos.x;
+		$y = currentPos.y;
 
 		prevPos.x = event.pageX;
 		prevPos.y = event.pageY;
 
 		if (!moving) {
 			moving = true;
-			dispatch('startMove', { x, y });
+			dispatch('startMove', { ...currentPos });
 		}
-		dispatch('move', { x, y });
+		dispatch('move', { ...currentPos });
 	}
 	function handlePointerCancel(event: PointerEvent) {
 		if (!hasClicked) return;
@@ -100,8 +115,8 @@
 
 <div
 	class="absolute {className}"
-	style:top="{y}px"
-	style:left="{x}px"
+	style:top="{$y}px"
+	style:left="{$x}px"
 	style={disabled ? '' : moving ? 'cursor : grabbing;' : 'cursor : grab;'}
 	on:pointerdown={handlePointerDown}
 	{...$$restProps}

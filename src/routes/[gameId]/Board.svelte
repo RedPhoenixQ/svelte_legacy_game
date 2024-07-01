@@ -32,8 +32,7 @@
 		{#each tokens as [id, token] (id)}
 			{@const character = $characters.get(token.character)}
 			<Movable
-				x={token.x}
-				y={token.y}
+				position={token}
 				disabled={!$isDm && character?.owner !== $user?.id}
 				class="size-[50px] bg-red-500"
 				on:startMove={() => (isGrabbing = true)}
