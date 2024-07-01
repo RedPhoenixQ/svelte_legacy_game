@@ -19,17 +19,27 @@
 </script>
 
 <main class="grid h-screen max-h-screen">
-	<Resizable.PaneGroup direction="horizontal">
-		<Resizable.Pane defaultSize={3}>
+	<Resizable.PaneGroup direction="horizontal" autoSaveId="gameMainLayout">
+		<Resizable.Pane collapsible defaultSize={25} minSize={10}>
+			<Resizable.PaneGroup direction="vertical" autoSaveId="gameLeftLayout">
+				<Resizable.Pane defaultSize={60}>Turn order</Resizable.Pane>
+				<Resizable.Handle withHandle />
+				<Resizable.Pane collapsible defaultSize={40} minSize={20}>Actions</Resizable.Pane>
+			</Resizable.PaneGroup>
+		</Resizable.Pane>
+		<Resizable.Handle withHandle />
+		<Resizable.Pane defaultSize={50}>
 			{#if $board}
 				<Board board={$board} bind:tokens={$tokens} />
 			{:else}
 				No board active
 			{/if}
 		</Resizable.Pane>
-		<Resizable.Handle />
+		<Resizable.Handle withHandle />
 		<Resizable.Pane
-			defaultSize={1}
+			collapsible
+			defaultSize={25}
+			minSize={10}
 			class="grid grid-rows-2"
 			style="grid-template-rows: auto minmax(0, 1fr);"
 		>
