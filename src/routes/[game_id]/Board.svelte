@@ -21,6 +21,13 @@
 			height={board.height * gridScaleFactor}
 			class="opacity-50"
 		/>
+		<!-- <div
+			class="absolute inset-0"
+			style="background-size: 50px 50px;
+  background-image:
+    linear-gradient(to right, white 1px, transparent 1px),
+    linear-gradient(to bottom, white 1px, transparent 1px);"
+		></div> -->
 		{#each tokens as [id, token] (id)}
 			{@const character = $characters.get(token.character)}
 			<Movable
