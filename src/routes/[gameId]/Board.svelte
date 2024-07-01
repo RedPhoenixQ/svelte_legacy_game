@@ -12,7 +12,7 @@
 	let isGrabbing = false;
 </script>
 
-<div class="h-screen overflow-hidden bg-background" style={isGrabbing ? 'cursor : grabbing;' : ''}>
+<div class="size-full bg-background" style={isGrabbing ? 'cursor : grabbing;' : ''}>
 	<PanZoom class="size-max" bounds={true} autocenter={true}>
 		<img
 			src={pb.getFileUrl(board, board.background)}
