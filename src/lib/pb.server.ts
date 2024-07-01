@@ -8,4 +8,4 @@ async function getAdminAuth() {
 
 getAdminAuth();
 
-export { pb as server_pb };
+export { pb as serverPb };

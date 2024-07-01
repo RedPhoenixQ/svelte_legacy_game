@@ -20,12 +20,12 @@ export const authRouter = t.router({
 	register: t.procedure
 		.input(z.object({ username, password, passwordConfirm: password }))
 		.mutation(async ({ ctx, input }) => {
-			const new_user = await ctx.event.locals.pb.from('users').create({
+			const newUser = await ctx.event.locals.pb.from('users').create({
 				username: input.username,
 				name: input.username,
 				password: input.password,
 				passwordConfirm: input.passwordConfirm
 			});
-			return new_user;
+			return newUser;
 		})
 });

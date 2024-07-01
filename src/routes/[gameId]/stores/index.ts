@@ -17,15 +17,15 @@ export const players = writable(new Map<string, UsersResponse>());
 players.subscribe(($players) => console.debug('store players', $players));
 
 let unsubs: UnsubscribeFunc[] = [];
-let ignore_sub = false;
+let ignoreSub = false;
 export async function initStores(data: {
 	game: GamesResponse;
 	dms: UsersResponse[];
 	players: UsersResponse[];
 	characters: CharactersResponse[];
-	active_board?: BoardResponse;
+	activeBoard?: BoardResponse;
 }) {
-	ignore_sub = true;
+	ignoreSub = true;
 	game.set(data.game);
 	if (data.dms !== undefined) {
 		dms.set(new Map(data.dms.map((r) => [r.id, r])));
@@ -34,10 +34,10 @@ export async function initStores(data: {
 		players.set(new Map(data.players.map((r) => [r.id, r])));
 	}
 	initCharacters(data.game.id, data.characters ?? []);
-	initBoard(data.active_board);
+	initBoard(data.activeBoard);
 
 	await Promise.allSettled(unsubs.map((unsub) => unsub?.()));
-	ignore_sub = false;
+	ignoreSub = false;
 	if (!browser) return;
 	unsubs = await Promise.all([
 		pb.from('games').subscribe(data.game.id, handleGame),
@@ -51,14 +51,14 @@ export async function deinitStores() {
 }
 
 async function handleGame({ action, record }: RecordSubscription<GamesResponse>) {
-	if (ignore_sub) return;
-	console.debug('Game sub', action, record);
+	if (ignoreSub) return;
+	console.debug('sub game', action, record);
 
 	switch (action) {
 		case 'update':
 			game.update(($game) => {
-				if ($game.active_board !== record.active_board) {
-					initBoard(record.active_board);
+				if ($game.activeBoard !== record.activeBoard) {
+					initBoard(record.activeBoard);
 				}
 				// TODO: Handle adding/removing players and dms
 				return record;

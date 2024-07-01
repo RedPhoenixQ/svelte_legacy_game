@@ -4,21 +4,21 @@
 	import { trpc } from '$lib/trpc/client';
 
 	async function roll() {
-		last_roll = await trpc($page).dice.roll.mutate({
-			game: $page.params.game_id,
+		lastRoll = await trpc($page).dice.roll.mutate({
+			game: $page.params.gameId,
 			sides
 		});
 	}
 
-	let last_roll: DiceRollResponse | undefined;
+	let lastRoll: DiceRollResponse | undefined;
 
 	let sides = 20;
 </script>
 
 <div>
-	{#if last_roll}
+	{#if lastRoll}
 		<div>
-			{last_roll.sides} rolled <b>{last_roll.roll}</b>
+			{lastRoll.sides} rolled <b>{lastRoll.roll}</b>
 		</div>
 	{/if}
 	<input type="number" bind:value={sides} />

@@ -6,7 +6,7 @@ import type { Schema } from './lib/schema';
 declare global {
 	namespace App {
 		interface Error {
-			needs_auth?: boolean;
+			needsAuth?: boolean;
 		}
 		interface Locals {
 			pb: TypedPocketBase<Schema>;

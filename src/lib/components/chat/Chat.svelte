@@ -2,10 +2,10 @@
 	import ChatFeed from './ChatFeed.svelte';
 	import ChatInput from './ChatInput.svelte';
 
-	export let game_id: string;
+	export let gameId: string;
 </script>
 
 <div class="grid" style="grid-template-rows: 1fr auto;">
-	<ChatFeed {game_id} />
-	<ChatInput {game_id} />
+	<ChatFeed {gameId} />
+	<ChatInput {gameId} />
 </div>

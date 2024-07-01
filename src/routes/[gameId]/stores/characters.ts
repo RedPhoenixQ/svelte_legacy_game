@@ -9,19 +9,19 @@ export const characters: Writable<Map<string, CharactersResponse>> = writable(ne
 characters.subscribe(($characters) => console.debug('store characters', $characters));
 
 let unsubs: UnsubscribeFunc[] = [];
-let ignore_sub = false;
+let ignoreSub = false;
 
 export async function initCharacters(
 	gameId: string,
 	charactersOrId: string | CharactersResponse[]
 ) {
-	ignore_sub = true;
+	ignoreSub = true;
 
 	if (typeof charactersOrId === 'string') {
-		const new_characters = await pb.from('characters').getFullList({
+		const newCharacters = await pb.from('characters').getFullList({
 			filter: eq('game.id', gameId)
 		});
-		characters.set(new Map(new_characters.map((token) => [token.id, token])));
+		characters.set(new Map(newCharacters.map((token) => [token.id, token])));
 	} else if (!charactersOrId.length) {
 		characters.update(($characters) => {
 			$characters.clear();
@@ -32,7 +32,7 @@ export async function initCharacters(
 	}
 
 	Promise.allSettled(unsubs.map((unsub) => unsub?.()));
-	ignore_sub = false;
+	ignoreSub = false;
 	if (!browser) return;
 
 	unsubs = await Promise.all([
@@ -49,7 +49,7 @@ export async function deinitCharacters() {
 }
 
 function handleCharacters({ action, record }: RecordSubscription<CharactersResponse>) {
-	if (ignore_sub) return;
+	if (ignoreSub) return;
 	console.debug('sub characters', action, record);
 
 	if (action === 'delete') {

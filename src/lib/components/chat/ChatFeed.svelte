@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import type { ChatResponse } from '$lib/schema';
 
-	export let game_id: string;
+	export let gameId: string;
 	let messages: ChatResponse[] = [];
 
 	function sortMessages() {
@@ -12,7 +12,7 @@
 
 	onMount(async () => {
 		const list = await pb.from('chat').getList(0, 20, {
-			filter: ['game', '=', game_id],
+			filter: ['game', '=', gameId],
 			sort: '-created'
 		});
 		messages = list.items;
@@ -47,7 +47,7 @@
 			},
 			{
 				query: {
-					filter: `game = '${game_id}'`
+					filter: `game = '${gameId}'`
 				}
 			}
 		);

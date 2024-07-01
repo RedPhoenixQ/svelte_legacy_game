@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { authedProcedure, t } from '../t';
-import { server_pb } from '$lib/pb.server';
+import { serverPb } from '$lib/pb.server';
 
 export const dice = t.router({
 	roll: authedProcedure
@@ -13,13 +13,13 @@ export const dice = t.router({
 		.mutation(async ({ ctx, input }) => {
 			const roll = Math.floor(Math.random() * input.sides) + 1;
 
-			const dice_roll = await server_pb.from('dice_roll').create({
+			const diceRoll = await serverPb.from('diceRoll').create({
 				game: input.game,
-				rolled_by: ctx.user.id,
+				rolledBy: ctx.user.id,
 				sides: input.sides,
 				roll
 			});
 
-			return dice_roll;
+			return diceRoll;
 		})
 });

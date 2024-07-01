@@ -2,7 +2,7 @@
 	import { pb } from '$lib/pb';
 	import { createEventDispatcher } from 'svelte';
 
-	export let game_id: string;
+	export let gameId: string;
 
 	const dispatch = createEventDispatcher<{
 		send: string;
@@ -16,7 +16,7 @@
 		const form = event.target as HTMLFormElement;
 
 		pb.from('chat').create({
-			game: game_id,
+			game: gameId,
 			sender: pb.authStore.model!.id,
 			content: value
 		});

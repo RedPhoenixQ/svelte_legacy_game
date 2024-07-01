@@ -47,7 +47,7 @@
 			style="grid-template-rows: auto minmax(0, 1fr);"
 		>
 			<RollDice />
-			<Chat game_id={$page.params.game_id} />
+			<Chat gameId={$page.params.gameId} />
 		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </main>

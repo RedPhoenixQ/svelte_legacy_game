@@ -163,7 +163,7 @@ export interface UsersCollection {
 		'games(players)': GamesCollection[];
 		'characters(owner)': CharactersCollection[];
 		'chat(sender)': ChatCollection[];
-		'dice_roll(rolled_by)': DiceRollCollection[];
+		'diceRoll(rolledBy)': DiceRollCollection[];
 	};
 }
 
@@ -174,14 +174,14 @@ export interface GamesResponse extends BaseCollectionResponse {
 	dms: Array<string>;
 	players: Array<string>;
 	name: string;
-	active_board: string;
+	activeBoard: string;
 }
 
 export interface GamesCreate extends BaseCollectionCreate {
 	dms: MaybeArray<string>;
 	players?: MaybeArray<string>;
 	name: string;
-	active_board?: string;
+	activeBoard?: string;
 }
 
 export interface GamesUpdate extends BaseCollectionUpdate {
@@ -192,7 +192,7 @@ export interface GamesUpdate extends BaseCollectionUpdate {
 	'players+'?: MaybeArray<string>;
 	'players-'?: MaybeArray<string>;
 	name?: string;
-	active_board?: string;
+	activeBoard?: string;
 }
 
 export interface GamesCollection {
@@ -205,10 +205,10 @@ export interface GamesCollection {
 	relations: {
 		dms: UsersCollection[];
 		players: UsersCollection[];
-		active_board: BoardCollection;
+		activeBoard: BoardCollection;
 		'characters(game)': CharactersCollection[];
 		'chat(game)': ChatCollection[];
-		'dice_roll(game)': DiceRollCollection[];
+		'diceRoll(game)': DiceRollCollection[];
 		'board(game)': BoardCollection[];
 	};
 }
@@ -315,26 +315,26 @@ export interface ChatCollection {
 	};
 }
 
-// ===== dice_roll =====
+// ===== diceRoll =====
 
 export interface DiceRollResponse extends BaseCollectionResponse {
-	collectionName: 'dice_roll';
+	collectionName: 'diceRoll';
 	game: string;
-	rolled_by: string;
+	rolledBy: string;
 	sides: number;
 	roll: number;
 }
 
 export interface DiceRollCreate extends BaseCollectionCreate {
 	game: string;
-	rolled_by: string;
+	rolledBy: string;
 	sides: number;
 	roll?: number;
 }
 
 export interface DiceRollUpdate extends BaseCollectionUpdate {
 	game?: string;
-	rolled_by?: string;
+	rolledBy?: string;
 	sides?: number;
 	'sides+'?: number;
 	'sides-'?: number;
@@ -346,13 +346,13 @@ export interface DiceRollUpdate extends BaseCollectionUpdate {
 export interface DiceRollCollection {
 	type: 'base';
 	collectionId: string;
-	collectionName: 'dice_roll';
+	collectionName: 'diceRoll';
 	response: DiceRollResponse;
 	create: DiceRollCreate;
 	update: DiceRollUpdate;
 	relations: {
 		game: GamesCollection;
-		rolled_by: UsersCollection;
+		rolledBy: UsersCollection;
 	};
 }
 
@@ -402,7 +402,7 @@ export interface BoardCollection {
 	create: BoardCreate;
 	update: BoardUpdate;
 	relations: {
-		'games(active_board)': GamesCollection[];
+		'games(activeBoard)': GamesCollection[];
 		game: GamesCollection;
 		order: TokenCollection[];
 		'token(board)': TokenCollection[];
@@ -495,7 +495,7 @@ export type Schema = {
 	test1: Test1Collection;
 	characters: CharactersCollection;
 	chat: ChatCollection;
-	dice_roll: DiceRollCollection;
+	diceRoll: DiceRollCollection;
 	board: BoardCollection;
 	token: TokenCollection;
 	actionItem: ActionItemCollection;

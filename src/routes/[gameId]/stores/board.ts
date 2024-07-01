@@ -13,7 +13,7 @@ export const actionItems: Writable<ActionItemResponse[]> = writable([]);
 actionItems.subscribe(($actionItems) => console.debug('store actionItems', $actionItems));
 
 let unsubs: UnsubscribeFunc[] = [];
-let ignore_sub = false;
+let ignoreSub = false;
 export async function initBoard(
 	boardOrId:
 		| undefined
@@ -25,13 +25,13 @@ export async function initBoard(
 				};
 		  })
 ) {
-	ignore_sub = true;
+	ignoreSub = true;
 
 	if (!boardOrId) {
 		board.set(undefined);
 		initTokens([]);
 	} else if (typeof boardOrId === 'string') {
-		const new_board = await pb.from('board').getOne(boardOrId, {
+		const newBoard = await pb.from('board').getOne(boardOrId, {
 			select: {
 				expand: {
 					'token(board)': true,
@@ -39,9 +39,9 @@ export async function initBoard(
 				}
 			}
 		});
-		board.set(new_board);
-		initTokens(new_board.expand?.['token(board)'] ?? []);
-		initActionItems(new_board.expand?.['actionItem(board)'] ?? []);
+		board.set(newBoard);
+		initTokens(newBoard.expand?.['token(board)'] ?? []);
+		initActionItems(newBoard.expand?.['actionItem(board)'] ?? []);
 	} else {
 		board.set(boardOrId);
 		initTokens(boardOrId.expand?.['token(board)'] ?? boardOrId.id);
@@ -49,7 +49,7 @@ export async function initBoard(
 	}
 
 	await Promise.allSettled(unsubs.map((unsub) => unsub?.()));
-	ignore_sub = false;
+	ignoreSub = false;
 	const boardId = typeof boardOrId === 'string' ? boardOrId : boardOrId?.id;
 	if (!browser || !boardId) return;
 
@@ -70,10 +70,10 @@ export async function initBoard(
 
 export async function initTokens(tokensOrBoardId: string | TokenResponse[]) {
 	if (typeof tokensOrBoardId === 'string') {
-		const new_tokens = await pb.from('token').getFullList({
+		const newTokens = await pb.from('token').getFullList({
 			filter: eq('board.id', tokensOrBoardId)
 		});
-		tokens.set(new Map(new_tokens.map((token) => [token.id, token])));
+		tokens.set(new Map(newTokens.map((token) => [token.id, token])));
 	} else if (!tokensOrBoardId.length) {
 		tokens.update(($tokens) => {
 			$tokens.clear();
@@ -108,7 +108,7 @@ export async function deinitBoard() {
 }
 
 function handleBoard({ action, record }: RecordSubscription<BoardResponse>) {
-	if (ignore_sub) return;
+	if (ignoreSub) return;
 	console.debug('sub board', action, record);
 
 	switch (action) {
@@ -122,7 +122,7 @@ function handleBoard({ action, record }: RecordSubscription<BoardResponse>) {
 }
 
 function handleTokens({ action, record }: RecordSubscription<TokenResponse>) {
-	if (ignore_sub) return;
+	if (ignoreSub) return;
 	console.debug('sub tokens', action, record);
 
 	if (action === 'delete') {
@@ -139,7 +139,7 @@ function handleTokens({ action, record }: RecordSubscription<TokenResponse>) {
 }
 
 function handleActionItem({ action, record }: RecordSubscription<ActionItemResponse>) {
-	if (ignore_sub) return;
+	if (ignoreSub) return;
 	console.debug('sub actionItem', action, record);
 
 	if (action === 'delete') {

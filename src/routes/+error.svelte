@@ -4,9 +4,9 @@
 	import { page } from '$app/stores';
 </script>
 
-<h1 class="text-center text-pretty">{$page.error?.message ?? 'An error occured'}</h1>
+<h1 class="text-pretty text-center">{$page.error?.message ?? 'An error occured'}</h1>
 
-{#if $page.error?.needs_auth}
+{#if $page.error?.needsAuth}
 	<h2>Login</h2>
 	<LoginForm
 		on:login={() =>
