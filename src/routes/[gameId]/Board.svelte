@@ -3,6 +3,7 @@
 	import { pb, user } from '$lib/pb';
 	import { characters, isDm } from './stores';
 	import type { BoardResponse, TokenResponse } from '$lib/schema';
+	import TokenImg from '$lib/components/board/TokenImg.svelte';
 
 	export let board: BoardResponse;
 	export let tokens: Map<string, TokenResponse>;
@@ -42,10 +43,7 @@
 				}}
 			>
 				{#if character}
-					{@const src = character.token
-						? pb.getFileUrl(character, character.token)
-						: pb.getFileUrl(character, character.art, { thumb: '100x100' })}
-					<img {src} alt={character.name} width="100" height="100" />
+					<TokenImg {character} />
 				{/if}
 			</Movable>
 		{/each}
