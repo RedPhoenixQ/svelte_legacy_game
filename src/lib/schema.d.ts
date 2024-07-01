@@ -365,6 +365,7 @@ export interface BoardResponse extends BaseCollectionResponse {
 	gridSize: number;
 	width: number;
 	height: number;
+	order: Array<string>;
 }
 
 export interface BoardCreate extends BaseCollectionCreate {
@@ -373,6 +374,7 @@ export interface BoardCreate extends BaseCollectionCreate {
 	gridSize: number;
 	width: number;
 	height: number;
+	order?: MaybeArray<string>;
 }
 
 export interface BoardUpdate extends BaseCollectionUpdate {
@@ -387,6 +389,9 @@ export interface BoardUpdate extends BaseCollectionUpdate {
 	height?: number;
 	'height+'?: number;
 	'height-'?: number;
+	order?: MaybeArray<string>;
+	'order+'?: MaybeArray<string>;
+	'order-'?: MaybeArray<string>;
 }
 
 export interface BoardCollection {
@@ -399,7 +404,9 @@ export interface BoardCollection {
 	relations: {
 		'games(active_board)': GamesCollection[];
 		game: GamesCollection;
+		order: TokenCollection[];
 		'token(board)': TokenCollection[];
+		'actionItem(board)': ActionItemCollection[];
 	};
 }
 
@@ -439,8 +446,44 @@ export interface TokenCollection {
 	create: TokenCreate;
 	update: TokenUpdate;
 	relations: {
+		'board(order)': BoardCollection[];
 		board: BoardCollection;
 		character: CharactersCollection;
+	};
+}
+
+// ===== actionItem =====
+
+export interface ActionItemResponse extends BaseCollectionResponse {
+	collectionName: 'actionItem';
+	tempName: string;
+	actionValue: number;
+	board: string;
+}
+
+export interface ActionItemCreate extends BaseCollectionCreate {
+	tempName?: string;
+	actionValue?: number;
+	board?: string;
+}
+
+export interface ActionItemUpdate extends BaseCollectionUpdate {
+	tempName?: string;
+	actionValue?: number;
+	'actionValue+'?: number;
+	'actionValue-'?: number;
+	board?: string;
+}
+
+export interface ActionItemCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'actionItem';
+	response: ActionItemResponse;
+	create: ActionItemCreate;
+	update: ActionItemUpdate;
+	relations: {
+		board: BoardCollection;
 	};
 }
 
@@ -455,4 +498,5 @@ export type Schema = {
 	dice_roll: DiceRollCollection;
 	board: BoardCollection;
 	token: TokenCollection;
+	actionItem: ActionItemCollection;
 };

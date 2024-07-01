@@ -1,37 +1,31 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { expoInOut } from 'svelte/easing';
-
-	let items = [
-		{ id: 1, value: 12 },
-		{ id: 2, value: 15 },
-		{ id: 3, value: 7 },
-		{ id: 4, value: 9 }
-	];
+	import { actionItems, sortActionItems } from './stores/board';
 
 	$: {
-		items.sort((a, b) => a.value - b.value);
-		items = items;
+		$actionItems.sort(sortActionItems);
+		$actionItems = $actionItems;
 	}
 </script>
 
 <ol>
-	{#each items as item (item.id)}
+	{#each $actionItems as item (item.id)}
 		<li class="flex justify-between px-2" animate:flip={{ duration: 1000, easing: expoInOut }}>
 			<button
 				on:click={() => {
-					item.value--;
-					items = items;
+					item.actionValue--;
+					$actionItems = $actionItems;
 				}}>-</button
 			>
 			<span>
-				{item.id}:
+				{item.tempName}:
 			</span>
-			{item.value}
+			{item.actionValue}
 			<button
 				on:click={() => {
-					item.value++;
-					items = items;
+					item.actionValue++;
+					$actionItems = $actionItems;
 				}}>+</button
 			>
 		</li>
