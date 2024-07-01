@@ -54,7 +54,7 @@
 	});
 </script>
 
-<ol class="flex flex-col-reverse">
+<ol class="flex flex-col-reverse overflow-y-auto p-1">
 	{#each messages as msg}
 		<li>{msg.created}: {msg.sender} - {msg.content}</li>
 	{/each}

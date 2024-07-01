@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import Board from './Board.svelte';
 	import { initStores, deinitStores, game } from './stores';
+	import * as Resizable from '$lib/components/ui/resizable';
 
 	export let data;
 	$: console.debug('page data', data);
@@ -17,12 +18,19 @@
 	});
 </script>
 
-<h1>{$game.name}</h1>
-
-<RollDice />
-
-<Board />
-
-<div class="h-screen">
-	<Chat game_id={$page.params.game_id} />
-</div>
+<main class="grid h-screen max-h-screen">
+	<Resizable.PaneGroup direction="horizontal">
+		<Resizable.Pane defaultSize={3}>
+			<Board />
+		</Resizable.Pane>
+		<Resizable.Handle />
+		<Resizable.Pane
+			defaultSize={1}
+			class="grid grid-rows-2"
+			style="grid-template-rows: auto minmax(0, 1fr);"
+		>
+			<RollDice />
+			<Chat game_id={$page.params.game_id} />
+		</Resizable.Pane>
+	</Resizable.PaneGroup>
+</main>
