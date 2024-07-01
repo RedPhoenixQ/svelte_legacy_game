@@ -41,7 +41,12 @@
 					pb.from('token').update(token.id, event.detail);
 				}}
 			>
-				{token.id}
+				{#if character}
+					{@const src = character.token
+						? pb.getFileUrl(character, character.token)
+						: pb.getFileUrl(character, character.art, { thumb: '100x100' })}
+					<img {src} alt={character.name} width="100" height="100" />
+				{/if}
 			</Movable>
 		{/each}
 	</PanZoom>

@@ -250,6 +250,8 @@ export interface CharactersResponse extends BaseCollectionResponse {
 	game: string;
 	owner: string;
 	name: string;
+	token: string;
+	art: string;
 	race: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
 }
 
@@ -257,6 +259,8 @@ export interface CharactersCreate extends BaseCollectionCreate {
 	game?: string;
 	owner?: string;
 	name: string;
+	token?: File | null;
+	art: File | null;
 	race: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
 }
 
@@ -264,6 +268,8 @@ export interface CharactersUpdate extends BaseCollectionUpdate {
 	game?: string;
 	owner?: string;
 	name?: string;
+	token?: File | null;
+	art?: File | null;
 	race?: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
 }
 
