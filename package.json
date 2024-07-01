@@ -37,6 +37,7 @@
 	"dependencies": {
 		"@trpc/client": "^10.45.2",
 		"@trpc/server": "^10.45.2",
+		"bits-ui": "^0.21.11",
 		"clsx": "^2.1.1",
 		"paneforge": "^0.0.5",
 		"panzoom": "^9.4.3",
