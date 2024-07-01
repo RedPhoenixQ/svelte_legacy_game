@@ -3,9 +3,9 @@
 	import Chat from '$lib/components/chat/Chat.svelte';
 	import RollDice from '$lib/components/dice/RollDice.svelte';
 	import { onMount } from 'svelte';
-	import Board from './Board.svelte';
+	import Board from '../../lib/components/board/Board.svelte';
 	import ActionList from './ActionList.svelte';
-	import { initStores, deinitStores, game, board, tokens } from './stores';
+	import { initStores, deinitStores, game, board, characters, tokens, isDm } from './stores';
 	import * as Resizable from '$lib/components/ui/resizable';
 
 	export let data;
@@ -33,7 +33,7 @@
 		<Resizable.Handle withHandle />
 		<Resizable.Pane defaultSize={50}>
 			{#if $board}
-				<Board board={$board} bind:tokens={$tokens} />
+				<Board board={$board} characters={$characters} moveAll={$isDm} bind:tokens={$tokens} />
 			{:else}
 				No board active
 			{/if}

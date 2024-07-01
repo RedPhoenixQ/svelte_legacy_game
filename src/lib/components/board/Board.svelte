@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { Movable, PanZoom, DEFAULT_GRID_SIZE } from '$lib/components/board';
 	import { pb, user } from '$lib/pb';
-	import { characters, isDm } from './stores';
-	import type { BoardResponse, TokenResponse } from '$lib/schema';
+	import type { BoardResponse, TokenResponse, CharactersResponse } from '$lib/schema';
 	import TokenImg from '$lib/components/board/TokenImg.svelte';
 
 	export let board: BoardResponse;
 	export let tokens: Map<string, TokenResponse>;
+	export let characters: Map<string, CharactersResponse>;
+	export let moveAll = false;
 
 	$: gridScaleFactor = DEFAULT_GRID_SIZE / board.gridSize;
 
@@ -30,10 +31,10 @@
     linear-gradient(to bottom, white 1px, transparent 1px);"
 		></div> -->
 		{#each tokens as [id, token] (id)}
-			{@const character = $characters.get(token.character)}
+			{@const character = characters.get(token.character)}
 			<Movable
 				position={token}
-				disabled={!$isDm && character?.owner !== $user?.id}
+				disabled={!moveAll && character?.owner !== $user?.id}
 				class="size-[50px] bg-red-500"
 				on:startMove={() => (isGrabbing = true)}
 				on:endMove={(event) => {

@@ -11,7 +11,7 @@ export const game = writable<GamesResponse>();
 game.subscribe(($game) => console.debug('store game', $game));
 export const dms = writable(new Map<string, UsersResponse>());
 dms.subscribe(($dms) => console.debug('store dms', $dms));
-export const isDm = derived([dms, user], ([$dms, $user]) => $user && $dms.has($user?.id));
+export const isDm = derived([dms, user], ([$dms, $user]) => !!$user && $dms.has($user.id));
 isDm.subscribe(($isDm) => console.debug('store isDm', $isDm));
 export const players = writable(new Map<string, UsersResponse>());
 players.subscribe(($players) => console.debug('store players', $players));
