@@ -3,6 +3,9 @@
 	import { pb } from '$lib/pb';
 	import { trpc } from '$lib/trpc/client';
 	import { createEventDispatcher } from 'svelte';
+	import { Input } from '../ui/input';
+	import { Button } from '../ui/button';
+	import { Label } from '../ui/label';
 
 	const dispatch = createEventDispatcher<{
 		login: undefined;
@@ -25,8 +28,14 @@
 	}
 </script>
 
-<form on:submit|preventDefault={handleLogin} method="post">
-	<input required type="text" name="username" autocomplete="username" />
-	<input required type="password" name="password" autocomplete="current-password" />
-	<button type="submit">Login</button>
+<form on:submit|preventDefault={handleLogin} method="post" class="flex items-center gap-2">
+	<Label>
+		<div class="pb-2">Username</div>
+		<Input required type="text" name="username" autocomplete="username" />
+	</Label>
+	<Label>
+		<div class="pb-2">Password</div>
+		<Input required type="password" name="password" autocomplete="current-password" />
+	</Label>
+	<Button type="submit">Login</Button>
 </form>

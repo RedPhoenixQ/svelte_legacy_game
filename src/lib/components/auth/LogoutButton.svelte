@@ -2,6 +2,9 @@
 	import { page } from '$app/stores';
 	import { pb } from '$lib/pb';
 	import { trpc } from '$lib/trpc/client';
+	import { Button, type ButtonProps } from '../ui/button';
+
+	type $$Props = ButtonProps;
 
 	async function logout() {
 		// TODO: Handle error. Show message or send event
@@ -11,6 +14,6 @@
 	}
 </script>
 
-<button on:click={logout} type="button">
+<Button on:click={logout} {...$$restProps}>
 	<slot>Logout</slot>
-</button>
+</Button>

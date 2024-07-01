@@ -3,6 +3,9 @@
 	import type { UsersResponse } from '$lib/schema';
 	import { trpc } from '$lib/trpc/client';
 	import { createEventDispatcher } from 'svelte';
+	import { Input } from '../ui/input';
+	import { Button } from '../ui/button';
+	import { Label } from '../ui/label';
 
 	const dispatch = createEventDispatcher<{
 		registered: UsersResponse;
@@ -26,9 +29,18 @@
 	}
 </script>
 
-<form on:submit|preventDefault={handleRegister} method="post">
-	<input required type="text" name="username" autocomplete="username" />
-	<input required type="password" name="password" autocomplete="new-password" />
-	<input required type="password" name="passwordConfirm" autocomplete="new-password" />
-	<button type="submit">Register</button>
+<form on:submit|preventDefault={handleRegister} method="post" class="flex items-center gap-2">
+	<Label>
+		<div class="pb-2">Username</div>
+		<Input required type="text" name="username" autocomplete="username" />
+	</Label>
+	<Label>
+		<div class="pb-2">Password</div>
+		<Input required type="password" name="password" autocomplete="new-password" />
+	</Label>
+	<Label>
+		<div class="pb-2">Repeat Password</div>
+		<Input required type="password" name="passwordConfirm" autocomplete="new-password" />
+	</Label>
+	<Button type="submit">Register</Button>
 </form>
