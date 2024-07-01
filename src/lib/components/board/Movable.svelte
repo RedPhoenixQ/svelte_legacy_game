@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { getPanZoomCtx, type XYPos } from '.';
+	import { DEFAULT_GRID_SIZE, getPanZoomCtx, type XYPos } from '.';
 
 	let className: string = '';
 	export { className as class };
@@ -55,6 +55,12 @@
 		clearTimeout(longPressTimeout);
 
 		if (moving) {
+			if (!event.shiftKey) {
+				// Snap to grid
+				x = Math.round(x / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
+				y = Math.round(y / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
+			}
+
 			dispatch('endMove', { x, y });
 		}
 		reset();

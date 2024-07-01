@@ -7,15 +7,19 @@
 	export let board: BoardResponse;
 	export let tokens: Map<string, TokenResponse>;
 
+	$: gridScaleFactor = DEFAULT_GRID_SIZE / board.gridSize;
+
 	let isGrabbing = false;
 </script>
 
-<div class="h-screen overflow-hidden bg-blue-400" style={isGrabbing ? 'cursor : grabbing;' : ''}>
-	<PanZoom class="h-fit w-fit bg-gray-400" bounds={true} autocenter={true}>
+<div class="h-screen overflow-hidden bg-background" style={isGrabbing ? 'cursor : grabbing;' : ''}>
+	<PanZoom class="size-max" bounds={true} autocenter={true}>
 		<img
 			src={pb.getFileUrl(board, board.background)}
 			alt="Game Board Background"
-			style="scale: {DEFAULT_GRID_SIZE / board.gridSize};"
+			width={board.width * gridScaleFactor}
+			height={board.height * gridScaleFactor}
+			class="opacity-50"
 		/>
 		{#each tokens as [id, token] (id)}
 			{@const character = $characters.get(token.character)}

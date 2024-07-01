@@ -363,12 +363,16 @@ export interface BoardResponse extends BaseCollectionResponse {
 	game: string;
 	background: string;
 	gridSize: number;
+	width: number;
+	height: number;
 }
 
 export interface BoardCreate extends BaseCollectionCreate {
 	game: string;
 	background: File | null;
 	gridSize: number;
+	width: number;
+	height: number;
 }
 
 export interface BoardUpdate extends BaseCollectionUpdate {
@@ -377,6 +381,12 @@ export interface BoardUpdate extends BaseCollectionUpdate {
 	gridSize?: number;
 	'gridSize+'?: number;
 	'gridSize-'?: number;
+	width?: number;
+	'width+'?: number;
+	'width-'?: number;
+	height?: number;
+	'height+'?: number;
+	'height-'?: number;
 }
 
 export interface BoardCollection {
