@@ -4,6 +4,7 @@
 	import RollDice from '$lib/components/dice/RollDice.svelte';
 	import { onMount } from 'svelte';
 	import Board from './Board.svelte';
+	import ActionList from './ActionList.svelte';
 	import { initStores, deinitStores, game, board, tokens } from './stores';
 	import * as Resizable from '$lib/components/ui/resizable';
 
@@ -22,7 +23,9 @@
 	<Resizable.PaneGroup direction="horizontal" autoSaveId="gameMainLayout">
 		<Resizable.Pane collapsible defaultSize={25} minSize={10}>
 			<Resizable.PaneGroup direction="vertical" autoSaveId="gameLeftLayout">
-				<Resizable.Pane defaultSize={60}>Turn order</Resizable.Pane>
+				<Resizable.Pane defaultSize={60}>
+					<ActionList />
+				</Resizable.Pane>
 				<Resizable.Handle withHandle />
 				<Resizable.Pane collapsible defaultSize={40} minSize={20}>Actions</Resizable.Pane>
 			</Resizable.PaneGroup>
