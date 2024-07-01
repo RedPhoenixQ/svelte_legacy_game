@@ -17,12 +17,18 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      paneforge:
+        specifier: ^0.0.5
+        version: 0.0.5(svelte@4.2.17)
       panzoom:
         specifier: ^9.4.3
         version: 9.4.3
       pocketbase:
         specifier: ^0.21.3
         version: 0.21.3
+      svelte-radix:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@4.2.17)
       tailwind-merge:
         specifier: ^2.3.0
         version: 2.3.0
@@ -1145,6 +1151,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@5.0.7:
+    resolution: {integrity: sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
@@ -1184,6 +1195,11 @@ packages:
   p-locate@5.0.0:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
+
+  paneforge@0.0.5:
+    resolution: {integrity: sha512-98QHobaN/KeQhqqglbvjUmNCTRC4h4iqDxpSV8jCGhRLttgGlRXZNzWNr4Firni5rwasAZjOza0k/JdwppB/AQ==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.1
 
   panzoom@9.4.3:
     resolution: {integrity: sha512-xaxCpElcRbQsUtIdwlrZA90P90+BHip4Vda2BC8MEb4tkI05PmR6cKECdqUCZ85ZvBHjpI9htJrZBxV5Gp/q/w==}
@@ -1495,6 +1511,11 @@ packages:
         optional: true
       typescript:
         optional: true
+
+  svelte-radix@1.1.0:
+    resolution: {integrity: sha512-kyE9wZiJV937INGb+wiBkAjmGtQUUYRPkVL2Q+/gj+9Vog1Ewd2wNvNmpNMUd+c+euxoc5u5YZMuCUgky9EUPw==}
+    peerDependencies:
+      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0
 
   svelte@4.2.17:
     resolution: {integrity: sha512-N7m1YnoXtRf5wya5Gyx3TWuTddI4nAyayyIWFojiWV5IayDYNV5i2mRp/7qNGol4DtxEYxljmrbgp1HM6hUbmQ==}
@@ -2675,6 +2696,8 @@ snapshots:
 
   nanoid@3.3.7: {}
 
+  nanoid@5.0.7: {}
+
   natural-compare@1.4.0: {}
 
   ngraph.events@1.2.2: {}
@@ -2709,6 +2732,11 @@ snapshots:
   p-locate@5.0.0:
     dependencies:
       p-limit: 3.1.0
+
+  paneforge@0.0.5(svelte@4.2.17):
+    dependencies:
+      nanoid: 5.0.7
+      svelte: 4.2.17
 
   panzoom@9.4.3:
     dependencies:
@@ -2996,6 +3024,10 @@ snapshots:
       postcss: 8.4.38
       postcss-load-config: 4.0.2(postcss@8.4.38)
       typescript: 5.4.5
+
+  svelte-radix@1.1.0(svelte@4.2.17):
+    dependencies:
+      svelte: 4.2.17
 
   svelte@4.2.17:
     dependencies:
