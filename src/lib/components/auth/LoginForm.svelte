@@ -5,9 +5,8 @@
 	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher<{
-		login: undefined
+		login: undefined;
 	}>();
-
 
 	async function handleLogin(event: SubmitEvent) {
 		const form = event.target as HTMLFormElement;
@@ -21,7 +20,7 @@
 		});
 		pb.authStore.save(auth.token, auth.record);
 		console.debug('AuthStore after login', pb.authStore);
-		dispatch("login")
+		dispatch('login');
 		form.reset();
 	}
 </script>
