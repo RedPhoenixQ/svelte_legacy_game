@@ -17,13 +17,15 @@ export type PanZoomInner = { element: HTMLElement; instance: PZ };
 
 export type PanZoomStore = Writable<PanZoomInner>;
 
+const CONTEXT_KEY = Symbol('panzoom');
+
 export function getPanZoomCtx(): PanZoomStore {
-	return getContext('panzoom');
+	return getContext(CONTEXT_KEY);
 }
 
 export function initPanZoomCtx(): PanZoomStore {
 	const store: PanZoomStore = writable();
-	setContext('panzoom', store);
+	setContext(CONTEXT_KEY, store);
 	return store;
 }
 
