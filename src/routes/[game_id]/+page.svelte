@@ -4,7 +4,7 @@
 	import RollDice from '$lib/components/dice/RollDice.svelte';
 	import { onMount } from 'svelte';
 	import Board from './Board.svelte';
-	import { initStores, deinitStores, game } from './stores';
+	import { initStores, deinitStores, game, board, tokens } from './stores';
 	import * as Resizable from '$lib/components/ui/resizable';
 
 	export let data;
@@ -21,7 +21,11 @@
 <main class="grid h-screen max-h-screen">
 	<Resizable.PaneGroup direction="horizontal">
 		<Resizable.Pane defaultSize={3}>
-			<Board />
+			{#if $board}
+				<Board board={$board} bind:tokens={$tokens} />
+			{:else}
+				No board active
+			{/if}
 		</Resizable.Pane>
 		<Resizable.Handle />
 		<Resizable.Pane

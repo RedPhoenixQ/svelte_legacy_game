@@ -1,13 +1,19 @@
-import type { PanZoom } from 'panzoom';
+import type { PanZoom as PZ } from 'panzoom';
 import { getContext, setContext } from 'svelte';
 import { writable, type Writable } from 'svelte/store';
+import Movable from './Movable.svelte';
+import PanZoom from './PanZoom.svelte';
+
+export { PanZoom, Movable };
+
+export const DEFAULT_GRID_SIZE = 50 as const;
 
 export type XYPos = {
 	x: number;
 	y: number;
 };
 
-export type PanZoomInner = { element: HTMLElement; instance: PanZoom };
+export type PanZoomInner = { element: HTMLElement; instance: PZ };
 
 export type PanZoomStore = Writable<PanZoomInner>;
 

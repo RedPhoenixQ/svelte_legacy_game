@@ -361,14 +361,22 @@ export interface DiceRollCollection {
 export interface BoardResponse extends BaseCollectionResponse {
 	collectionName: 'board';
 	game: string;
+	background: string;
+	gridSize: number;
 }
 
 export interface BoardCreate extends BaseCollectionCreate {
 	game: string;
+	background: File | null;
+	gridSize: number;
 }
 
 export interface BoardUpdate extends BaseCollectionUpdate {
 	game?: string;
+	background?: File | null;
+	gridSize?: number;
+	'gridSize+'?: number;
+	'gridSize-'?: number;
 }
 
 export interface BoardCollection {
