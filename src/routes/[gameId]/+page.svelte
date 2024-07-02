@@ -6,15 +6,25 @@
 	import Board from '../../lib/components/board/Board.svelte';
 	import ActionList from './ActionList.svelte';
 	import ActionButtons from './ActionButtons.svelte';
-	import { initStores, deinitStores, game, board, characters, tokens, isDm } from './stores';
+	import { initStores, deinitStores, board, characters, tokens, isDm } from './stores';
 	import * as Resizable from '$lib/components/ui/resizable';
+	import { Game } from '$lib/game/game';
+	import { pb, user } from '$lib/pb';
 
 	export let data;
 	$: console.debug('page data', data);
 	$: initStores(data);
 
+	const game = new Game(data.game, user, {
+		...data,
+		tokens: data?.activeBoard?.expand?.['token(board)'],
+		actionItems: data?.activeBoard?.expand?.['actionItem(board)']
+	});
+
 	onMount(() => {
+		game.init(pb).catch(console.error);
 		return () => {
+			game.cleanup().catch(console.error);
 			deinitStores();
 		};
 	});
@@ -25,7 +35,9 @@
 		<Resizable.Pane collapsible defaultSize={25} minSize={10}>
 			<Resizable.PaneGroup direction="vertical" autoSaveId="gameLeftLayout">
 				<Resizable.Pane defaultSize={60}>
-					<ActionList />
+					{#if game.activeBoard}
+						<ActionList actionItems={game.activeBoard.actionItems} />
+					{/if}
 				</Resizable.Pane>
 				<Resizable.Handle withHandle />
 				<Resizable.Pane collapsible defaultSize={40} minSize={20}>

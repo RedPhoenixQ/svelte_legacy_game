@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
 	import { expoInOut } from 'svelte/easing';
-	import { actionItems, sortActionItems } from './stores/board';
 	import TokenImg from '$lib/components/board/TokenImg.svelte';
 	import { characters } from './stores';
+	import type { ActionItems } from '$lib/game/actionItem';
 
-	$: {
-		$actionItems.sort(sortActionItems);
-		$actionItems = $actionItems;
-	}
+	export let actionItems: ActionItems;
 </script>
 
 <ol>
