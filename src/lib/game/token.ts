@@ -2,20 +2,17 @@ import type { TokenResponse } from '$lib/schema';
 import { get, writable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
-import type { BoardStore } from './board';
 import { pb } from '$lib/pb';
+import type { GameStores } from '.';
 
 export type TokenMap = Map<string, Token>;
 
 export class TokensStore implements Writable<TokenMap> {
+	stores!: GameStores;
+
 	subscribe!: Writable<TokenMap>['subscribe'];
 	set!: Writable<TokenMap>['set'];
 	update!: Writable<TokenMap>['update'];
-
-	#board!: BoardStore;
-	stores(board: BoardStore) {
-		this.#board = board;
-	}
 
 	get() {
 		return get(this);
@@ -25,13 +22,13 @@ export class TokensStore implements Writable<TokenMap> {
 		Object.assign(this, writable(tokens));
 	}
 
-	static fromResponse(tokens: TokenResponse[] = []): TokensStore {
-		return new TokensStore(new Map(tokens.map((token) => [token.id, new Token(token)])));
+	static fromResponse(tokens: TokenResponse[] = []): TokenMap {
+		return new Map(tokens.map((token) => [token.id, new Token(token)]));
 	}
 
 	#unsub!: UnsubscribeFunc;
 	async init() {
-		const board = this.#board.get();
+		const board = this.stores.board.get();
 		if (!board) return;
 
 		this.#unsub = await pb.from('token').subscribe(
@@ -70,7 +67,7 @@ export class TokensStore implements Writable<TokenMap> {
 	}
 
 	async deinit() {
-		await this.#unsub();
+		await this.#unsub?.();
 	}
 }
 

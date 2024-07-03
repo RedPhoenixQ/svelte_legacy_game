@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import Chat from '$lib/components/chat/Chat.svelte';
 	import RollDice from '$lib/components/dice/RollDice.svelte';
 	import { onMount } from 'svelte';
@@ -7,12 +6,12 @@
 	import ActionList from './ActionList.svelte';
 	import ActionButtons from './ActionButtons.svelte';
 	import * as Resizable from '$lib/components/ui/resizable';
-	import { createGameStores } from '$lib/game';
+	import { GameStores } from '$lib/game';
 
 	export let data;
 	$: console.debug('page data', data);
-	const { game, characters, board, tokens, actionItems, isDm, init, deinit } =
-		createGameStores(data);
+	$: stores = new GameStores(data);
+	$: ({ game, characters, board, tokens, actionItems, isDm } = stores);
 
 	$: console.debug('game', $game);
 	$: console.debug('characters', $characters);
@@ -21,9 +20,9 @@
 	$: console.debug('actionItems', $actionItems);
 
 	onMount(() => {
-		init().catch(console.error);
+		stores.init().catch(console.error);
 		return () => {
-			deinit().catch(console.error);
+			stores.deinit().catch(console.error);
 			// deinitStores();
 		};
 	});
@@ -44,7 +43,11 @@
 				</Resizable.Pane>
 				<Resizable.Handle withHandle />
 				<Resizable.Pane collapsible defaultSize={40} minSize={20}>
-					<ActionButtons />
+					{#if $board}
+						<ActionButtons boardId={$board.id} />
+					{/if}
+					<a href="/testing-test001">001</a>
+					<a href="/testing-testing">ing</a>
 				</Resizable.Pane>
 			</Resizable.PaneGroup>
 		</Resizable.Pane>
@@ -65,7 +68,7 @@
 			style="grid-template-rows: auto minmax(0, 1fr);"
 		>
 			<RollDice />
-			<Chat gameId={$page.params.gameId} />
+			<Chat gameId={$game.id} />
 		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </main>

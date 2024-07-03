@@ -2,20 +2,17 @@ import type { CharactersResponse } from '$lib/schema';
 import { get, writable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
-import type { GameStore } from './game';
 import { pb } from '$lib/pb';
+import type { GameStores } from '.';
 
 export type CharactersMap = Map<string, Character>;
 
 export class CharactersStore implements Writable<CharactersMap> {
+	stores!: GameStores;
+
 	subscribe!: Writable<CharactersMap>['subscribe'];
 	set!: Writable<CharactersMap>['set'];
 	update!: Writable<CharactersMap>['update'];
-
-	#game!: GameStore;
-	stores(game: GameStore) {
-		this.#game = game;
-	}
 
 	get() {
 		return get(this);
@@ -62,7 +59,7 @@ export class CharactersStore implements Writable<CharactersMap> {
 			},
 			{
 				query: {
-					filter: eq('game.id', this.#game.get().id)
+					filter: eq('game.id', this.stores.game.get().id)
 				}
 			}
 		);

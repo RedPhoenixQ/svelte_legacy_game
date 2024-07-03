@@ -2,8 +2,11 @@ import type { GamesResponse } from '$lib/schema';
 import { derived, get, writable, type Writable } from 'svelte/store';
 import { pb, user } from '$lib/pb';
 import type { UnsubscribeFunc } from 'pocketbase';
+import type { GameStores } from '.';
 
 export class GameStore implements Writable<Game> {
+	stores!: GameStores;
+
 	subscribe!: Writable<Game>['subscribe'];
 	set!: Writable<Game>['set'];
 	update!: Writable<Game>['update'];
@@ -27,9 +30,9 @@ export class GameStore implements Writable<Game> {
 			switch (action) {
 				case 'update':
 					this.update(($game) => {
-						// if ($game.activeBoard !== record.activeBoard) {
-						// 	initBoard(record.activeBoard);
-						// }
+						if ($game.activeBoard !== record.activeBoard) {
+							this.stores.board.change(record.activeBoard);
+						}
 						// TODO: Handle adding/removing players and dms
 						$game.assign(record);
 						return $game;
@@ -47,7 +50,7 @@ export class GameStore implements Writable<Game> {
 	}
 
 	async deinit() {
-		await this.#unsub();
+		await this.#unsub?.();
 	}
 }
 

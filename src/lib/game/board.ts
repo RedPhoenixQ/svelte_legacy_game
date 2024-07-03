@@ -3,12 +3,14 @@ import { get, writable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
 import { TokensStore } from './token';
 import { ActionItemsStore } from './actionItem';
-import { CharactersStore } from './character';
 import { pb } from '$lib/pb';
+import type { GameStores } from '.';
 
 export type BoardStoreInner = Board | undefined;
 
 export class BoardStore implements Writable<BoardStoreInner> {
+	stores!: GameStores;
+
 	subscribe!: Writable<BoardStoreInner>['subscribe'];
 	set!: Writable<BoardStoreInner>['set'];
 	update!: Writable<BoardStoreInner>['update'];
@@ -41,7 +43,37 @@ export class BoardStore implements Writable<BoardStoreInner> {
 	}
 
 	async deinit() {
-		await this.#unsub();
+		await this.#unsub?.();
+	}
+
+	async change(boardId: string | null) {
+		await Promise.all([
+			this.deinit(),
+			this.stores.tokens.deinit(),
+			this.stores.actionItems.deinit()
+		]);
+		if (!boardId) return this.set(undefined);
+
+		try {
+			const boardResponse = await pb.from('board').getOne(boardId, {
+				select: {
+					expand: {
+						'token(board)': true,
+						'actionItem(board)': true
+					}
+				}
+			});
+			this.stores.tokens.set(TokensStore.fromResponse(boardResponse.expand?.['token(board)']));
+			this.stores.actionItems.set(
+				ActionItemsStore.fromResponse(boardResponse.expand?.['actionItem(board)'])
+			);
+			const board = new Board(boardResponse);
+			this.set(board);
+			await Promise.all([this.init(), this.stores.tokens.init(), this.stores.actionItems.init()]);
+		} catch (err) {
+			console.error(err);
+			this.set(undefined);
+		}
 	}
 }
 
@@ -57,10 +89,6 @@ export class Board implements BoardResponse {
 	created!: string;
 	updated!: string;
 	collectionId!: string;
-
-	characters!: CharactersStore;
-	tokens!: TokensStore;
-	actionItems!: ActionItemsStore;
 
 	constructor(board: BoardResponse) {
 		this.assign(board);

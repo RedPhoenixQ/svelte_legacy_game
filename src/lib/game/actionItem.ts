@@ -2,18 +2,15 @@ import type { ActionItemResponse } from '$lib/schema';
 import { get, writable, type Readable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
-import type { BoardStore } from './board';
 import { pb } from '$lib/pb';
+import type { GameStores } from '.';
 
 export class ActionItemsStore implements Readable<ActionItems> {
+	stores!: GameStores;
+
 	subscribe!: Writable<ActionItems>['subscribe'];
 	set!: Writable<ActionItems>['set'];
 	update!: Writable<ActionItems>['update'];
-
-	#board!: BoardStore;
-	stores(board: BoardStore) {
-		this.#board = board;
-	}
 
 	get() {
 		return get(this);
@@ -23,13 +20,13 @@ export class ActionItemsStore implements Readable<ActionItems> {
 		Object.assign(this, writable(actionItems));
 	}
 
-	static fromResponse(actionItems: ActionItemResponse[] = []): ActionItemsStore {
-		return new ActionItemsStore(new ActionItems(actionItems));
+	static fromResponse(actionItems: ActionItemResponse[] = []): ActionItems {
+		return new ActionItems(actionItems);
 	}
 
 	#unsub!: UnsubscribeFunc;
 	async init() {
-		const board = this.#board.get();
+		const board = this.stores.board.get();
 		if (!board) return;
 
 		this.#unsub = await pb.from('actionItem').subscribe(
@@ -72,7 +69,7 @@ export class ActionItemsStore implements Readable<ActionItems> {
 	}
 
 	async deinit() {
-		await this.#unsub();
+		await this.#unsub?.();
 	}
 }
 
