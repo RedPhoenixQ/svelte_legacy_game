@@ -1,84 +1,38 @@
-import type {
-	GamesResponse,
-	CharactersResponse,
-	BoardResponse,
-	TokenResponse,
-	Schema,
-	ActionItemResponse,
-	UsersResponse
-} from '$lib/schema';
-import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
-import { Characters } from './character';
+import type { GamesResponse } from '$lib/schema';
+import { derived, get, writable, type Writable } from 'svelte/store';
+import { pb, user } from '$lib/pb';
 import type { UnsubscribeFunc } from 'pocketbase';
-import type { TypedPocketBase } from 'typed-pocketbase';
-import { Board } from './board';
 
-export class Game implements Readable<GamesResponse> {
-	subscribe: Writable<GamesResponse>['subscribe'];
-	// eslint-disable-next-line no-unused-private-class-members
-	#set: Writable<GamesResponse>['set'];
-	#update: Writable<GamesResponse>['update'];
-
-	#unsub: UnsubscribeFunc | undefined = undefined;
-
-	id: string;
-
-	user: Writable<UsersResponse | null>;
-	isDm: Readable<boolean>;
-
-	characters: Characters;
-	activeBoard: Board | undefined;
+export class GameStore implements Writable<Game> {
+	subscribe!: Writable<Game>['subscribe'];
+	set!: Writable<Game>['set'];
+	update!: Writable<Game>['update'];
 
 	get() {
 		return get(this);
 	}
 
-	constructor(
-		game: GamesResponse,
-		user: Writable<UsersResponse | null>,
-		others?: {
-			characters?: CharactersResponse[];
-			activeBoard?: BoardResponse;
-			tokens?: TokenResponse[];
-			actionItems?: ActionItemResponse[];
-		}
-	) {
-		this.id = game.id;
-		this.user = user;
-
-		const { subscribe, set, update } = writable(game);
-		subscribe(($game) => console.debug('Game', $game));
-		this.subscribe = subscribe;
-		this.#set = set;
-		this.#update = update;
-
-		this.isDm = derived([this, user], ([$game, $user]) => {
-			if (!$user) return false;
-			return $game.dms.has($user.id);
-		});
-
-		this.characters = Characters.fromCharacters(game.id, others?.characters);
-		if (others?.activeBoard) {
-			this.activeBoard = new Board(
-				others?.activeBoard,
-				this.characters,
-				others?.tokens ?? [],
-				others?.actionItems ?? []
-			);
-		}
+	constructor(game?: Game) {
+		Object.assign(this, writable(game));
 	}
 
-	async init(pb: TypedPocketBase<Schema>) {
+	static fromResponse(game: GamesResponse): GameStore {
+		return new GameStore(new Game(game));
+	}
+
+	#unsub!: UnsubscribeFunc;
+	async init() {
 		this.#unsub = await pb.from('games').subscribe(this.get().id, ({ action, record }) => {
 			console.debug('sub game', action, record);
 			switch (action) {
 				case 'update':
-					this.#update(() => {
+					this.update(($game) => {
 						// if ($game.activeBoard !== record.activeBoard) {
 						// 	initBoard(record.activeBoard);
 						// }
 						// TODO: Handle adding/removing players and dms
-						return record;
+						$game.assign(record);
+						return $game;
 					});
 					break;
 				default:
@@ -90,11 +44,36 @@ export class Game implements Readable<GamesResponse> {
 					});
 			}
 		});
-		this.characters.init(pb);
-		this.activeBoard?.init?.(pb);
 	}
 
-	async cleanup() {
-		await Promise.all([this.#unsub?.(), this.characters.cleanup(), this.activeBoard?.cleanup?.()]);
+	async deinit() {
+		await this.#unsub();
+	}
+}
+
+export function createIsDm(game: GameStore) {
+	return derived([game, user], ([$game, $user]) => {
+		if (!$user) return false;
+		return $game.dms.includes($user.id);
+	});
+}
+
+export class Game implements GamesResponse {
+	collectionName = 'games' as const;
+	dms!: string[];
+	players!: string[];
+	name!: string;
+	activeBoard!: string;
+	id!: string;
+	created!: string;
+	updated!: string;
+	collectionId!: string;
+
+	constructor(game: GamesResponse) {
+		this.assign(game);
+	}
+
+	assign(game: GamesResponse) {
+		Object.assign(this, game);
 	}
 }

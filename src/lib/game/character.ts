@@ -1,58 +1,55 @@
-import type { CharactersResponse, Schema } from '$lib/schema';
-import { get, writable, type Readable, type Writable } from 'svelte/store';
+import type { CharactersResponse } from '$lib/schema';
+import { get, writable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
-import { eq, type TypedPocketBase } from 'typed-pocketbase';
+import { eq } from 'typed-pocketbase';
+import type { GameStore } from './game';
+import { pb } from '$lib/pb';
 
 export type CharactersMap = Map<string, Character>;
 
-export class Characters implements Readable<CharactersMap> {
-	subscribe: Writable<CharactersMap>['subscribe'];
-	// eslint-disable-next-line no-unused-private-class-members
-	#set: Writable<CharactersMap>['set'];
-	#update: Writable<CharactersMap>['update'];
+export class CharactersStore implements Writable<CharactersMap> {
+	subscribe!: Writable<CharactersMap>['subscribe'];
+	set!: Writable<CharactersMap>['set'];
+	update!: Writable<CharactersMap>['update'];
 
-	#unsub: UnsubscribeFunc | undefined = undefined;
-
-	#gameId: string;
+	#game!: GameStore;
+	stores(game: GameStore) {
+		this.#game = game;
+	}
 
 	get() {
 		return get(this);
 	}
 
-	constructor(gameId: string, characters: CharactersMap) {
-		this.#gameId = gameId;
-		const { subscribe, set, update } = writable(characters);
-		subscribe(($characters) => console.debug('Characters', $characters));
-		this.subscribe = subscribe;
-		this.#set = set;
-		this.#update = update;
+	constructor(characters: CharactersMap) {
+		Object.assign(this, writable(characters));
 	}
 
-	static fromCharacters(gameId: string, characters: CharactersResponse[] = []) {
-		return new Characters(
-			gameId,
+	static fromResponse(characters: CharactersResponse[] = []): CharactersStore {
+		return new CharactersStore(
 			new Map(characters.map((character) => [character.id, new Character(character)]))
 		);
 	}
 
-	async init(pb: TypedPocketBase<Schema>) {
+	#unsub!: UnsubscribeFunc;
+	async init() {
 		this.#unsub = await pb.from('characters').subscribe(
 			'*',
 			({ action, record }) => {
 				console.debug('sub characters', action, record);
 
 				if (action === 'delete') {
-					this.#update(($characters) => {
+					this.update(($characters) => {
 						$characters.delete(record.id);
 						return $characters;
 					});
 				} else if (action === 'create') {
-					this.#update(($characters) => {
+					this.update(($characters) => {
 						$characters.set(record.id, new Character(record));
 						return $characters;
 					});
 				} else {
-					this.#update(($characters) => {
+					this.update(($characters) => {
 						const character = $characters.get(record.id);
 						if (character) {
 							character.assign(record);
@@ -65,16 +62,14 @@ export class Characters implements Readable<CharactersMap> {
 			},
 			{
 				query: {
-					filter: eq('game.id', this.#gameId)
+					filter: eq('game.id', this.#game.get().id)
 				}
 			}
 		);
 	}
 
-	async cleanup() {
-		if (this.#unsub) {
-			await this.#unsub();
-		}
+	async deinit() {
+		await this.#unsub();
 	}
 }
 

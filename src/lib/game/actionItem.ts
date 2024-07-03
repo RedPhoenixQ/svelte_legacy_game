@@ -1,58 +1,62 @@
-import type { ActionItemResponse, Schema } from '$lib/schema';
+import type { ActionItemResponse } from '$lib/schema';
 import { get, writable, type Readable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
-import { eq, type TypedPocketBase } from 'typed-pocketbase';
+import { eq } from 'typed-pocketbase';
+import type { BoardStore } from './board';
+import { pb } from '$lib/pb';
 
-export class ActionItems implements Readable<ActionItemResponse[]> {
-	subscribe: Writable<ActionItemResponse[]>['subscribe'];
-	// eslint-disable-next-line no-unused-private-class-members
-	#set: Writable<ActionItemResponse[]>['set'];
-	#update: Writable<ActionItemResponse[]>['update'];
+export class ActionItemsStore implements Readable<ActionItems> {
+	subscribe!: Writable<ActionItems>['subscribe'];
+	set!: Writable<ActionItems>['set'];
+	update!: Writable<ActionItems>['update'];
 
-	#unsub: UnsubscribeFunc | undefined = undefined;
-
-	#boardId: string;
+	#board!: BoardStore;
+	stores(board: BoardStore) {
+		this.#board = board;
+	}
 
 	get() {
 		return get(this);
 	}
 
-	constructor(boardId: string, actionItems: ActionItemResponse[]) {
-		this.#boardId = boardId;
-		const { subscribe, set, update } = writable(actionItems);
-		subscribe(($actionItems) => console.debug('ActionItem', $actionItems));
-		this.subscribe = subscribe;
-		this.#set = set;
-		this.#update = update;
+	constructor(actionItems: ActionItems) {
+		Object.assign(this, writable(actionItems));
 	}
 
-	async init(pb: TypedPocketBase<Schema>) {
+	static fromResponse(actionItems: ActionItemResponse[] = []): ActionItemsStore {
+		return new ActionItemsStore(new ActionItems(actionItems));
+	}
+
+	#unsub!: UnsubscribeFunc;
+	async init() {
+		const board = this.#board.get();
+		if (!board) return;
+
 		this.#unsub = await pb.from('actionItem').subscribe(
 			'*',
 			({ action, record }) => {
 				console.debug('sub actionItem', action, record);
 
 				if (action === 'delete') {
-					this.#update(($actionItems) => {
-						return $actionItems.filter((item) => item.id !== record.id);
+					this.update(($actionItems) => {
+						$actionItems.remove(record.id);
+						return $actionItems;
 					});
 				} else if (action === 'create') {
-					this.#update(($actionItems) => {
-						$actionItems.push(record);
-						$actionItems.sort(ActionItems.sort);
+					this.update(($actionItems) => {
+						$actionItems.add(record);
 						return $actionItems;
 					});
 				} else {
-					this.#update(($actionItems) => {
-						const index = $actionItems.findIndex((item) => item.id === record.id);
+					this.update(($actionItems) => {
+						const index = $actionItems.items.findIndex((item) => item.id === record.id);
 						if (index < 0) {
-							$actionItems.push(record);
-							$actionItems.sort(ActionItems.sort);
+							$actionItems.add(record);
 						} else {
-							const prev = $actionItems[index];
-							$actionItems[index] = record;
+							const prev = $actionItems.items[index];
+							$actionItems.items[index] = record;
 							if (prev.actionValue !== record.actionValue) {
-								$actionItems.sort(ActionItems.sort);
+								$actionItems.sort();
 							}
 						}
 						return $actionItems;
@@ -61,17 +65,34 @@ export class ActionItems implements Readable<ActionItemResponse[]> {
 			},
 			{
 				query: {
-					filter: eq('board.id', this.#boardId)
+					filter: eq('board.id', board.id)
 				}
 			}
 		);
 	}
 
-	async cleanup() {
-		await Promise.all([this.#unsub?.()]);
+	async deinit() {
+		await this.#unsub();
+	}
+}
+
+export class ActionItems {
+	items: ActionItemResponse[];
+
+	constructor(actionItems: ActionItemResponse[]) {
+		this.items = actionItems;
 	}
 
-	static sort(a: ActionItemResponse, b: ActionItemResponse): number {
-		return a.actionValue - b.actionValue;
+	add(item: ActionItemResponse) {
+		this.items.push(item);
+		this.sort();
+	}
+
+	remove(id: string) {
+		this.items = this.items.filter((item) => item.id !== id);
+	}
+
+	sort() {
+		this.items.sort((a, b) => a.actionValue - b.actionValue);
 	}
 }

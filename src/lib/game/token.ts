@@ -1,55 +1,56 @@
-import type { TokenResponse, Schema } from '$lib/schema';
-import { get, writable, type Readable, type Writable } from 'svelte/store';
+import type { TokenResponse } from '$lib/schema';
+import { get, writable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
-import { eq, type TypedPocketBase } from 'typed-pocketbase';
+import { eq } from 'typed-pocketbase';
+import type { BoardStore } from './board';
+import { pb } from '$lib/pb';
 
 export type TokenMap = Map<string, Token>;
 
-export class Tokens implements Readable<TokenMap> {
-	subscribe: Writable<TokenMap>['subscribe'];
-	// eslint-disable-next-line no-unused-private-class-members
-	#set: Writable<TokenMap>['set'];
-	#update: Writable<TokenMap>['update'];
+export class TokensStore implements Writable<TokenMap> {
+	subscribe!: Writable<TokenMap>['subscribe'];
+	set!: Writable<TokenMap>['set'];
+	update!: Writable<TokenMap>['update'];
 
-	#unsub: UnsubscribeFunc | undefined = undefined;
-
-	#boardId: string;
+	#board!: BoardStore;
+	stores(board: BoardStore) {
+		this.#board = board;
+	}
 
 	get() {
 		return get(this);
 	}
 
-	constructor(boardId: string, tokens: TokenMap) {
-		this.#boardId = boardId;
-		const { subscribe, set, update } = writable(tokens);
-		subscribe(($tokens) => console.debug('Tokens', $tokens));
-		this.subscribe = subscribe;
-		this.#set = set;
-		this.#update = update;
+	constructor(tokens: TokenMap) {
+		Object.assign(this, writable(tokens));
 	}
 
-	static fromTokens(boardId: string, tokens: TokenResponse[] = []) {
-		return new Tokens(boardId, new Map(tokens.map((token) => [token.id, new Token(token)])));
+	static fromResponse(tokens: TokenResponse[] = []): TokensStore {
+		return new TokensStore(new Map(tokens.map((token) => [token.id, new Token(token)])));
 	}
 
-	async init(pb: TypedPocketBase<Schema>) {
+	#unsub!: UnsubscribeFunc;
+	async init() {
+		const board = this.#board.get();
+		if (!board) return;
+
 		this.#unsub = await pb.from('token').subscribe(
 			'*',
 			({ action, record }) => {
 				console.debug('sub token', action, record);
 
 				if (action === 'delete') {
-					this.#update(($tokens) => {
+					this.update(($tokens) => {
 						$tokens.delete(record.id);
 						return $tokens;
 					});
 				} else if (action === 'create') {
-					this.#update(($tokens) => {
+					this.update(($tokens) => {
 						$tokens.set(record.id, new Token(record));
 						return $tokens;
 					});
 				} else {
-					this.#update(($tokens) => {
+					this.update(($tokens) => {
 						const token = $tokens.get(record.id);
 						if (token) {
 							token.assign(record);
@@ -62,14 +63,14 @@ export class Tokens implements Readable<TokenMap> {
 			},
 			{
 				query: {
-					filter: eq('board.id', this.#boardId)
+					filter: eq('board.id', board.id)
 				}
 			}
 		);
 	}
 
-	async cleanup() {
-		await Promise.all([this.#unsub?.()]);
+	async deinit() {
+		await this.#unsub();
 	}
 }
 

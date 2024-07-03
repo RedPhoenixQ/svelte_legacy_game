@@ -1,57 +1,72 @@
-import type { BoardResponse, TokenResponse, Schema, ActionItemResponse } from '$lib/schema';
-import { get, writable, type Readable, type Writable } from 'svelte/store';
+import type { BoardResponse } from '$lib/schema';
+import { get, writable, type Writable } from 'svelte/store';
 import type { UnsubscribeFunc } from 'pocketbase';
-import { type TypedPocketBase } from 'typed-pocketbase';
-import { Tokens } from './token';
-import { ActionItems } from './actionItem';
-import { Characters } from './character';
+import { TokensStore } from './token';
+import { ActionItemsStore } from './actionItem';
+import { CharactersStore } from './character';
+import { pb } from '$lib/pb';
 
-export class Board implements Readable<BoardResponse> {
-	subscribe: Writable<BoardResponse>['subscribe'];
-	#set: Writable<BoardResponse>['set'];
-	// eslint-disable-next-line no-unused-private-class-members
-	#update: Writable<BoardResponse>['update'];
+export type BoardStoreInner = Board | undefined;
 
-	#unsub: UnsubscribeFunc | undefined = undefined;
-
-	id: string;
-	tokens: Tokens;
-	characters: Characters;
-	actionItems: ActionItems;
+export class BoardStore implements Writable<BoardStoreInner> {
+	subscribe!: Writable<BoardStoreInner>['subscribe'];
+	set!: Writable<BoardStoreInner>['set'];
+	update!: Writable<BoardStoreInner>['update'];
 
 	get() {
 		return get(this);
 	}
 
-	constructor(
-		board: BoardResponse,
-		characters: Characters,
-		tokens: TokenResponse[],
-		actionItems: ActionItemResponse[]
-	) {
-		this.id = board.id;
-		const { subscribe, set, update } = writable(board);
-		subscribe(($board) => console.debug('Board', $board));
-		this.subscribe = subscribe;
-		this.#set = set;
-		this.#update = update;
-
-		this.characters = characters;
-		this.tokens = Tokens.fromTokens(this.id, tokens);
-		this.actionItems = new ActionItems(this.id, actionItems);
+	constructor(board?: Board) {
+		Object.assign(this, writable(board));
 	}
 
-	async init(pb: TypedPocketBase<Schema>) {
-		this.#unsub = await pb.from('board').subscribe(this.id, ({ action, record }) => {
+	static fromResponse(board?: BoardResponse) {
+		return new BoardStore(board ? new Board(board) : undefined);
+	}
+
+	#unsub!: UnsubscribeFunc;
+	async init() {
+		const board = this.get();
+		if (!board) return;
+		this.#unsub = await pb.from('board').subscribe(board.id, ({ action, record }) => {
 			console.debug('sub board', action, record);
 
-			this.#set(record);
+			this.update(($board) => {
+				if (!$board) return new Board(record);
+				$board.assign(record);
+				return $board;
+			});
 		});
-		await this.tokens.init(pb);
-		await this.actionItems.init(pb);
 	}
 
-	async cleanup() {
-		await Promise.all([this.#unsub?.(), this.tokens.cleanup(), this.actionItems.cleanup()]);
+	async deinit() {
+		await this.#unsub();
+	}
+}
+
+export class Board implements BoardResponse {
+	collectionName = 'board' as const;
+	game!: string;
+	background!: string;
+	gridSize!: number;
+	width!: number;
+	height!: number;
+	time!: number;
+	id!: string;
+	created!: string;
+	updated!: string;
+	collectionId!: string;
+
+	characters!: CharactersStore;
+	tokens!: TokensStore;
+	actionItems!: ActionItemsStore;
+
+	constructor(board: BoardResponse) {
+		this.assign(board);
+	}
+
+	assign(board: BoardResponse) {
+		Object.assign(this, board);
 	}
 }

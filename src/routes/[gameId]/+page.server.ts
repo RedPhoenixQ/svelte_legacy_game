@@ -33,6 +33,8 @@ export async function load({ params, locals }) {
 		dms: game.expand!.dms ?? [],
 		players: game.expand!.players ?? [],
 		activeBoard: game.expand?.activeBoard,
+		tokens: game.expand?.activeBoard?.expand?.['token(board)'],
+		actionItems: game.expand?.activeBoard?.expand?.['actionItem(board)'],
 		characters: game.expand!['characters(game)'] ?? []
 	};
 	delete game.expand;

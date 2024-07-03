@@ -6,37 +6,40 @@
 	import Board from '../../lib/components/board/Board.svelte';
 	import ActionList from './ActionList.svelte';
 	import ActionButtons from './ActionButtons.svelte';
-	import { initStores, deinitStores, board, characters, tokens, isDm } from './stores';
 	import * as Resizable from '$lib/components/ui/resizable';
-	import { Game } from '$lib/game/game';
-	import { pb, user } from '$lib/pb';
+	import { createGameStores } from '$lib/game';
 
 	export let data;
 	$: console.debug('page data', data);
-	$: initStores(data);
+	const { game, characters, board, tokens, actionItems, isDm, init, deinit } =
+		createGameStores(data);
 
-	const game = new Game(data.game, user, {
-		...data,
-		tokens: data?.activeBoard?.expand?.['token(board)'],
-		actionItems: data?.activeBoard?.expand?.['actionItem(board)']
-	});
+	$: console.debug('Game', $game);
+	$: console.debug('Characters', $characters);
+	$: console.debug('Board', $board);
+	$: console.debug('Tokens', $tokens);
+	$: console.debug('ActionItems', $actionItems);
 
 	onMount(() => {
-		game.init(pb).catch(console.error);
+		init().catch(console.error);
 		return () => {
-			game.cleanup().catch(console.error);
-			deinitStores();
+			deinit().catch(console.error);
+			// deinitStores();
 		};
 	});
 </script>
+
+<svelte:head>
+	<title>{$game.name}</title>
+</svelte:head>
 
 <main class="grid h-screen max-h-screen">
 	<Resizable.PaneGroup direction="horizontal" autoSaveId="gameMainLayout">
 		<Resizable.Pane collapsible defaultSize={25} minSize={10}>
 			<Resizable.PaneGroup direction="vertical" autoSaveId="gameLeftLayout">
 				<Resizable.Pane defaultSize={60}>
-					{#if game.activeBoard}
-						<ActionList actionItems={game.activeBoard.actionItems} />
+					{#if $board}
+						<ActionList actionItems={$actionItems} characters={$characters} />
 					{/if}
 				</Resizable.Pane>
 				<Resizable.Handle withHandle />
