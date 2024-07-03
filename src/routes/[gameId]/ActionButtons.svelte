@@ -3,10 +3,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import { trpc } from '$lib/trpc/client';
 
-	export let boardId: string;
-
 	async function endTurn() {
-		const end = await trpc($page).combat.endTurn.mutate(boardId);
+		const end = await trpc($page).combat.endTurn.mutate({gameId: $page.params.gameId});
 	}
 </script>
 

@@ -1,4 +1,5 @@
 import { authError } from '$lib/error.js';
+import { startGame } from '$lib/game/games.server.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, locals }) {
@@ -38,5 +39,8 @@ export async function load({ params, locals }) {
 		characters: game.expand!['characters(game)'] ?? []
 	};
 	delete game.expand;
+
+	startGame(params.gameId, data);
+
 	return data;
 }

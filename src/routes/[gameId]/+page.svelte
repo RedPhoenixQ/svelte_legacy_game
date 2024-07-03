@@ -44,7 +44,7 @@
 				<Resizable.Handle withHandle />
 				<Resizable.Pane collapsible defaultSize={40} minSize={20}>
 					{#if $board}
-						<ActionButtons boardId={$board.id} />
+						<ActionButtons />
 					{/if}
 					<a href="/testing-test001">001</a>
 					<a href="/testing-testing">ing</a>
