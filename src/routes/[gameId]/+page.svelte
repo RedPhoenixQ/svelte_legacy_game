@@ -14,11 +14,11 @@
 	const { game, characters, board, tokens, actionItems, isDm, init, deinit } =
 		createGameStores(data);
 
-	$: console.debug('Game', $game);
-	$: console.debug('Characters', $characters);
-	$: console.debug('Board', $board);
-	$: console.debug('Tokens', $tokens);
-	$: console.debug('ActionItems', $actionItems);
+	$: console.debug('game', $game);
+	$: console.debug('characters', $characters);
+	$: console.debug('board', $board);
+	$: console.debug('tokens', $tokens);
+	$: console.debug('actionItems', $actionItems);
 
 	onMount(() => {
 		init().catch(console.error);
