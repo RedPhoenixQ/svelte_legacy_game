@@ -23,7 +23,6 @@
 		stores.init().catch(console.error);
 		return () => {
 			stores.deinit().catch(console.error);
-			// deinitStores();
 		};
 	});
 </script>
@@ -46,8 +45,6 @@
 					{#if $board}
 						<ActionButtons />
 					{/if}
-					<a href="/testing-test001">001</a>
-					<a href="/testing-testing">ing</a>
 				</Resizable.Pane>
 			</Resizable.PaneGroup>
 		</Resizable.Pane>
