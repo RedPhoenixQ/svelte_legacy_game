@@ -6,7 +6,7 @@
 	import type { CharactersMap } from '$lib/game/character';
 	import type { Board } from '$lib/game/board';
 	import { Button } from '$lib/components/ui/button';
-	import Aim from './Aim.svelte';
+	// import Aim from './Aim.svelte';
 
 	export let board: Board;
 	export let tokens: TokenMap;
