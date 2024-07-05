@@ -117,19 +117,18 @@
 	}
 
 	function testCollisions() {
-		console.log(
-			'HIT TEST',
-			board.checkOne(mainCollider, (res) => {
-				if (res.a.isTrigger && res.b.isTrigger) return;
-				if (res.overlap > 0) {
-					if (secondayCollider && !board.checkCollision(secondayCollider, res.b)) {
-						// Collision is not inside secondary collider
-						return;
-					}
-					console.log('Collision', res);
+		console.group('HIT TEST', mainCollider, secondayCollider);
+		board.checkOne(mainCollider, (res) => {
+			if (res.a.isTrigger && res.b.isTrigger) return;
+			if (res.overlap > 0) {
+				if (secondayCollider && !board.checkCollision(secondayCollider, res.b)) {
+					// Collision is not inside secondary collider
+					return;
 				}
-			})
-		);
+				console.log('Collision', res);
+			}
+		});
+		console.groupEnd();
 	}
 
 	let canvas: HTMLCanvasElement;
