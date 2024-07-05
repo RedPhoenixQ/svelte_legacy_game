@@ -42,6 +42,7 @@
 			{width}
 			{height}
 			origin={{ x: 200, y: 200 }}
+			angle={Math.PI / 4}
 			shape={{
 				// type: 'cone',
 				// radius: 200,

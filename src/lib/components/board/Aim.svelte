@@ -15,6 +15,7 @@
 	export let board: Board;
 	export let width: number;
 	export let height: number;
+	export let angle = 0;
 
 	// TODO: Replace with game targering types when they are implemented
 	// export let centeredOnOrigin: boolean;
@@ -36,7 +37,8 @@
 	};
 	const mainCollider =
 		shape.type === 'box'
-			? new Box(originPos, shape.height, shape.width, opts)
+			? // Width and height is revesed to that box follows the x-axis for angle calculations
+				new Box(originPos, shape.height, shape.width, opts)
 			: new Circle(originPos, shape.radius, opts);
 	if (shape.type === 'box') {
 		mainCollider.setOffset(ensureVectorPoint({ x: shape.height / 2, y: 0 }));
@@ -65,6 +67,11 @@
 			],
 			{ ...opts, isCentered: movableOrigin }
 		);
+	}
+
+	$: {
+		mainCollider.setAngle(angle);
+		secondayCollider?.setAngle?.(angle);
 	}
 
 	function resetTarget() {
