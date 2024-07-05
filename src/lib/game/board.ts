@@ -5,6 +5,7 @@ import { TokensStore } from './token';
 import { ActionItemsStore } from './actionItem';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
+import { System } from 'detect-collisions';
 
 export type BoardStoreInner = Board | undefined;
 
@@ -77,7 +78,7 @@ export class BoardStore implements Writable<BoardStoreInner> {
 	}
 }
 
-export class Board implements BoardResponse {
+export class Board extends System implements BoardResponse {
 	collectionName = 'board' as const;
 	game!: string;
 	background!: string;
@@ -91,6 +92,8 @@ export class Board implements BoardResponse {
 	collectionId!: string;
 
 	constructor(board: BoardResponse) {
+		// TODO: Handle adding eventual walls and other static objects on the board to the collision system
+		super();
 		this.assign(board);
 	}
 

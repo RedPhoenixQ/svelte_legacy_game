@@ -7,6 +7,7 @@ import PanZoom from './PanZoom.svelte';
 export { PanZoom, Movable };
 
 export const DEFAULT_GRID_SIZE = 50 as const;
+export const DEFAULT_GRID_SIZE_HALF = DEFAULT_GRID_SIZE / 2;
 
 export type XYPos = {
 	x: number;

@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { DEFAULT_GRID_SIZE, getPanZoomCtx, type XYPos } from '.';
+	import { DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE_HALF, getPanZoomCtx, type XYPos } from '.';
 	import { tweened } from 'svelte/motion';
 	import { cubicInOut } from 'svelte/easing';
 
 	let className: string = '';
 	export { className as class };
 	export let position: XYPos;
+	export let snapToGrid = true;
 	export let disabled = false;
+	export let duration = 500;
 
 	const panzoom = getPanZoomCtx();
 
@@ -29,8 +31,9 @@
 	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
 
 	$: {
-		x.set(position.x, { duration: 500 });
-		y.set(position.y, { duration: 500 });
+		currentPos = position;
+		x.set(position.x, { duration });
+		y.set(position.y, { duration });
 	}
 
 	function reset() {
@@ -64,10 +67,16 @@
 		clearTimeout(longPressTimeout);
 
 		if (moving) {
-			if (!event.shiftKey) {
+			if (snapToGrid && !event.shiftKey) {
 				// Snap to grid
-				currentPos.x = Math.round(currentPos.x / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
-				currentPos.y = Math.round(currentPos.y / DEFAULT_GRID_SIZE) * DEFAULT_GRID_SIZE;
+				currentPos.x =
+					DEFAULT_GRID_SIZE_HALF +
+					Math.round((currentPos.x - DEFAULT_GRID_SIZE_HALF) / DEFAULT_GRID_SIZE) *
+						DEFAULT_GRID_SIZE;
+				currentPos.y =
+					DEFAULT_GRID_SIZE_HALF +
+					Math.round((currentPos.y - DEFAULT_GRID_SIZE_HALF) / DEFAULT_GRID_SIZE) *
+						DEFAULT_GRID_SIZE;
 			}
 
 			$x = currentPos.x;
@@ -114,7 +123,7 @@
 />
 
 <div
-	class="absolute {className}"
+	class="absolute {className} -translate-x-1/2 -translate-y-1/2"
 	style:top="{$y}px"
 	style:left="{$x}px"
 	style={disabled ? '' : moving ? 'cursor : grabbing;' : 'cursor : grab;'}
