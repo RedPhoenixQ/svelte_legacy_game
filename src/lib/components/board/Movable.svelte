@@ -9,6 +9,7 @@
 	export let position: XYPos;
 	export let snapToGrid = true;
 	export let disabled = false;
+	export let duration = 500;
 
 	const panzoom = getPanZoomCtx();
 
@@ -31,8 +32,8 @@
 
 	$: {
 		currentPos = position;
-		x.set(position.x, { duration: 500 });
-		y.set(position.y, { duration: 500 });
+		x.set(position.x, { duration });
+		y.set(position.y, { duration });
 	}
 
 	function reset() {
