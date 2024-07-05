@@ -27,7 +27,7 @@ export const combat = t.router({
 					const record = await serverPb
 						.from('actionItem')
 						.update(first.id, { 'actionValue+': delta });
-					actionItems.items[0] = record;
+					stores.actionItems.handleChange({ action: 'update', record });
 					// Move combat time forward
 					const newBoard = await serverPb
 						.from('board')
