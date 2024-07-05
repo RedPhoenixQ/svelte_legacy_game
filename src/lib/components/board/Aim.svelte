@@ -118,6 +118,9 @@
 
 	function testCollisions() {
 		console.group('HIT TEST', mainCollider, secondayCollider);
+		ctx.save();
+		ctx.strokeStyle = 'Red';
+		ctx.beginPath();
 		board.checkOne(mainCollider, (res) => {
 			if (res.a.isTrigger && res.b.isTrigger) return;
 			if (res.overlap > 0) {
@@ -126,8 +129,11 @@
 					return;
 				}
 				console.log('Collision', res);
+				res.b.draw(ctx);
 			}
 		});
+		ctx.stroke();
+		ctx.restore();
 		console.groupEnd();
 	}
 
