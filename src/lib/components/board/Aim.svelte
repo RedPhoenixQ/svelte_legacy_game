@@ -97,9 +97,12 @@
 
 	function draw() {
 		ctx.clearRect(0, 0, width, height);
-		ctx.beginPath();
 		if (shape.type === 'cone') {
 			const halfAngle = shape.angle / 2;
+			ctx.save();
+			ctx.setLineDash([2, 4]);
+			ctx.beginPath();
+
 			ctx.moveTo(mainCollider.x, mainCollider.y);
 			ctx.arc(
 				mainCollider.x,
@@ -109,11 +112,15 @@
 				mainCollider.angle + halfAngle
 			);
 			ctx.lineTo(mainCollider.x, mainCollider.y);
+
+			ctx.stroke();
+			ctx.restore();
 		} else {
+			ctx.beginPath();
 			mainCollider.draw(ctx);
 			if (secondayCollider) secondayCollider.draw(ctx);
+			ctx.stroke();
 		}
-		ctx.stroke();
 	}
 
 	function testCollisions() {
@@ -142,6 +149,7 @@
 	onMount(() => {
 		ctx = canvas.getContext('2d')!;
 		ctx.strokeStyle = '#FFF';
+		ctx.lineWidth = 2;
 
 		board.insert(mainCollider);
 		if (secondayCollider) board.insert(secondayCollider);
@@ -160,7 +168,7 @@
 	<Movable
 		snapToGrid={false}
 		duration={0}
-		class="border-red z-40 size-8 rounded-full border-2 bg-red-700"
+		class="z-40 size-8 rounded-full border-2 border-primary bg-red-700 bg-opacity-75"
 		bind:position={targetPos}
 		on:move={({ detail }) => {
 			angleTowards(detail);
@@ -177,7 +185,7 @@
 	<Movable
 		snapToGrid={false}
 		duration={0}
-		class="border-red z-40 size-8 rounded-full border-2 bg-green-700"
+		class="z-40 size-8 rounded-full border-2 border-primary bg-green-700 bg-opacity-75"
 		bind:position={originPos}
 		on:move={({ detail }) => {
 			moveTo(detail);
