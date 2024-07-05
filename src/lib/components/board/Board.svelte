@@ -37,7 +37,7 @@
 		}}>Draw</Button
 	>
 	<PanZoom class="size-max" bounds={true} autocenter={true}>
-		<Aim
+		<!-- <Aim
 			{board}
 			{width}
 			{height}
@@ -54,7 +54,7 @@
 				// radius: 100
 			}}
 			movableOrigin
-		/>
+		/> -->
 		<img
 			src={pb.getFileUrl(board, board.background)}
 			alt="Game Board Background"
