@@ -5,6 +5,7 @@
 	import type { TokenMap } from '$lib/game/token';
 	import type { CharactersMap } from '$lib/game/character';
 	import type { Board } from '$lib/game/board';
+	import { Button } from '$lib/components/ui/button';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -12,6 +13,10 @@
 	export let moveAll = false;
 
 	$: gridScaleFactor = DEFAULT_GRID_SIZE / board.gridSize;
+	$: width = board.width * gridScaleFactor;
+	$: height = board.height * gridScaleFactor;
+
+	let canvas: HTMLCanvasElement;
 
 	let isGrabbing = false;
 </script>
@@ -21,10 +26,24 @@
 		<img
 			src={pb.getFileUrl(board, board.background)}
 			alt="Game Board Background"
-			width={board.width * gridScaleFactor}
-			height={board.height * gridScaleFactor}
+			{width}
+			{height}
 			class="opacity-50"
 		/>
+		<canvas {width} {height} class="pointer-events-none absolute inset-0 z-30" bind:this={canvas}
+		></canvas>
+		<Button
+			class="absolute left-4 top-4"
+			on:click={() => {
+				const ctx = canvas.getContext('2d');
+				if (!ctx) return console.error('No context');
+				ctx.strokeStyle = '#FF2020';
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				ctx.beginPath();
+				board.draw(ctx);
+				ctx.stroke();
+			}}>Draw</Button
+		>
 		<!-- <div
 			class="absolute inset-0"
 			style="background-size: 50px 50px;
@@ -41,6 +60,7 @@
 				on:startMove={() => (isGrabbing = true)}
 				on:endMove={(event) => {
 					isGrabbing = false;
+					token.collider.setPosition(event.detail.x, event.detail.y, true);
 					pb.from('token').update(token.id, event.detail);
 				}}
 			>
