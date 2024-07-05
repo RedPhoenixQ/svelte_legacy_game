@@ -65,7 +65,7 @@
 				{ x: extendedRadius, y: right.y },
 				right
 			],
-			{ ...opts, isCentered: movableOrigin }
+			{ ...opts, isCentered: false }
 		);
 	}
 
