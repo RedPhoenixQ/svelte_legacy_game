@@ -10,14 +10,8 @@
 
 	export let data;
 	$: console.debug('page data', data);
-	$: stores = new GameStores(data);
+	$: stores = new GameStores(data, true);
 	$: ({ game, characters, board, tokens, actionItems, isDm } = stores);
-
-	$: console.debug('game', $game);
-	$: console.debug('characters', $characters);
-	$: console.debug('board', $board);
-	$: console.debug('tokens', $tokens);
-	$: console.debug('actionItems', $actionItems);
 
 	onMount(() => {
 		stores.init().catch(console.error);

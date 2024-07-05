@@ -22,15 +22,18 @@ export class GameStores {
 	actionItems: ActionItemsStore;
 	isDm: ReturnType<typeof createIsDm>;
 
-	constructor(args: {
-		game: GamesResponse;
-		dms: UsersResponse[];
-		players: UsersResponse[];
-		activeBoard?: BoardResponse;
-		tokens?: TokenResponse[];
-		actionItems?: ActionItemResponse[];
-		characters: CharactersResponse[];
-	}) {
+	constructor(
+		args: {
+			game: GamesResponse;
+			dms: UsersResponse[];
+			players: UsersResponse[];
+			activeBoard?: BoardResponse;
+			tokens?: TokenResponse[];
+			actionItems?: ActionItemResponse[];
+			characters: CharactersResponse[];
+		},
+		debug?: boolean
+	) {
 		this.game = GameStore.fromResponse(args.game);
 		this.board = BoardStore.fromResponse(args.activeBoard);
 		this.characters = CharactersStore.fromResponse(args.characters);
@@ -43,6 +46,14 @@ export class GameStores {
 		this.characters.stores = this;
 		this.tokens.stores = this;
 		this.actionItems.stores = this;
+
+		if (debug) {
+			this.game.subscribe(($game) => console.debug('game', $game));
+			this.board.subscribe(($board) => console.debug('board', $board));
+			this.characters.subscribe(($characters) => console.debug('characters', $characters));
+			this.tokens.subscribe(($tokens) => console.debug('tokens', $tokens));
+			this.actionItems.subscribe(($actionItems) => console.debug('actionItems', $actionItems));
+		}
 	}
 
 	async init() {
