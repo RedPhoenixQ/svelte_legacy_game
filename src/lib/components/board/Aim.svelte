@@ -81,8 +81,6 @@
 			.add(mainCollider.pos);
 	}
 
-	console.log(originPos, targetPos, movableTarget);
-
 	function moveTo(point: Vector) {
 		mainCollider.setPosition(point.x, point.y, true);
 		secondayCollider?.setPosition(point.x, point.y, true);
