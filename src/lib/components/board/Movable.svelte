@@ -7,6 +7,7 @@
 	let className: string = '';
 	export { className as class };
 	export let position: XYPos;
+	export let snapToGrid = true;
 	export let disabled = false;
 
 	const panzoom = getPanZoomCtx();
@@ -29,6 +30,7 @@
 	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
 
 	$: {
+		currentPos = position;
 		x.set(position.x, { duration: 500 });
 		y.set(position.y, { duration: 500 });
 	}
@@ -64,7 +66,7 @@
 		clearTimeout(longPressTimeout);
 
 		if (moving) {
-			if (!event.shiftKey) {
+			if (snapToGrid && !event.shiftKey) {
 				// Snap to grid
 				currentPos.x =
 					DEFAULT_GRID_SIZE_HALF +

@@ -6,6 +6,7 @@
 	import type { CharactersMap } from '$lib/game/character';
 	import type { Board } from '$lib/game/board';
 	import { Button } from '$lib/components/ui/button';
+	import Aim from './Aim.svelte';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -21,8 +22,22 @@
 	let isGrabbing = false;
 </script>
 
-<div class="size-full bg-background" style={isGrabbing ? 'cursor : grabbing;' : ''}>
+<div class="relative size-full bg-background" style={isGrabbing ? 'cursor : grabbing;' : ''}>
+	<Button
+		class="absolute left-4 top-4"
+		on:click={() => {
+			const ctx = canvas.getContext('2d');
+			if (!ctx) return console.error('No context');
+			ctx.strokeStyle = '#FF2020';
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.beginPath();
+			board.draw(ctx);
+			ctx.stroke();
+			console.log(board.data);
+		}}>Draw</Button
+	>
 	<PanZoom class="size-max" bounds={true} autocenter={true}>
+		<Aim {board} {width} {height} />
 		<img
 			src={pb.getFileUrl(board, board.background)}
 			alt="Game Board Background"
@@ -32,18 +47,6 @@
 		/>
 		<canvas {width} {height} class="pointer-events-none absolute inset-0 z-30" bind:this={canvas}
 		></canvas>
-		<Button
-			class="absolute left-4 top-4"
-			on:click={() => {
-				const ctx = canvas.getContext('2d');
-				if (!ctx) return console.error('No context');
-				ctx.strokeStyle = '#FF2020';
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				ctx.beginPath();
-				board.draw(ctx);
-				ctx.stroke();
-			}}>Draw</Button
-		>
 		<!-- <div
 			class="absolute inset-0"
 			style="background-size: 50px 50px;
