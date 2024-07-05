@@ -4,7 +4,7 @@
 	import { trpc } from '$lib/trpc/client';
 
 	async function endTurn() {
-		const end = await trpc($page).combat.endTurn.mutate($page.data.game.activeBoard);
+		const end = await trpc($page).combat.endTurn.mutate({gameId: $page.params.gameId});
 	}
 </script>
 

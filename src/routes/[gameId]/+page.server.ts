@@ -1,4 +1,5 @@
 import { authError } from '$lib/error.js';
+import { startGame } from '$lib/game/games.server.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, locals }) {
@@ -15,7 +16,8 @@ export async function load({ params, locals }) {
 					players: true,
 					activeBoard: {
 						expand: {
-							'token(board)': true
+							'token(board)': true,
+							'actionItem(board)': true
 						}
 					},
 					'characters(game)': true
@@ -32,8 +34,13 @@ export async function load({ params, locals }) {
 		dms: game.expand!.dms ?? [],
 		players: game.expand!.players ?? [],
 		activeBoard: game.expand?.activeBoard,
+		tokens: game.expand?.activeBoard?.expand?.['token(board)'],
+		actionItems: game.expand?.activeBoard?.expand?.['actionItem(board)'],
 		characters: game.expand!['characters(game)'] ?? []
 	};
 	delete game.expand;
+
+	startGame(params.gameId, data);
+
 	return data;
 }

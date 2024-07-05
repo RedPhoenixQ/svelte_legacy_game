@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { Movable, PanZoom, DEFAULT_GRID_SIZE } from '$lib/components/board';
 	import { pb, user } from '$lib/pb';
-	import type { BoardResponse, TokenResponse, CharactersResponse } from '$lib/schema';
 	import TokenImg from '$lib/components/board/TokenImg.svelte';
+	import type { TokenMap } from '$lib/game/token';
+	import type { CharactersMap } from '$lib/game/character';
+	import type { Board } from '$lib/game/board';
 
-	export let board: BoardResponse;
-	export let tokens: Map<string, TokenResponse>;
-	export let characters: Map<string, CharactersResponse>;
+	export let board: Board;
+	export let tokens: TokenMap;
+	export let characters: CharactersMap;
 	export let moveAll = false;
 
 	$: gridScaleFactor = DEFAULT_GRID_SIZE / board.gridSize;
