@@ -2,11 +2,9 @@
 	import Chat from '$lib/components/chat/Chat.svelte';
 	import RollDice from '$lib/components/dice/RollDice.svelte';
 	import { onMount } from 'svelte';
-	import Board from '../../lib/components/board/Board.svelte';
-	import ActionList from './ActionList.svelte';
-	import ActionButtons from './ActionButtons.svelte';
 	import * as Resizable from '$lib/components/ui/resizable';
 	import { GameStores } from '$lib/game';
+	import Combat from './Combat.svelte';
 
 	export let data;
 	$: console.debug('page data', data);
@@ -27,25 +25,15 @@
 
 <main class="grid h-screen max-h-screen">
 	<Resizable.PaneGroup direction="horizontal" autoSaveId="gameMainLayout">
-		<Resizable.Pane collapsible defaultSize={25} minSize={10}>
-			<Resizable.PaneGroup direction="vertical" autoSaveId="gameLeftLayout">
-				<Resizable.Pane defaultSize={60}>
-					{#if $board}
-						<ActionList actionItems={$actionItems} characters={$characters} />
-					{/if}
-				</Resizable.Pane>
-				<Resizable.Handle withHandle />
-				<Resizable.Pane collapsible defaultSize={40} minSize={20}>
-					{#if $board}
-						<ActionButtons />
-					{/if}
-				</Resizable.Pane>
-			</Resizable.PaneGroup>
-		</Resizable.Pane>
-		<Resizable.Handle withHandle />
-		<Resizable.Pane defaultSize={50}>
+		<Resizable.Pane defaultSize={75} minSize={20}>
 			{#if $board}
-				<Board board={$board} characters={$characters} moveAll={$isDm} bind:tokens={$tokens} />
+				<Combat
+					board={$board}
+					characters={$characters}
+					actionItems={$actionItems}
+					isDm={$isDm}
+					tokens={$tokens}
+				/>
 			{:else}
 				No board active
 			{/if}
