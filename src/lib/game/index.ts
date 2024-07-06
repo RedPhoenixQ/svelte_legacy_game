@@ -55,6 +55,8 @@ export class GameStores {
 			this.characters.subscribe(($characters) => console.debug('characters', $characters));
 			this.tokens.subscribe(($tokens) => console.debug('tokens', $tokens));
 			this.actionItems.subscribe(($actionItems) => console.debug('actionItems', $actionItems));
+			this.isDm.subscribe(($isDm) => console.debug('isDm', $isDm));
+			this.currentTurn.subscribe(($currentTurn) => console.debug('currentTurn', $currentTurn));
 		}
 	}
 
