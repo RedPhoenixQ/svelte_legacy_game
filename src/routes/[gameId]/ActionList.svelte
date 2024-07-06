@@ -9,11 +9,18 @@
 	export let characters: CharactersMap;
 </script>
 
-<ol>
-	{#each actionItems.items as item (item.id)}
+<ol class="p-4">
+	{#each actionItems.items as item, i (item.id)}
 		{@const character = item.character && characters.get(item.character)}
+		{@const isFirst = i === 0}
 
-		<li class="flex justify-between px-2" animate:flip={{ duration: 1000, easing: expoInOut }}>
+		<li
+			class="flex justify-between px-2 bg-background transition-all duration-1000 {isFirst
+				? 'mb-4 ring-2 ring-indigo-300 shadow-md shadow-indigo-300 z-10 relative '
+				: ''}"
+			style:scale={isFirst ? '110%' : ''}
+			animate:flip={{ duration: 1000, easing: expoInOut }}
+		>
 			<button
 				on:click={() => {
 					item.actionValue--;
