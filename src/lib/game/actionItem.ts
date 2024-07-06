@@ -4,6 +4,7 @@ import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
+import type { Character } from './character';
 
 export class ActionItemsStore implements Readable<ActionItems> {
 	stores!: GameStores;
@@ -56,9 +57,21 @@ export class ActionItemsStore implements Readable<ActionItems> {
 	}
 }
 
-export function createCurrentTurn(actionItems: ActionItemsStore) {
-	return derived(actionItems, ($actionItems) => {
-		return $actionItems.items.at(0);
+export type CurrentTurn =
+	| {
+			item: ActionItemResponse;
+			character?: Character;
+	  }
+	| undefined;
+
+export function createCurrentTurn(stores: GameStores) {
+	return derived([stores.actionItems, stores.characters], ([$actionItems, $characters]) => {
+		if ($actionItems.items.length < 1) {
+			return undefined;
+		}
+		const item = $actionItems.items[0];
+		const character = $characters.get(item.character);
+		return { item, character };
 	});
 }
 
