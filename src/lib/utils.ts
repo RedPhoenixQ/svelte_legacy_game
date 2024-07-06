@@ -81,3 +81,18 @@ export function throttled<Args extends unknown[]>(fn: (...args: Args) => unknown
 		}
 	};
 }
+
+/**
+ * Calls the provided function only once if multiple calls are made within the decided delay. The delay time get reset on every call
+ *
+ * @param fn The function to call
+ * @param delay The amount of time to wait until calling the function
+ * @returns trottled function
+ */
+export function debounced<Args extends unknown[]>(fn: (...args: Args) => unknown, delay = 250) {
+	let timeout: ReturnType<typeof setTimeout> | undefined;
+	return (...args: Args) => {
+		clearTimeout(timeout);
+		timeout = setTimeout(fn, delay, ...args);
+	};
+}
