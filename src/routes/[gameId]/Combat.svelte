@@ -16,13 +16,15 @@
 	export let characters: CharactersMap;
 	export let currentTurn: CurrentTurn;
 	export let isDm = false;
+
+	$: isUsersTurn = currentTurn?.character?.owner === $user?.id;
 </script>
 
 <Resizable.PaneGroup direction="horizontal" autoSaveId="combatLayout">
 	<Resizable.Pane collapsible defaultSize={25} minSize={10}>
 		<Resizable.PaneGroup direction="vertical" autoSaveId="combatSidebarLayout">
 			<Resizable.Pane defaultSize={60}>
-				<ActionList {actionItems} {characters} />
+				<ActionList {actionItems} {characters} {tokens} />
 			</Resizable.Pane>
 			<Resizable.Handle withHandle />
 			<Resizable.Pane collapsible defaultSize={40} minSize={20}>
@@ -33,26 +35,28 @@
 	<Resizable.Handle withHandle />
 	<Resizable.Pane defaultSize={75} minSize={20} class="relative">
 		<BoardComp {board} {characters} moveAll={isDm} {tokens} let:width let:height>
-			<Aim
-				{board}
-				{width}
-				{height}
-				origin={{ x: 200, y: 200 }}
-				angle={Math.PI / 4}
-				shape={{
-					// type: 'cone',
-					// radius: 200,
-					// angle: 1.2
-					type: 'box',
-					width: 20,
-					height: 300
-					// type: 'circle',
-					// radius: 100
-				}}
-				movableOrigin
-			/>
+			{#if isUsersTurn && currentTurn?.token}
+				<Aim
+					{board}
+					{width}
+					{height}
+					origin={currentTurn.token}
+					angle={0}
+					shape={{
+						// type: 'cone',
+						// radius: 200,
+						// angle: 1.2
+						type: 'box',
+						width: 20,
+						height: 300
+						// type: 'circle',
+						// radius: 100
+					}}
+					movableOrigin
+				/>
+			{/if}
 		</BoardComp>
-		{#if currentTurn?.character?.owner === $user?.id}
+		{#if isUsersTurn}
 			<div
 				class="absolute inset-0 top-auto mx-auto my-4 w-fit animate-bounce rounded-md bg-accent px-4 py-2 text-accent-foreground"
 			>

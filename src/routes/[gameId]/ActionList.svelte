@@ -4,14 +4,17 @@
 	import TokenImg from '$lib/components/board/TokenImg.svelte';
 	import type { ActionItems } from '$lib/game/actionItem';
 	import type { CharactersMap } from '$lib/game/character';
+	import type { TokenMap } from '$lib/game/token';
 
 	export let actionItems: ActionItems;
 	export let characters: CharactersMap;
+	export let tokens: TokenMap;
 </script>
 
 <ol class="p-4">
 	{#each actionItems.items as item, i (item.id)}
-		{@const character = item.character && characters.get(item.character)}
+		{@const token = item.token && tokens.get(item.token)}
+		{@const character = token && characters.get(token.character)}
 		{@const isFirst = i === 0}
 
 		<li

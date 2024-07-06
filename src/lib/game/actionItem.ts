@@ -5,6 +5,7 @@ import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
 import type { Character } from './character';
+import type { Token } from './token';
 
 export class ActionItemsStore implements Readable<ActionItems> {
 	stores!: GameStores;
@@ -60,19 +61,24 @@ export class ActionItemsStore implements Readable<ActionItems> {
 export type CurrentTurn =
 	| {
 			item: ActionItemResponse;
+			token?: Token;
 			character?: Character;
 	  }
 	| undefined;
 
 export function createCurrentTurn(stores: GameStores) {
-	return derived([stores.actionItems, stores.characters], ([$actionItems, $characters]) => {
-		if ($actionItems.items.length < 1) {
-			return undefined;
+	return derived(
+		[stores.actionItems, stores.characters, stores.tokens],
+		([$actionItems, $characters, $tokens]) => {
+			if ($actionItems.items.length < 1) {
+				return undefined;
+			}
+			const item = $actionItems.items[0];
+			const token = $tokens.get(item.token);
+			const character = token?.character ? $characters.get(token.character) : undefined;
+			return { item, token, character };
 		}
-		const item = $actionItems.items[0];
-		const character = $characters.get(item.character);
-		return { item, character };
-	});
+	);
 }
 
 export class ActionItems {
