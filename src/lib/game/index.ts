@@ -40,7 +40,7 @@ export class GameStores {
 		this.characters = CharactersStore.fromResponse(args.characters);
 		this.tokens = new TokensStore(TokensStore.fromResponse(args.tokens));
 		this.actionItems = new ActionItemsStore(ActionItemsStore.fromResponse(args.actionItems));
-		this.isDm = createIsDm(this.game);
+		this.isDm = createIsDm(this);
 		this.currentTurn = createCurrentTurn(this);
 
 		this.game.stores = this;

@@ -58,8 +58,8 @@ export class GameStore implements Writable<Game> {
 	}
 }
 
-export function createIsDm(game: GameStore) {
-	return derived([game, user], ([$game, $user]) => {
+export function createIsDm(stores: GameStores) {
+	return derived([stores.game, user], ([$game, $user]) => {
 		if (!$user) return false;
 		return $game.dms.includes($user.id);
 	});
