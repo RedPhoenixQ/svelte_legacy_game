@@ -54,3 +54,30 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+/**
+ * The arguments to the last function call is remebered and used after the choosen delay.
+ *
+ * @param fn The function to call
+ * @param delay The amount of time to wait between calls
+ * @returns trottled function
+ */
+export function throttled<Args extends unknown[]>(fn: (...args: Args) => unknown, delay = 250) {
+	let timeout: ReturnType<typeof setTimeout> | undefined;
+	let lastCalledArgs: Args | undefined;
+	function onTimeout() {
+		if (lastCalledArgs) {
+			fn(...lastCalledArgs);
+			lastCalledArgs = undefined;
+			timeout = setTimeout(onTimeout, delay);
+		} else {
+			timeout = undefined;
+		}
+	}
+	return (...args: Args) => {
+		lastCalledArgs = args;
+		if (timeout === undefined) {
+			onTimeout();
+		}
+	};
+}
