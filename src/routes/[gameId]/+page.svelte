@@ -9,7 +9,7 @@
 	export let data;
 	$: console.debug('page data', data);
 	$: stores = new GameStores(data, true);
-	$: ({ game, characters, board, tokens, actionItems, isDm } = stores);
+	$: ({ game, characters, board, tokens, actionItems, currentTurn, isDm } = stores);
 
 	onMount(() => {
 		stores.init().catch(console.error);
@@ -31,6 +31,7 @@
 					board={$board}
 					characters={$characters}
 					actionItems={$actionItems}
+					currentTurn={$currentTurn}
 					isDm={$isDm}
 					tokens={$tokens}
 				/>

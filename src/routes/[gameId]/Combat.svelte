@@ -3,16 +3,18 @@
 	import type { Board } from '$lib/game/board';
 	import type { CharactersMap } from '$lib/game/character';
 	import type { TokenMap } from '$lib/game/token';
-	import type { ActionItems } from '$lib/game/actionItem';
+	import type { ActionItems, CurrentTurn } from '$lib/game/actionItem';
 	import * as Resizable from '$lib/components/ui/resizable';
 	import ActionButtons from './ActionButtons.svelte';
 	import ActionList from './ActionList.svelte';
 	import Aim from '$lib/components/board/Aim.svelte';
+	import { user } from '$lib/pb';
 
 	export let board: Board;
 	export let tokens: TokenMap;
 	export let actionItems: ActionItems;
 	export let characters: CharactersMap;
+	export let currentTurn: CurrentTurn;
 	export let isDm = false;
 </script>
 
@@ -29,7 +31,7 @@
 		</Resizable.PaneGroup>
 	</Resizable.Pane>
 	<Resizable.Handle withHandle />
-	<Resizable.Pane defaultSize={75} minSize={20}>
+	<Resizable.Pane defaultSize={75} minSize={20} class="relative">
 		<BoardComp {board} {characters} moveAll={isDm} {tokens} let:width let:height>
 			<Aim
 				{board}
@@ -50,5 +52,12 @@
 				movableOrigin
 			/>
 		</BoardComp>
+		{#if currentTurn?.character?.owner === $user?.id}
+			<div
+				class="absolute inset-0 top-auto mx-auto my-4 w-fit animate-bounce rounded-md bg-accent px-4 py-2 text-accent-foreground"
+			>
+				It's your turn
+			</div>
+		{/if}
 	</Resizable.Pane>
 </Resizable.PaneGroup>
