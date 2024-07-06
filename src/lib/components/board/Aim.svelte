@@ -11,6 +11,7 @@
 	import Movable from './Movable.svelte';
 	import { onMount } from 'svelte';
 	import type { Board } from '$lib/game/board';
+	import { throttled } from '$lib/utils';
 
 	export let board: Board;
 	export let width: number;
@@ -87,7 +88,7 @@
 		resetTarget();
 	}
 
-	function angleTowards(point: PotentialVector) {
+	function angleTowards(point: Vector) {
 		const vec = ensureVectorPoint(point);
 		const dir = vec.sub(mainCollider.pos);
 		const angle = Math.atan2(dir.y, dir.x);
@@ -144,6 +145,17 @@
 		console.groupEnd();
 	}
 
+	const slowAngle = throttled((point: Vector) => {
+		angleTowards(point);
+		draw();
+		testCollisions();
+	}, 32);
+	const slowMove = throttled((point: Vector) => {
+		moveTo(ensureVectorPoint(point));
+		draw();
+		testCollisions();
+	}, 32);
+
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
 	onMount(() => {
@@ -171,8 +183,7 @@
 		class="z-40 size-8 rounded-full border-2 border-primary bg-red-700 bg-opacity-75"
 		bind:position={targetPos}
 		on:move={({ detail }) => {
-			angleTowards(detail);
-			draw();
+			slowAngle(detail);
 		}}
 		on:endMove={({ detail }) => {
 			angleTowards(detail);
@@ -188,8 +199,7 @@
 		class="z-40 size-8 rounded-full border-2 border-primary bg-green-700 bg-opacity-75"
 		bind:position={originPos}
 		on:move={({ detail }) => {
-			moveTo(detail);
-			draw();
+			slowMove(detail);
 		}}
 		on:endMove={({ detail }) => {
 			moveTo(detail);
