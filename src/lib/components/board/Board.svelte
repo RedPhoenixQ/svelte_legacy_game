@@ -6,7 +6,6 @@
 	import type { CharactersMap } from '$lib/game/character';
 	import type { Board } from '$lib/game/board';
 	import { Button } from '$lib/components/ui/button';
-	// import Aim from './Aim.svelte';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -37,24 +36,6 @@
 		}}>Draw</Button
 	>
 	<PanZoom class="size-max" bounds={true} autocenter={true}>
-		<!-- <Aim
-			{board}
-			{width}
-			{height}
-			origin={{ x: 200, y: 200 }}
-			angle={Math.PI / 4}
-			shape={{
-				// type: 'cone',
-				// radius: 200,
-				// angle: 1.2
-				type: 'box',
-				width: 20,
-				height: 300
-				// type: 'circle',
-				// radius: 100
-			}}
-			movableOrigin
-		/> -->
 		<img
 			src={pb.getFileUrl(board, board.background)}
 			alt="Game Board Background"
@@ -89,5 +70,7 @@
 				{/if}
 			</Movable>
 		{/each}
+
+		<slot {width} {height} />
 	</PanZoom>
 </div>
