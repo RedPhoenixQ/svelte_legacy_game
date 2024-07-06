@@ -67,6 +67,7 @@ export class TokensStore implements Writable<TokenMap> {
 			this.update(($tokens) => {
 				const token = $tokens.get(record.id);
 				if (token) {
+					if (token.updated >= record.updated) return $tokens;
 					token.assign(record);
 				} else {
 					$tokens.set(record.id, new Token(record));

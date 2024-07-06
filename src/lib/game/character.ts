@@ -54,6 +54,7 @@ export class CharactersStore implements Writable<CharactersMap> {
 			this.update(($characters) => {
 				const character = $characters.get(record.id);
 				if (character) {
+					if (character.updated >= record.updated) return $characters;
 					character.assign(record);
 				} else {
 					$characters.set(record.id, new Character(record));

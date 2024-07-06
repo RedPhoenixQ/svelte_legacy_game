@@ -33,6 +33,8 @@ export class GameStore implements Writable<Game> {
 		switch (action) {
 			case 'update':
 				this.update(($game) => {
+					if ($game.updated >= record.updated) return $game;
+
 					if ($game.activeBoard !== record.activeBoard) {
 						this.stores.board.change(record.activeBoard);
 					}

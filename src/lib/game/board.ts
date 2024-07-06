@@ -40,6 +40,7 @@ export class BoardStore implements Writable<BoardStoreInner> {
 
 		this.update(($board) => {
 			if (!$board) return new Board(record);
+			if ($board.updated >= record.updated) return $board;
 			$board.assign(record);
 			return $board;
 		});
