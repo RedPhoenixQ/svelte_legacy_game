@@ -1,5 +1,5 @@
 import type { ActionItemResponse } from '$lib/schema';
-import { get, writable, type Readable, type Writable } from 'svelte/store';
+import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
@@ -54,6 +54,12 @@ export class ActionItemsStore implements Readable<ActionItems> {
 	async deinit() {
 		await this.#unsub?.();
 	}
+}
+
+export function createCurrentTurn(actionItems: ActionItemsStore) {
+	return derived(actionItems, ($actionItems) => {
+		return $actionItems.items.at(0);
+	});
 }
 
 export class ActionItems {

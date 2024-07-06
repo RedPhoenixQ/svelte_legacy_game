@@ -6,7 +6,7 @@ import type {
 	TokenResponse,
 	UsersResponse
 } from '$lib/schema';
-import { ActionItemsStore } from './actionItem';
+import { ActionItemsStore, createCurrentTurn } from './actionItem';
 import { BoardStore } from './board';
 import { CharactersStore } from './character';
 import { GameStore, createIsDm } from './game';
@@ -21,6 +21,7 @@ export class GameStores {
 	tokens: TokensStore;
 	actionItems: ActionItemsStore;
 	isDm: ReturnType<typeof createIsDm>;
+	currentTurn: ReturnType<typeof createCurrentTurn>;
 
 	constructor(
 		args: {
@@ -40,6 +41,7 @@ export class GameStores {
 		this.tokens = new TokensStore(TokensStore.fromResponse(args.tokens));
 		this.actionItems = new ActionItemsStore(ActionItemsStore.fromResponse(args.actionItems));
 		this.isDm = createIsDm(this.game);
+		this.currentTurn = createCurrentTurn(this.actionItems);
 
 		this.game.stores = this;
 		this.board.stores = this;
