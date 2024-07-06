@@ -1,6 +1,6 @@
 import type { TokenResponse } from '$lib/schema';
 import { get, writable, type Writable } from 'svelte/store';
-import type { UnsubscribeFunc } from 'pocketbase';
+import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
@@ -36,44 +36,44 @@ export class TokensStore implements Writable<TokenMap> {
 			board.insert(token.collider);
 		}
 
-		this.#unsub = await pb.from('token').subscribe(
-			'*',
-			({ action, record }) => {
-				console.debug('sub token', action, record);
-
-				if (action === 'delete') {
-					this.update(($tokens) => {
-						const token = $tokens.get(record.id);
-						if (!token) return $tokens;
-						board.remove(token.collider);
-						$tokens.delete(record.id);
-						return $tokens;
-					});
-				} else if (action === 'create') {
-					this.update(($tokens) => {
-						const token = new Token(record);
-						$tokens.set(record.id, token);
-						board.insert(token.collider);
-						return $tokens;
-					});
-				} else {
-					this.update(($tokens) => {
-						const token = $tokens.get(record.id);
-						if (token) {
-							token.assign(record);
-						} else {
-							$tokens.set(record.id, new Token(record));
-						}
-						return $tokens;
-					});
-				}
-			},
-			{
-				query: {
-					filter: eq('board.id', board.id)
-				}
+		this.#unsub = await pb.from('token').subscribe('*', this.handleChange.bind(this), {
+			query: {
+				filter: eq('board.id', board.id)
 			}
-		);
+		});
+	}
+
+	handleChange({ action, record }: RecordSubscription<TokenResponse>) {
+		console.debug('sub token', action, record);
+		const board = this.stores.board.get();
+		if (!board) return;
+
+		if (action === 'delete') {
+			this.update(($tokens) => {
+				const token = $tokens.get(record.id);
+				if (!token) return $tokens;
+				board.remove(token.collider);
+				$tokens.delete(record.id);
+				return $tokens;
+			});
+		} else if (action === 'create') {
+			this.update(($tokens) => {
+				const token = new Token(record);
+				$tokens.set(record.id, token);
+				board.insert(token.collider);
+				return $tokens;
+			});
+		} else {
+			this.update(($tokens) => {
+				const token = $tokens.get(record.id);
+				if (token) {
+					token.assign(record);
+				} else {
+					$tokens.set(record.id, new Token(record));
+				}
+				return $tokens;
+			});
+		}
 	}
 
 	async deinit() {

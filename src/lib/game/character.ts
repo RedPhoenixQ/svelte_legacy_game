@@ -1,6 +1,6 @@
 import type { CharactersResponse } from '$lib/schema';
 import { get, writable, type Writable } from 'svelte/store';
-import type { UnsubscribeFunc } from 'pocketbase';
+import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
@@ -30,39 +30,37 @@ export class CharactersStore implements Writable<CharactersMap> {
 
 	#unsub!: UnsubscribeFunc;
 	async init() {
-		this.#unsub = await pb.from('characters').subscribe(
-			'*',
-			({ action, record }) => {
-				console.debug('sub characters', action, record);
-
-				if (action === 'delete') {
-					this.update(($characters) => {
-						$characters.delete(record.id);
-						return $characters;
-					});
-				} else if (action === 'create') {
-					this.update(($characters) => {
-						$characters.set(record.id, new Character(record));
-						return $characters;
-					});
-				} else {
-					this.update(($characters) => {
-						const character = $characters.get(record.id);
-						if (character) {
-							character.assign(record);
-						} else {
-							$characters.set(record.id, new Character(record));
-						}
-						return $characters;
-					});
-				}
-			},
-			{
-				query: {
-					filter: eq('game.id', this.stores.game.get().id)
-				}
+		this.#unsub = await pb.from('characters').subscribe('*', this.handleChange.bind(this), {
+			query: {
+				filter: eq('game.id', this.stores.game.get().id)
 			}
-		);
+		});
+	}
+
+	handleChange({ action, record }: RecordSubscription<CharactersResponse>) {
+		console.debug('sub characters', action, record);
+
+		if (action === 'delete') {
+			this.update(($characters) => {
+				$characters.delete(record.id);
+				return $characters;
+			});
+		} else if (action === 'create') {
+			this.update(($characters) => {
+				$characters.set(record.id, new Character(record));
+				return $characters;
+			});
+		} else {
+			this.update(($characters) => {
+				const character = $characters.get(record.id);
+				if (character) {
+					character.assign(record);
+				} else {
+					$characters.set(record.id, new Character(record));
+				}
+				return $characters;
+			});
+		}
 	}
 
 	async deinit() {

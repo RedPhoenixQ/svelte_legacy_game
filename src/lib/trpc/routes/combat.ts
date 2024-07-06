@@ -32,7 +32,7 @@ export const combat = t.router({
 					const newBoard = await serverPb
 						.from('board')
 						.update(first.board, { time: first.actionValue });
-					stores.board.get()?.assign?.(newBoard);
+					stores.board.handleChange({ action: 'update', record: newBoard });
 
 					return record.actionValue;
 				} catch (err) {

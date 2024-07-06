@@ -1,6 +1,6 @@
 import type { BoardResponse } from '$lib/schema';
 import { get, writable, type Writable } from 'svelte/store';
-import type { UnsubscribeFunc } from 'pocketbase';
+import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { TokensStore } from './token';
 import { ActionItemsStore } from './actionItem';
 import { pb } from '$lib/pb';
@@ -32,14 +32,16 @@ export class BoardStore implements Writable<BoardStoreInner> {
 	async init() {
 		const board = this.get();
 		if (!board) return;
-		this.#unsub = await pb.from('board').subscribe(board.id, ({ action, record }) => {
-			console.debug('sub board', action, record);
+		this.#unsub = await pb.from('board').subscribe(board.id, this.handleChange.bind(this));
+	}
 
-			this.update(($board) => {
-				if (!$board) return new Board(record);
-				$board.assign(record);
-				return $board;
-			});
+	handleChange({ action, record }: RecordSubscription<BoardResponse>) {
+		console.debug('sub board', action, record);
+
+		this.update(($board) => {
+			if (!$board) return new Board(record);
+			$board.assign(record);
+			return $board;
 		});
 	}
 

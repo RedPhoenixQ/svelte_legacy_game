@@ -1,7 +1,7 @@
 import type { GamesResponse } from '$lib/schema';
 import { derived, get, writable, type Writable } from 'svelte/store';
 import { pb, user } from '$lib/pb';
-import type { UnsubscribeFunc } from 'pocketbase';
+import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import type { GameStores } from '.';
 
 export class GameStore implements Writable<Game> {
@@ -25,28 +25,30 @@ export class GameStore implements Writable<Game> {
 
 	#unsub!: UnsubscribeFunc;
 	async init() {
-		this.#unsub = await pb.from('games').subscribe(this.get().id, ({ action, record }) => {
-			console.debug('sub game', action, record);
-			switch (action) {
-				case 'update':
-					this.update(($game) => {
-						if ($game.activeBoard !== record.activeBoard) {
-							this.stores.board.change(record.activeBoard);
-						}
-						// TODO: Handle adding/removing players and dms
-						$game.assign(record);
-						return $game;
-					});
-					break;
-				default:
-					throw new Error(`Game cannot handle action ${action}`, {
-						cause: {
-							action,
-							record
-						}
-					});
-			}
-		});
+		this.#unsub = await pb.from('games').subscribe(this.get().id, this.handleChange.bind(this));
+	}
+
+	handleChange({ action, record }: RecordSubscription<GamesResponse>) {
+		console.debug('sub game', action, record);
+		switch (action) {
+			case 'update':
+				this.update(($game) => {
+					if ($game.activeBoard !== record.activeBoard) {
+						this.stores.board.change(record.activeBoard);
+					}
+					// TODO: Handle adding/removing players and dms
+					$game.assign(record);
+					return $game;
+				});
+				break;
+			default:
+				throw new Error(`Game cannot handle action ${action}`, {
+					cause: {
+						action,
+						record
+					}
+				});
+		}
 	}
 
 	async deinit() {
