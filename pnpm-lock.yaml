@@ -21,8 +21,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       detect-collisions:
-        specifier: ^9.8.0
-        version: 9.8.0
+        specifier: https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation
+        version: https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation
       eventsource:
         specifier: ^2.0.2
         version: 2.0.2
@@ -785,8 +785,9 @@ packages:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
 
-  detect-collisions@9.8.0:
-    resolution: {integrity: sha512-AISyd0PTYVCiQkjRh/wZA9K+EZIWtPGtEfESqYVbJIZfdhkAor658O+W8JO6oTohU4BZB4eAXtoHM12SkMh7yA==}
+  detect-collisions@https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation:
+    resolution: {tarball: https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation}
+    version: 9.8.1
 
   detect-indent@6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
@@ -2380,7 +2381,7 @@ snapshots:
 
   dequal@2.0.3: {}
 
-  detect-collisions@9.8.0:
+  detect-collisions@https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation:
     dependencies:
       '@types/rbush': 3.0.3
       '@types/sat': 0.0.35
