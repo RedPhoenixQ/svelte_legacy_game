@@ -3,7 +3,6 @@
 		Box,
 		Circle,
 		ensureVectorPoint,
-		Polygon,
 		type BodyOptions,
 		type PotentialVector,
 		type Vector
@@ -12,6 +11,7 @@
 	import { onMount } from 'svelte';
 	import type { Board } from '$lib/game/board';
 	import { throttled } from '$lib/utils';
+	import { Sector } from '$lib/helpers/sector';
 
 	export let board: Board;
 	export let width: number;
@@ -36,106 +36,53 @@
 		isCentered: true,
 		isTrigger: true
 	};
-	const mainCollider =
+	const collider =
 		shape.type === 'box'
 			? // Width and height is revesed to that box follows the x-axis for angle calculations
 				new Box(originPos, shape.height, shape.width, opts)
-			: new Circle(originPos, shape.radius, opts);
+			: shape.type === 'circle'
+				? new Circle(originPos, shape.radius, opts)
+				: new Sector(originPos, shape.radius, shape.angle, { ...opts, isCentered: false });
 	if (shape.type === 'box') {
-		mainCollider.setOffset(ensureVectorPoint({ x: shape.height / 2, y: 0 }));
-	}
-	let secondayCollider: Polygon | undefined = undefined;
-	if (shape.type === 'cone') {
-		const extendedRadius = shape.radius * 1.2;
-		const halfAngle = shape.angle / 2;
-		const pi2HalfAngle = Math.PI * 2 - halfAngle;
-		const left = {
-			x: extendedRadius * Math.cos(halfAngle),
-			y: extendedRadius * Math.sin(halfAngle)
-		};
-		const right = {
-			x: extendedRadius * Math.cos(pi2HalfAngle),
-			y: extendedRadius * Math.sin(pi2HalfAngle)
-		};
-		secondayCollider = new Polygon(
-			originPos,
-			[
-				{ x: 0, y: 0 },
-				left,
-				{ x: extendedRadius, y: left.y },
-				{ x: extendedRadius, y: right.y },
-				right
-			],
-			{ ...opts, isCentered: false }
-		);
+		collider.setOffset(ensureVectorPoint({ x: shape.height / 2, y: 0 }));
 	}
 
-	$: {
-		mainCollider.setAngle(angle);
-		secondayCollider?.setAngle?.(angle);
-	}
+	$: collider.setAngle(angle);
 
 	function resetTarget() {
 		if (!movableTarget) return;
 		targetPos = ensureVectorPoint({ x: shape.type === 'box' ? shape.height : shape.radius, y: 0 })
-			.rotate(mainCollider.angle)
-			.add(mainCollider.pos);
+			.rotate(collider.angle)
+			.add(collider.pos);
 	}
 
 	function moveTo(point: Vector) {
-		mainCollider.setPosition(point.x, point.y, true);
-		secondayCollider?.setPosition(point.x, point.y, true);
+		collider.setPosition(point.x, point.y, true);
 		resetTarget();
 	}
 
 	function angleTowards(point: Vector) {
 		const vec = ensureVectorPoint(point);
-		const dir = vec.sub(mainCollider.pos);
+		const dir = vec.sub(collider.pos);
 		const angle = Math.atan2(dir.y, dir.x);
-		mainCollider.setAngle(angle, true);
-		secondayCollider?.setAngle(angle, true);
+		collider.setAngle(angle, true);
 	}
 
 	function draw() {
 		ctx.clearRect(0, 0, width, height);
-		if (shape.type === 'cone') {
-			const halfAngle = shape.angle / 2;
-			ctx.save();
-			ctx.setLineDash([2, 4]);
-			ctx.beginPath();
-
-			ctx.moveTo(mainCollider.x, mainCollider.y);
-			ctx.arc(
-				mainCollider.x,
-				mainCollider.y,
-				shape.radius,
-				mainCollider.angle - halfAngle,
-				mainCollider.angle + halfAngle
-			);
-			ctx.lineTo(mainCollider.x, mainCollider.y);
-
-			ctx.stroke();
-			ctx.restore();
-		} else {
-			ctx.beginPath();
-			mainCollider.draw(ctx);
-			if (secondayCollider) secondayCollider.draw(ctx);
-			ctx.stroke();
-		}
+		ctx.beginPath();
+		collider.draw(ctx);
+		ctx.stroke();
 	}
 
 	function testCollisions() {
-		console.group('HIT TEST', mainCollider, secondayCollider);
+		console.group('HIT TEST', collider);
 		ctx.save();
 		ctx.strokeStyle = 'Red';
 		ctx.beginPath();
-		board.checkOne(mainCollider, (res) => {
+		board.checkOne(collider, (res) => {
 			if (res.a.isTrigger && res.b.isTrigger) return;
 			if (res.overlap > 0) {
-				if (secondayCollider && !board.checkCollision(secondayCollider, res.b)) {
-					// Collision is not inside secondary collider
-					return;
-				}
 				console.log('Collision', res);
 				res.b.draw(ctx);
 			}
@@ -163,15 +110,13 @@
 		ctx.strokeStyle = '#FFF';
 		ctx.lineWidth = 2;
 
-		board.insert(mainCollider);
-		if (secondayCollider) board.insert(secondayCollider);
+		board.insert(collider);
 
 		resetTarget();
 		draw();
 
 		return () => {
-			board.remove(mainCollider);
-			if (secondayCollider) board.remove(secondayCollider);
+			board.remove(collider);
 		};
 	});
 </script>
