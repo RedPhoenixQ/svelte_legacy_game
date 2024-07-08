@@ -253,6 +253,7 @@ export interface CharactersResponse extends BaseCollectionResponse {
 	token: string;
 	art: string;
 	race: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
+	actions: Array<string>;
 }
 
 export interface CharactersCreate extends BaseCollectionCreate {
@@ -262,6 +263,7 @@ export interface CharactersCreate extends BaseCollectionCreate {
 	token?: File | null;
 	art: File | null;
 	race: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
+	actions?: MaybeArray<string>;
 }
 
 export interface CharactersUpdate extends BaseCollectionUpdate {
@@ -271,6 +273,9 @@ export interface CharactersUpdate extends BaseCollectionUpdate {
 	token?: File | null;
 	art?: File | null;
 	race?: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
+	actions?: MaybeArray<string>;
+	'actions+'?: MaybeArray<string>;
+	'actions-'?: MaybeArray<string>;
 }
 
 export interface CharactersCollection {
@@ -283,6 +288,7 @@ export interface CharactersCollection {
 	relations: {
 		game: GamesCollection;
 		owner: UsersCollection;
+		actions: ActionsCollection[];
 		'token(character)': TokenCollection[];
 	};
 }
@@ -423,6 +429,7 @@ export interface TokenResponse extends BaseCollectionResponse {
 	character: string;
 	x: number;
 	y: number;
+	angle: number;
 }
 
 export interface TokenCreate extends BaseCollectionCreate {
@@ -430,6 +437,7 @@ export interface TokenCreate extends BaseCollectionCreate {
 	character?: string;
 	x?: number;
 	y?: number;
+	angle?: number;
 }
 
 export interface TokenUpdate extends BaseCollectionUpdate {
@@ -441,6 +449,9 @@ export interface TokenUpdate extends BaseCollectionUpdate {
 	y?: number;
 	'y+'?: number;
 	'y-'?: number;
+	angle?: number;
+	'angle+'?: number;
+	'angle-'?: number;
 }
 
 export interface TokenCollection {
@@ -496,6 +507,33 @@ export interface ActionItemCollection {
 	};
 }
 
+// ===== actions =====
+
+export interface ActionsResponse extends BaseCollectionResponse {
+	collectionName: 'actions';
+	name: string;
+}
+
+export interface ActionsCreate extends BaseCollectionCreate {
+	name?: string;
+}
+
+export interface ActionsUpdate extends BaseCollectionUpdate {
+	name?: string;
+}
+
+export interface ActionsCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'actions';
+	response: ActionsResponse;
+	create: ActionsCreate;
+	update: ActionsUpdate;
+	relations: {
+		'characters(actions)': CharactersCollection[];
+	};
+}
+
 // ===== Schema =====
 
 export type Schema = {
@@ -508,4 +546,5 @@ export type Schema = {
 	board: BoardCollection;
 	token: TokenCollection;
 	actionItem: ActionItemCollection;
+	actions: ActionsCollection;
 };

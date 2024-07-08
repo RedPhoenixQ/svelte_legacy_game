@@ -90,6 +90,7 @@ export class Token implements TokenResponse {
 	character!: string;
 	x!: number;
 	y!: number;
+	angle!: number;
 	id!: string;
 	created!: string;
 	updated!: string;
