@@ -72,9 +72,9 @@
 				class="size-[50px] bg-red-500"
 				on:startMove={() => (isGrabbing = true)}
 				on:move={({ detail }) => updatePos(token, detail)}
-				on:endMove={(event) => {
+				on:endMove={({ detail }) => {
 					isGrabbing = false;
-					updatePos(token, event.detail);
+					updatePos(token, detail);
 				}}
 				on:rotate={({ detail }) => updateRotation(token, detail)}
 				on:endRotate={({ detail }) => updateRotation(token, detail)}
