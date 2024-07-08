@@ -5,6 +5,7 @@ import type { Handle } from '@sveltejs/kit';
 import { createTRPCHandle } from 'trpc-sveltekit';
 import { TypedPocketBase } from 'typed-pocketbase';
 import type { Schema } from '$lib/schema';
+import { dev } from '$app/environment';
 
 const trpcHandle: Handle = createTRPCHandle({ router, createContext });
 
@@ -19,6 +20,8 @@ export async function handle({ event, resolve }) {
 		'Set-Cookie',
 		event.locals.pb.authStore.exportToCookie({
 			path: '/',
+			// This enables local hosting in dev
+			secure: !dev,
 			httpOnly: true
 		})
 	);
