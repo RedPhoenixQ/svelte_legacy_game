@@ -21,7 +21,7 @@
 		endMove: XYPos;
 	}>();
 
-	let longPressTimeout: number;
+	let longPressTimeout: ReturnType<typeof setTimeout>;
 	let hasClicked = false;
 	let moving = false;
 	let canceled = false;
@@ -56,7 +56,7 @@
 		longPressTimeout = setTimeout(() => {
 			dispatch('longPress', event);
 			reset();
-		}, 500) as unknown as number;
+		}, 500);
 
 		console.log('canceled', canceled);
 	}
