@@ -9,4 +9,11 @@
 		: pb.getFileUrl(character, character.art, { thumb: '100x100' });
 </script>
 
-<img {src} alt={character.name} width="100" height="100" {...$$restProps} />
+<img
+	style="-webkit-touch-callout: none;"
+	{src}
+	alt={character.name}
+	width="100"
+	height="100"
+	{...$$restProps}
+/>

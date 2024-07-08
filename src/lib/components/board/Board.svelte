@@ -48,6 +48,7 @@
 	>
 	<PanZoom class="size-max" bounds={true} autocenter={true}>
 		<img
+			style="-webkit-touch-callout: none;"
 			src={pb.getFileUrl(board, board.background)}
 			alt="Game Board Background"
 			{width}
