@@ -62,6 +62,7 @@
 
 	function handlePointerDown(event: PointerEvent) {
 		if (disabled) return;
+		event.stopPropagation();
 		event.preventDefault();
 		console.debug(event);
 
@@ -168,16 +169,21 @@
 />
 
 <div
-	class="absolute {className} -translate-x-1/2 -translate-y-1/2 origin-top-left"
+	class="absolute {className} -translate-x-1/2 -translate-y-1/2 origin-top-left touch-none"
 	style:top="{$y}px"
 	style:left="{$x}px"
 	style:rotate="{deg}deg"
 	style={disabled ? '' : moving ? 'cursor : grabbing;' : 'cursor : grab;'}
 	on:pointerdown={handlePointerDown}
+	on:touchstart={(event) => event.stopPropagation()}
 	{...$$restProps}
 >
 	{#if !preventRotate}
-		<div class="absolute -top-8 left-0 right-0 m-auto" on:pointerdown={handleRotatePointerDown}>
+		<div
+			class="absolute -top-8 left-0 right-0 m-auto"
+			on:pointerdown={handleRotatePointerDown}
+			on:touchstart={(event) => event.stopPropagation()}
+		>
 			Handle
 		</div>
 	{/if}
