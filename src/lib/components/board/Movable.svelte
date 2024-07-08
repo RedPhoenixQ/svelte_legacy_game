@@ -3,10 +3,12 @@
 	import { DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE_HALF, getPanZoomCtx, type XYPos } from '.';
 	import { tweened } from 'svelte/motion';
 	import { cubicInOut } from 'svelte/easing';
+	import { rad2deg } from 'detect-collisions';
 
 	let className: string = '';
 	export { className as class };
 	export let position: XYPos;
+	export let angle: number;
 	export let snapToGrid = true;
 	export let disabled = false;
 	export let duration = 500;
@@ -123,9 +125,10 @@
 />
 
 <div
-	class="absolute {className} -translate-x-1/2 -translate-y-1/2"
+	class="absolute {className} -translate-x-1/2 -translate-y-1/2 origin-top-left"
 	style:top="{$y}px"
 	style:left="{$x}px"
+	style:rotate="{rad2deg(angle)}deg"
 	style={disabled ? '' : moving ? 'cursor : grabbing;' : 'cursor : grab;'}
 	on:pointerdown={handlePointerDown}
 	{...$$restProps}
