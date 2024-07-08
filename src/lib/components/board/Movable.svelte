@@ -96,13 +96,13 @@
 
 		clearTimeout(longPressTimeout);
 		if (rotating) {
-			if (snapToGrid && !event.shiftKey) {
+			if (snapToGrid && event.shiftKey) {
 				angle = Math.round(angle / ROTATION_SPAN_STEP) * ROTATION_SPAN_STEP;
 				deg = rad2deg(angle);
 			}
 			dispatch('endRotate', angle);
 		} else if (moving) {
-			if (snapToGrid && !event.shiftKey) {
+			if (snapToGrid && event.shiftKey) {
 				// Snap to grid
 				currentPos.x =
 					DEFAULT_GRID_SIZE_HALF +
