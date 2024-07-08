@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE_HALF, getPanZoomCtx, type XYPos } from '.';
+	import {
+		DEFAULT_GRID_SIZE,
+		DEFAULT_GRID_SIZE_HALF,
+		getPanZoomCtx,
+		ONE_AND_A_HALF_PI,
+		pageToBoard,
+		ROTATION_SPAN_STEP,
+		type XYPos
+	} from '.';
 	import { tweened } from 'svelte/motion';
 	import { cubicInOut } from 'svelte/easing';
 	import { rad2deg } from 'detect-collisions';
@@ -8,9 +16,10 @@
 	let className: string = '';
 	export { className as class };
 	export let position: XYPos;
-	export let angle: number;
+	export let angle = 0;
 	export let snapToGrid = true;
 	export let disabled = false;
+	export let preventRotate = false;
 	export let duration = 500;
 
 	const panzoom = getPanZoomCtx();
@@ -21,26 +30,33 @@
 		startMove: XYPos;
 		move: XYPos;
 		endMove: XYPos;
+		rotate: number;
+		endRotate: number;
 	}>();
 
 	let longPressTimeout: ReturnType<typeof setTimeout>;
 	let hasClicked = false;
 	let moving = false;
+	let rotating = false;
 	let canceled = false;
 	let prevPos: XYPos = { x: 0, y: 0 };
+	let rotateCurrentPos: XYPos = { x: 0, y: 0 };
 	let currentPos: XYPos = { ...position };
 	let x = tweened(position.x, { easing: cubicInOut, duration: 0 });
 	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
+	let deg = rad2deg(angle);
 
-	$: {
+	$: if (!moving) {
 		currentPos = position;
 		x.set(position.x, { duration });
 		y.set(position.y, { duration });
 	}
+	$: if (!rotating) deg = rad2deg(angle);
 
 	function reset() {
 		hasClicked = false;
 		moving = false;
+		rotating = false;
 		canceled = false;
 	}
 
@@ -62,13 +78,29 @@
 
 		console.log('canceled', canceled);
 	}
+	function handleRotatePointerDown(event: PointerEvent) {
+		if (disabled || preventRotate) return;
+		event.stopPropagation();
+		event.preventDefault();
+
+		hasClicked = true;
+		rotating = true;
+		prevPos.x = event.pageX;
+		prevPos.y = event.pageY;
+		rotateCurrentPos = pageToBoard($panzoom, event.pageX, event.pageY);
+	}
 	function handlePointerUp(event: PointerEvent) {
 		if (!hasClicked) return;
 		console.debug(event);
 
 		clearTimeout(longPressTimeout);
-
-		if (moving) {
+		if (rotating) {
+			if (snapToGrid && !event.shiftKey) {
+				angle = Math.round(angle / ROTATION_SPAN_STEP) * ROTATION_SPAN_STEP;
+				deg = rad2deg(angle);
+			}
+			dispatch('endRotate', angle);
+		} else if (moving) {
 			if (snapToGrid && !event.shiftKey) {
 				// Snap to grid
 				currentPos.x =
@@ -92,24 +124,35 @@
 		if (!hasClicked) return;
 		console.debug(event);
 
-		clearTimeout(longPressTimeout);
-
 		const transform = $panzoom.instance.getTransform();
 
-		currentPos.x += (event.pageX - prevPos.x) / transform.scale;
-		currentPos.y += (event.pageY - prevPos.y) / transform.scale;
+		if (rotating) {
+			rotateCurrentPos.x += (event.pageX - prevPos.x) / transform.scale;
+			rotateCurrentPos.y += (event.pageY - prevPos.y) / transform.scale;
 
-		$x = currentPos.x;
-		$y = currentPos.y;
+			angle =
+				Math.atan2(currentPos.y - rotateCurrentPos.y, currentPos.x - rotateCurrentPos.x) +
+				ONE_AND_A_HALF_PI;
+			deg = rad2deg(angle);
+			dispatch('rotate', angle);
+		} else {
+			clearTimeout(longPressTimeout);
+
+			currentPos.x += (event.pageX - prevPos.x) / transform.scale;
+			currentPos.y += (event.pageY - prevPos.y) / transform.scale;
+
+			$x = currentPos.x;
+			$y = currentPos.y;
+
+			if (!moving) {
+				moving = true;
+				dispatch('startMove', { ...currentPos });
+			}
+			dispatch('move', { ...currentPos });
+		}
 
 		prevPos.x = event.pageX;
 		prevPos.y = event.pageY;
-
-		if (!moving) {
-			moving = true;
-			dispatch('startMove', { ...currentPos });
-		}
-		dispatch('move', { ...currentPos });
 	}
 	function handlePointerCancel(event: PointerEvent) {
 		if (!hasClicked) return;
@@ -128,10 +171,15 @@
 	class="absolute {className} -translate-x-1/2 -translate-y-1/2 origin-top-left"
 	style:top="{$y}px"
 	style:left="{$x}px"
-	style:rotate="{rad2deg(angle)}deg"
+	style:rotate="{deg}deg"
 	style={disabled ? '' : moving ? 'cursor : grabbing;' : 'cursor : grab;'}
 	on:pointerdown={handlePointerDown}
 	{...$$restProps}
 >
+	{#if !preventRotate}
+		<div class="absolute -top-8 left-0 right-0 m-auto" on:pointerdown={handleRotatePointerDown}>
+			Handle
+		</div>
+	{/if}
 	<slot />
 </div>
