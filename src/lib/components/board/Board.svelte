@@ -2,10 +2,12 @@
 	import { Movable, PanZoom, DEFAULT_GRID_SIZE } from '$lib/components/board';
 	import { pb, user } from '$lib/pb';
 	import TokenImg from '$lib/components/board/TokenImg.svelte';
-	import type { TokenMap } from '$lib/game/token';
+	import type { Token, TokenMap } from '$lib/game/token';
 	import type { CharactersMap } from '$lib/game/character';
 	import type { Board } from '$lib/game/board';
 	import { Button } from '$lib/components/ui/button';
+	import type { Vector } from 'detect-collisions';
+	import { throttled } from '$lib/utils';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -19,6 +21,15 @@
 	let canvas: HTMLCanvasElement;
 
 	let isGrabbing = false;
+
+	const updatePos = throttled((token: Token, pos: Vector) => {
+		token.collider.setPosition(pos.x, pos.y, true);
+		pb.from('token').update(token.id, pos);
+	});
+	const updateRotation = throttled((token: Token, angle: number) => {
+		token.collider.setAngle(angle, true);
+		pb.from('token').update(token.id, { angle });
+	});
 </script>
 
 <div class="relative size-full bg-background" style={isGrabbing ? 'cursor : grabbing;' : ''}>
@@ -56,14 +67,17 @@
 			{@const character = characters.get(token.character)}
 			<Movable
 				position={token}
+				angle={token.angle}
 				disabled={!moveAll && character?.owner !== $user?.id}
 				class="size-[50px] bg-red-500"
 				on:startMove={() => (isGrabbing = true)}
+				on:move={({ detail }) => updatePos(token, detail)}
 				on:endMove={(event) => {
 					isGrabbing = false;
-					token.collider.setPosition(event.detail.x, event.detail.y, true);
-					pb.from('token').update(token.id, event.detail);
+					updatePos(token, event.detail);
 				}}
+				on:rotate={({ detail }) => updateRotation(token, detail)}
+				on:endRotate={({ detail }) => updateRotation(token, detail)}
 			>
 				{#if character}
 					<TokenImg {character} />

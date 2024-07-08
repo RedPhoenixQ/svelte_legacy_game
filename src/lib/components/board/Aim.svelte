@@ -140,6 +140,7 @@
 		duration={0}
 		class="z-40 size-8 rounded-full border-2 border-primary bg-red-700 bg-opacity-75"
 		position={targetPos}
+		preventRotate
 		on:move={({ detail }) => onTargetSlow(detail)}
 		on:endMove={({ detail }) => onTarget(detail)}
 	/>
@@ -149,6 +150,7 @@
 		snapToGrid={false}
 		duration={0}
 		class="z-40 size-8 rounded-full border-2 border-primary bg-green-700 bg-opacity-75"
+		preventRotate
 		bind:position={collider.pos}
 		on:move={onMoveSlow}
 		on:endMove={onMove}
