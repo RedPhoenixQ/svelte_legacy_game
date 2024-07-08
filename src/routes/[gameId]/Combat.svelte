@@ -9,6 +9,9 @@
 	import ActionList from './ActionList.svelte';
 	import Aim from '$lib/components/board/Aim.svelte';
 	import { user } from '$lib/pb';
+	import * as Menubar from '$lib/components/ui/menubar';
+	import UseAttackMenu from './UseAttackMenuContent.svelte';
+	import type { AttackShape } from '$lib/components/board';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -18,6 +21,13 @@
 	export let isDm = false;
 
 	$: isUsersTurn = currentTurn?.character?.owner === $user?.id;
+
+	let selectedAttack:
+		| {
+				centered: boolean;
+				shape: AttackShape;
+		  }
+		| undefined;
 </script>
 
 <Resizable.PaneGroup direction="horizontal" autoSaveId="combatLayout">
@@ -35,27 +45,24 @@
 	<Resizable.Handle withHandle />
 	<Resizable.Pane defaultSize={75} minSize={20} class="relative">
 		<BoardComp {board} {characters} moveAll={isDm} {tokens} let:width let:height>
-			{#if isUsersTurn && currentTurn?.token}
+			{#if isUsersTurn && currentTurn?.token && selectedAttack}
 				<Aim
 					{board}
 					{width}
 					{height}
 					origin={currentTurn.token}
 					angle={0}
-					shape={{
-						// type: 'cone',
-						// radius: 200,
-						// angle: 1.2
-						type: 'box',
-						width: 20,
-						height: 300
-						// type: 'circle',
-						// radius: 100
-					}}
-					movableOrigin
+					shape={selectedAttack.shape}
+					movableOrigin={!selectedAttack.centered}
 				/>
 			{/if}
 		</BoardComp>
+		<Menubar.Menubar class="absolute left-2 top-2">
+			<Menubar.Menu>
+				<Menubar.Trigger disabled={!isUsersTurn}>Attack</Menubar.Trigger>
+				<UseAttackMenu on:useAttack={({ detail }) => (selectedAttack = detail)} />
+			</Menubar.Menu>
+		</Menubar.Menubar>
 		{#if isUsersTurn}
 			<div
 				class="absolute inset-0 top-auto mx-auto my-4 w-fit animate-bounce rounded-md bg-accent px-4 py-2 text-accent-foreground"
