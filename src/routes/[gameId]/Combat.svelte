@@ -12,11 +12,14 @@
 	import * as Menubar from '$lib/components/ui/menubar';
 	import UseAttackMenu from './UseAttackMenuContent.svelte';
 	import type { AttackShape } from '$lib/components/board';
+	import type { StatsMap } from '$lib/game/stats';
+	import { Progress } from '$lib/components/ui/progress';
 
 	export let board: Board;
 	export let tokens: TokenMap;
 	export let actionItems: ActionItems;
 	export let characters: CharactersMap;
+	export let statsMap: StatsMap;
 	export let currentTurn: CurrentTurn;
 	export let isDm = false;
 
@@ -56,6 +59,24 @@
 					movableOrigin={!selectedAttack.centered}
 				/>
 			{/if}
+
+			<svlete:fragment slot="token" let:token let:character>
+				{@const stats = character
+					? statsMap.character.get(character.id)
+					: statsMap.token.get(token.id)}
+				<div class="absolute left-0 right-0 top-full">
+					{#if stats}
+						<Progress
+							class="h-4 text-center text-xs"
+							barBgClass="bg-red-700"
+							max={stats.maxHp}
+							value={stats.hp}
+						>
+							{stats.hp}/{stats.maxHp}
+						</Progress>
+					{/if}
+				</div>
+			</svlete:fragment>
 		</BoardComp>
 		<Menubar.Menubar class="absolute left-2 top-2">
 			<Menubar.Menu>

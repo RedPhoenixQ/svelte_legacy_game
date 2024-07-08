@@ -82,6 +82,7 @@
 				{#if character}
 					<TokenImg {character} />
 				{/if}
+				<slot name="token" {token} {character} />
 			</Movable>
 		{/each}
 
