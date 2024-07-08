@@ -20,7 +20,8 @@ export async function load({ params, locals }) {
 							'actionItem(board)': true
 						}
 					},
-					'characters(game)': true
+					'characters(game)': true,
+					'stats(game)': true
 				}
 			}
 		});
@@ -36,7 +37,8 @@ export async function load({ params, locals }) {
 		activeBoard: game.expand?.activeBoard,
 		tokens: game.expand?.activeBoard?.expand?.['token(board)'],
 		actionItems: game.expand?.activeBoard?.expand?.['actionItem(board)'],
-		characters: game.expand!['characters(game)'] ?? []
+		characters: game.expand!['characters(game)'] ?? [],
+		stats: game.expand!['stats(game)'] ?? []
 	};
 	delete game.expand;
 
