@@ -67,7 +67,6 @@
 	}
 
 	function resetTarget() {
-		console.warn('Reset');
 		if (!movableTarget) return;
 		targetPos = ensureVectorPoint({ x: shape.type === 'box' ? shape.height : shape.radius, y: 0 })
 			.rotate(collider.angle)
