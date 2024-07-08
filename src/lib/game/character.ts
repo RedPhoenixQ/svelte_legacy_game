@@ -77,6 +77,7 @@ export class Character implements CharactersResponse {
 	token!: string;
 	art!: string;
 	race!: 'khaviri' | 'dwarf' | 'elf' | 'half-elf' | 'moon-elf' | 'sun-elf' | 'sea-elf' | 'human';
+	actions!: string[];
 	id!: string;
 	created!: string;
 	updated!: string;
