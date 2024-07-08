@@ -33,16 +33,11 @@ export class StatsStore implements Writable<StatsMap> {
 			token: new Map()
 		};
 		for (const stats of statsList) {
-			switch (Stats.relatedTo(stats)) {
-				case 'character':
-					statsMap.character.set(stats.character, new Stats(stats));
-					break;
-				case 'token':
-					statsMap.token.set(stats.token, new Stats(stats));
-					break;
-				default:
-					console.error('Stats object was not related to anything', stats);
-					break;
+			const relatedTo = Stats.relatedTo(stats);
+			if (relatedTo) {
+				statsMap[relatedTo].set(stats[relatedTo], new Stats(stats));
+			} else {
+				console.error('Stats object was not related to anything', stats);
 			}
 		}
 		return statsMap;
