@@ -173,7 +173,7 @@
 	style:top="{$y}px"
 	style:left="{$x}px"
 	style:rotate="{deg}deg"
-	style={disabled ? '' : moving ? 'cursor : grabbing;' : 'cursor : grab;'}
+	style:cursor={disabled ? '' : moving ? 'grabbing' : 'grab'}
 	on:pointerdown={handlePointerDown}
 	on:touchstart={(event) => event.stopPropagation()}
 	{...$$restProps}
