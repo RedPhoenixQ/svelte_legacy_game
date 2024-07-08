@@ -3,6 +3,7 @@ import type {
 	BoardResponse,
 	CharactersResponse,
 	GamesResponse,
+	StatsResponse,
 	TokenResponse,
 	UsersResponse
 } from '$lib/schema';
@@ -10,6 +11,7 @@ import { ActionItemsStore, createCurrentTurn } from './actionItem';
 import { BoardStore } from './board';
 import { CharactersStore } from './character';
 import { GameStore, createIsDm } from './game';
+import { StatsStore } from './stats';
 import { TokensStore } from './token';
 // import type { UnsubscribeFunc } from 'pocketbase';
 // import { writable, type Writable } from 'svelte/store';
@@ -20,6 +22,7 @@ export class GameStores {
 	characters: CharactersStore;
 	tokens: TokensStore;
 	actionItems: ActionItemsStore;
+	stats: StatsStore;
 	isDm: ReturnType<typeof createIsDm>;
 	currentTurn: ReturnType<typeof createCurrentTurn>;
 
@@ -32,6 +35,7 @@ export class GameStores {
 			tokens?: TokenResponse[];
 			actionItems?: ActionItemResponse[];
 			characters: CharactersResponse[];
+			stats?: StatsResponse[];
 		},
 		debug?: boolean
 	) {
@@ -40,6 +44,7 @@ export class GameStores {
 		this.characters = CharactersStore.fromResponse(args.characters);
 		this.tokens = new TokensStore(TokensStore.fromResponse(args.tokens));
 		this.actionItems = new ActionItemsStore(ActionItemsStore.fromResponse(args.actionItems));
+		this.stats = new StatsStore(StatsStore.fromResponse(args.stats));
 		this.isDm = createIsDm(this);
 		this.currentTurn = createCurrentTurn(this);
 
@@ -48,6 +53,7 @@ export class GameStores {
 		this.characters.stores = this;
 		this.tokens.stores = this;
 		this.actionItems.stores = this;
+		this.stats.stores = this;
 
 		if (debug) {
 			this.game.subscribe(($game) => console.debug('game', $game));
@@ -55,6 +61,7 @@ export class GameStores {
 			this.characters.subscribe(($characters) => console.debug('characters', $characters));
 			this.tokens.subscribe(($tokens) => console.debug('tokens', $tokens));
 			this.actionItems.subscribe(($actionItems) => console.debug('actionItems', $actionItems));
+			this.stats.subscribe(($stats) => console.debug('stats', $stats));
 			this.isDm.subscribe(($isDm) => console.debug('isDm', $isDm));
 			this.currentTurn.subscribe(($currentTurn) => console.debug('currentTurn', $currentTurn));
 		}
@@ -66,7 +73,8 @@ export class GameStores {
 			this.board.init(),
 			this.characters.init(),
 			this.tokens.init(),
-			this.actionItems.init()
+			this.actionItems.init(),
+			this.stats.init()
 		]);
 	}
 
@@ -76,7 +84,8 @@ export class GameStores {
 			this.board.deinit(),
 			this.characters.deinit(),
 			this.tokens.deinit(),
-			this.actionItems.deinit()
+			this.actionItems.deinit(),
+			this.stats.deinit()
 		]);
 	}
 }
