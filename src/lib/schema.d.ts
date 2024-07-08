@@ -210,6 +210,7 @@ export interface GamesCollection {
 		'chat(game)': ChatCollection[];
 		'diceRoll(game)': DiceRollCollection[];
 		'board(game)': BoardCollection[];
+		'stats(game)': StatsCollection[];
 	};
 }
 
@@ -290,6 +291,7 @@ export interface CharactersCollection {
 		owner: UsersCollection;
 		actions: ActionsCollection[];
 		'token(character)': TokenCollection[];
+		'stats(character)': StatsCollection[];
 	};
 }
 
@@ -465,6 +467,7 @@ export interface TokenCollection {
 		board: BoardCollection;
 		character: CharactersCollection;
 		'actionItem(token)': ActionItemCollection[];
+		'stats(token)': StatsCollection[];
 	};
 }
 
@@ -534,6 +537,51 @@ export interface ActionsCollection {
 	};
 }
 
+// ===== stats =====
+
+export interface StatsResponse extends BaseCollectionResponse {
+	collectionName: 'stats';
+	game: string;
+	character: string;
+	token: string;
+	hp: number;
+	maxHp: number;
+}
+
+export interface StatsCreate extends BaseCollectionCreate {
+	game: string;
+	character?: string;
+	token?: string;
+	hp?: number;
+	maxHp?: number;
+}
+
+export interface StatsUpdate extends BaseCollectionUpdate {
+	game?: string;
+	character?: string;
+	token?: string;
+	hp?: number;
+	'hp+'?: number;
+	'hp-'?: number;
+	maxHp?: number;
+	'maxHp+'?: number;
+	'maxHp-'?: number;
+}
+
+export interface StatsCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'stats';
+	response: StatsResponse;
+	create: StatsCreate;
+	update: StatsUpdate;
+	relations: {
+		game: GamesCollection;
+		character: CharactersCollection;
+		token: TokenCollection;
+	};
+}
+
 // ===== Schema =====
 
 export type Schema = {
@@ -547,4 +595,5 @@ export type Schema = {
 	token: TokenCollection;
 	actionItem: ActionItemCollection;
 	actions: ActionsCollection;
+	stats: StatsCollection;
 };
