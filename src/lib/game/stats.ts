@@ -135,16 +135,20 @@ export class Stats implements StatsResponse {
 
 	assign(stats: StatsResponse) {
 		this.#inner = stats;
-		Object.assign(this, stats);
-		for (const attribute of Object.keys(this.#modifiers) as ModifiableAttribute[]) {
-			this.#updateModifier(attribute);
-		}
+		this.applyModifiers();
 	}
 
 	#updateModifier(attribute: ModifiableAttribute) {
 		const mod = this.#modifiers[attribute];
 		if (!mod) return;
 		this[attribute] = this.#inner[attribute] * (1 + mod.multiplier) + mod.flat;
+	}
+
+	applyModifiers() {
+		Object.assign(this, this.#inner);
+		for (const attribute of Object.keys(this.#modifiers) as ModifiableAttribute[]) {
+			this.#updateModifier(attribute);
+		}
 	}
 
 	clearModifiers() {
