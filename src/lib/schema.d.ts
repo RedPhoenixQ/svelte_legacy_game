@@ -579,6 +579,47 @@ export interface StatsCollection {
 		game: GamesCollection;
 		character: CharactersCollection;
 		token: TokenCollection;
+		'modifiers(stats)': ModifiersCollection[];
+	};
+}
+
+// ===== modifiers =====
+
+export interface ModifiersResponse extends BaseCollectionResponse {
+	collectionName: 'modifiers';
+	stats: string;
+	attribute: 'hp' | 'maxHp';
+	multiplier: number;
+	flat: number;
+}
+
+export interface ModifiersCreate extends BaseCollectionCreate {
+	stats: string;
+	attribute: 'hp' | 'maxHp';
+	multiplier?: number;
+	flat?: number;
+}
+
+export interface ModifiersUpdate extends BaseCollectionUpdate {
+	stats?: string;
+	attribute?: 'hp' | 'maxHp';
+	multiplier?: number;
+	'multiplier+'?: number;
+	'multiplier-'?: number;
+	flat?: number;
+	'flat+'?: number;
+	'flat-'?: number;
+}
+
+export interface ModifiersCollection {
+	type: 'base';
+	collectionId: string;
+	collectionName: 'modifiers';
+	response: ModifiersResponse;
+	create: ModifiersCreate;
+	update: ModifiersUpdate;
+	relations: {
+		stats: StatsCollection;
 	};
 }
 
@@ -596,4 +637,5 @@ export type Schema = {
 	actionItem: ActionItemCollection;
 	actions: ActionsCollection;
 	stats: StatsCollection;
+	modifiers: ModifiersCollection;
 };
