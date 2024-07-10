@@ -16,12 +16,14 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import { trpc } from '$lib/trpc/client';
 	import { page } from '$app/stores';
+	import type { ActionItemResponse } from '$lib/schema';
 
 	export let board: Board;
 	export let tokens: TokenMap;
 	export let actionItems: ActionItems;
 	export let characters: CharactersMap;
 	export let statsMap: StatsMap;
+	export let firstActionItem: ActionItemResponse;
 	export let currentTurn: CurrentTurn;
 	export let isDm = false;
 
@@ -33,6 +35,12 @@
 				shape: AttackShape;
 		  }
 		| undefined;
+
+		$: {
+			// eslint-disable-next-line  @typescript-eslint/no-unused-expressions
+			firstActionItem;
+			selectedAttack = undefined
+		}
 </script>
 
 <Resizable.PaneGroup direction="horizontal" autoSaveId="combatLayout">

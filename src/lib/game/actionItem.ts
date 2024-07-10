@@ -1,5 +1,5 @@
 import type { ActionItemResponse } from '$lib/schema';
-import { derived } from 'svelte/store';
+import { derived, readable } from 'svelte/store';
 import type { RecordSubscription } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
@@ -50,17 +50,28 @@ export type CurrentTurn =
 	  }
 	| undefined;
 
+export function createFirstActionItem(stores: GameStores) {
+	let current = stores.actionItems.val.items[0];
+	return readable(current, (set) => {
+		return stores.actionItems.subscribe(($actionItems) => {
+			const first = $actionItems.items[0];
+			if (first !== current) {
+				current = first;
+				set(current);
+			}
+		});
+	});
+}
+
+/** MUST be created after firstActionItem */
 export function createCurrentTurn(stores: GameStores) {
 	return derived(
-		[stores.actionItems, stores.characters, stores.tokens],
-		([$actionItems, $characters, $tokens]) => {
-			if ($actionItems.items.length < 1) {
-				return undefined;
-			}
-			const item = $actionItems.items[0];
-			const token = $tokens.get(item.token);
+		[stores.firstActionItem, stores.characters, stores.tokens],
+		([$first, $characters, $tokens]) => {
+			if (!$first) return;
+			const token = $tokens.get($first.token);
 			const character = token?.character ? $characters.get(token.character) : undefined;
-			return { item, token, character };
+			return { item: $first, token, character };
 		}
 	);
 }

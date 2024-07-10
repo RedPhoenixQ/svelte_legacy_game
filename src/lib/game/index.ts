@@ -1,5 +1,5 @@
-import type { Readable } from 'svelte/store';
-import { ActionItemsStore, createCurrentTurn } from './actionItem';
+import { type Readable } from 'svelte/store';
+import { ActionItemsStore, createCurrentTurn, createFirstActionItem } from './actionItem';
 import { BoardStore } from './board';
 import { CharactersStore } from './character';
 import { GameStore, createIsDm } from './game';
@@ -19,6 +19,7 @@ export class GameStores {
 	stats: StatsStore;
 	modifiers: ModifiersStore;
 	isDm: ReturnType<typeof createIsDm>;
+	firstActionItem: ReturnType<typeof createFirstActionItem>;
 	currentTurn: ReturnType<typeof createCurrentTurn>;
 
 	constructor(
@@ -60,6 +61,7 @@ export class GameStores {
 			game?.expand?.['stats(game)']?.flatMap((stats) => stats?.expand?.['modifiers(stats)'] ?? [])
 		);
 		this.isDm = createIsDm(this);
+		this.firstActionItem = createFirstActionItem(this);
 		this.currentTurn = createCurrentTurn(this);
 
 		if (debug) {
