@@ -14,6 +14,8 @@
 	import type { AttackShape } from '$lib/components/board';
 	import type { StatsMap } from '$lib/game/stats';
 	import { Progress } from '$lib/components/ui/progress';
+	import { trpc } from '$lib/trpc/client';
+	import { page } from '$app/stores';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -82,6 +84,18 @@
 			<Menubar.Menu>
 				<Menubar.Trigger disabled={!isUsersTurn}>Attack</Menubar.Trigger>
 				<UseAttackMenu on:useAttack={({ detail }) => (selectedAttack = detail)} />
+			</Menubar.Menu>
+			<Menubar.Menu>
+				<Menubar.Trigger>Test</Menubar.Trigger>
+				<Menubar.Content>
+					<Menubar.Item
+						on:click={() => {
+							trpc($page).combat.testAction.mutate({ gameId: board.game }).then(console.warn);
+						}}
+					>
+						Test modifiers
+					</Menubar.Item>
+				</Menubar.Content>
 			</Menubar.Menu>
 		</Menubar.Menubar>
 		{#if isUsersTurn}

@@ -479,6 +479,7 @@ export interface ActionItemResponse extends BaseCollectionResponse {
 	actionValue: number;
 	board: string;
 	token: string;
+	modifiers: Array<string>;
 }
 
 export interface ActionItemCreate extends BaseCollectionCreate {
@@ -486,6 +487,7 @@ export interface ActionItemCreate extends BaseCollectionCreate {
 	actionValue?: number;
 	board: string;
 	token?: string;
+	modifiers?: MaybeArray<string>;
 }
 
 export interface ActionItemUpdate extends BaseCollectionUpdate {
@@ -495,6 +497,9 @@ export interface ActionItemUpdate extends BaseCollectionUpdate {
 	'actionValue-'?: number;
 	board?: string;
 	token?: string;
+	modifiers?: MaybeArray<string>;
+	'modifiers+'?: MaybeArray<string>;
+	'modifiers-'?: MaybeArray<string>;
 }
 
 export interface ActionItemCollection {
@@ -507,6 +512,7 @@ export interface ActionItemCollection {
 	relations: {
 		board: BoardCollection;
 		token: TokenCollection;
+		modifiers: ModifiersCollection[];
 	};
 }
 
@@ -619,6 +625,7 @@ export interface ModifiersCollection {
 	create: ModifiersCreate;
 	update: ModifiersUpdate;
 	relations: {
+		'actionItem(modifiers)': ActionItemCollection[];
 		stats: StatsCollection;
 	};
 }
