@@ -15,8 +15,6 @@ import { GameStore, createIsDm } from './game';
 import { ModifiersStore } from './modifier';
 import { StatsStore } from './stats';
 import { TokensStore } from './token';
-// import type { UnsubscribeFunc } from 'pocketbase';
-// import { writable, type Writable } from 'svelte/store';
 
 export class GameStores {
 	game: GameStore;

@@ -1,39 +1,28 @@
 import type { ActionItemResponse } from '$lib/schema';
-import { derived, writable, type Writable } from 'svelte/store';
-import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
+import { derived } from 'svelte/store';
+import type { RecordSubscription } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
+import { Store, type Synced } from './store';
 import type { Character } from './character';
 import type { Token } from './token';
 
-export class ActionItemsStore implements Writable<ActionItems> {
-	#stores: GameStores;
-	/**A reference to the same object that is in the store for direct use. If this is modified the
-	 * store must be updated to alert subscribers of changes manually */
-	val: ActionItems;
-
-	subscribe!: Writable<ActionItems>['subscribe'];
-	set!: Writable<ActionItems>['set'];
-	update!: Writable<ActionItems>['update'];
-
+export class ActionItemsStore extends Store<ActionItems> implements Synced<ActionItemResponse> {
 	constructor(stores: GameStores, actionItems: ActionItemResponse[] = []) {
-		this.#stores = stores;
-		this.val = ActionItemsStore.fromResponse(actionItems);
-		Object.assign(this, writable(this.val));
+		super(stores, ActionItemsStore.fromResponse(actionItems));
 	}
 
 	static fromResponse(actionItems: ActionItemResponse[] = []): ActionItems {
 		return new ActionItems(actionItems);
 	}
 
-	#unsub!: UnsubscribeFunc;
 	async init() {
-		if (!this.#stores.board.val) return;
+		if (!this.stores.board.val) return;
 
-		this.#unsub = await pb.from('actionItem').subscribe('*', this.handleChange.bind(this), {
+		this.unsub = await pb.from('actionItem').subscribe('*', this.handleChange.bind(this), {
 			query: {
-				filter: eq('board.id', this.#stores.board.val.id)
+				filter: eq('board.id', this.stores.board.val.id)
 			}
 		});
 	}
@@ -49,11 +38,7 @@ export class ActionItemsStore implements Writable<ActionItems> {
 			this.val.remove(record.id);
 		}
 
-		this.set(this.val);
-	}
-
-	async deinit() {
-		await this.#unsub?.();
+		this.syncStore();
 	}
 }
 

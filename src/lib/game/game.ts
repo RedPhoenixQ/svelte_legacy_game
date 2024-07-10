@@ -1,32 +1,21 @@
 import type { GamesResponse } from '$lib/schema';
-import { derived, writable, type Writable } from 'svelte/store';
+import { derived } from 'svelte/store';
 import { pb, user } from '$lib/pb';
-import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
+import type { RecordSubscription } from 'pocketbase';
 import type { GameStores } from '.';
+import { Store, type Synced } from './store';
 
-export class GameStore implements Writable<Game> {
-	#stores: GameStores;
-	/**A reference to the same object that is in the store for direct use. If this is modified the
-	 * store must be updated to alert subscribers of changes manually */
-	val: Game;
-
-	subscribe!: Writable<Game>['subscribe'];
-	set!: Writable<Game>['set'];
-	update!: Writable<Game>['update'];
-
+export class GameStore extends Store<Game> implements Synced<GamesResponse> {
 	constructor(stores: GameStores, game: GamesResponse) {
-		this.#stores = stores;
-		this.val = GameStore.fromResponse(game);
-		Object.assign(this, writable(this.val));
+		super(stores, GameStore.fromResponse(game));
 	}
 
 	static fromResponse(game: GamesResponse): Game {
 		return new Game(game);
 	}
 
-	#unsub!: UnsubscribeFunc;
 	async init() {
-		this.#unsub = await pb.from('games').subscribe(this.val.id, this.handleChange.bind(this));
+		this.unsub = await pb.from('games').subscribe(this.val.id, this.handleChange.bind(this));
 	}
 
 	handleChange({ action, record }: RecordSubscription<GamesResponse>) {
@@ -35,7 +24,7 @@ export class GameStore implements Writable<Game> {
 			if (this.val.updated >= record.updated) return;
 
 			if (this.val.activeBoard !== record.activeBoard) {
-				this.#stores.board.change(record.activeBoard);
+				this.stores.board.change(record.activeBoard);
 			}
 			// TODO: Handle adding/removing players and dms
 			this.val.assign(record);
@@ -48,11 +37,7 @@ export class GameStore implements Writable<Game> {
 			});
 		}
 
-		this.set(this.val);
-	}
-
-	async deinit() {
-		await this.#unsub?.();
+		this.syncStore();
 	}
 }
 

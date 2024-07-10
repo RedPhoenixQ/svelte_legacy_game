@@ -1,9 +1,9 @@
 import type { ModifiersResponse, StatsResponse } from '$lib/schema';
-import { writable, type Writable } from 'svelte/store';
-import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
+import type { RecordSubscription } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
+import { Store, type Synced } from './store';
 import type { ModifiableAttribute, ModifierValues } from './modifier';
 
 export type StatsMap = {
@@ -15,20 +15,9 @@ export type StatsMap = {
 	stats: Map<string, Stats>;
 };
 
-export class StatsStore implements Writable<StatsMap> {
-	#stores!: GameStores;
-	/**A reference to the same object that is in the store for direct use. If this is modified the
-	 * store must be updated to alert subscribers of changes manually */
-	val: StatsMap;
-
-	subscribe!: Writable<StatsMap>['subscribe'];
-	set!: Writable<StatsMap>['set'];
-	update!: Writable<StatsMap>['update'];
-
+export class StatsStore extends Store<StatsMap> implements Synced<StatsResponse> {
 	constructor(stores: GameStores, stats: StatsResponse[] = []) {
-		this.#stores = stores;
-		this.val = StatsStore.fromResponse(stats);
-		Object.assign(this, writable(this.val));
+		super(stores, StatsStore.fromResponse(stats));
 	}
 
 	static fromResponse(statsList: StatsResponse[] = []): StatsMap {
@@ -50,11 +39,10 @@ export class StatsStore implements Writable<StatsMap> {
 		return statsMap;
 	}
 
-	#unsub!: UnsubscribeFunc;
 	async init() {
-		this.#unsub = await pb.from('stats').subscribe('*', this.handleChange.bind(this), {
+		this.unsub = await pb.from('stats').subscribe('*', this.handleChange.bind(this), {
 			query: {
-				filter: eq('game.id', this.#stores.game.val.id)
+				filter: eq('game.id', this.stores.game.val.id)
 			}
 		});
 	}
@@ -93,11 +81,7 @@ export class StatsStore implements Writable<StatsMap> {
 			this.val[relatedTo].set(record[relatedTo], stats);
 		}
 
-		this.set(this.val);
-	}
-
-	async deinit() {
-		await this.#unsub?.();
+		this.syncStore();
 	}
 }
 
