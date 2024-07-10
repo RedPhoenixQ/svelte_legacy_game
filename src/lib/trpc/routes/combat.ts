@@ -86,7 +86,8 @@ export const combat = t.router({
 					serverPb.from('modifiers').create({
 						attribute: 'maxHp',
 						stats: stats.id,
-						multiplier: -0.5
+						multiplier: -0.5,
+						applyPost: true
 					})
 				);
 			}
