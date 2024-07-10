@@ -24,6 +24,9 @@ export class Store<T> implements Readable<T> {
 	}
 
 	protected unsub?: UnsubscribeFunc = undefined;
+	async init() {
+		console.warn('Unimplemented init function', this);
+	}
 	async deinit() {
 		if (this.unsub) {
 			await this.unsub();
