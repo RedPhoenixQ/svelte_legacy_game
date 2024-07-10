@@ -1,13 +1,3 @@
-import type {
-	ActionItemResponse,
-	BoardResponse,
-	CharactersResponse,
-	GamesResponse,
-	ModifiersResponse,
-	StatsResponse,
-	TokenResponse,
-	UsersResponse
-} from '$lib/schema';
 import type { Readable } from 'svelte/store';
 import { ActionItemsStore, createCurrentTurn } from './actionItem';
 import { BoardStore } from './board';
@@ -17,6 +7,8 @@ import { ModifiersStore } from './modifier';
 import { StatsStore } from './stats';
 import { TokensStore } from './token';
 import { Store } from './store';
+import type { SelectExpanded } from '$lib/helpers/pocketbase';
+import type { GamesCollection } from '$lib/schema';
 
 export class GameStores {
 	game: GameStore;
@@ -30,27 +22,43 @@ export class GameStores {
 	currentTurn: ReturnType<typeof createCurrentTurn>;
 
 	constructor(
-		args: {
-			game: GamesResponse;
-			dms: UsersResponse[];
-			players: UsersResponse[];
-			activeBoard?: BoardResponse;
-			tokens?: TokenResponse[];
-			actionItems?: ActionItemResponse[];
-			characters: CharactersResponse[];
-			stats?: StatsResponse[];
-			modifiers?: ModifiersResponse[];
-		},
+		game: SelectExpanded<
+			GamesCollection,
+			{
+				expand: {
+					dms: true;
+					players: true;
+					activeBoard: {
+						expand: {
+							'token(board)': true;
+							'actionItem(board)': true;
+						};
+					};
+					'characters(game)': true;
+					'stats(game)': {
+						expand: {
+							'modifiers(stats)': true;
+						};
+					};
+				};
+			}
+		>,
 		debug?: boolean
 	) {
-		this.game = new GameStore(this, args.game);
-		this.board = new BoardStore(this, args.activeBoard);
-		this.characters = new CharactersStore(this, args.characters);
-		this.tokens = new TokensStore(this, args.tokens);
-		this.actionItems = new ActionItemsStore(this, args.actionItems);
-		this.stats = new StatsStore(this, args.stats);
+		this.game = new GameStore(this, game);
+		this.board = new BoardStore(this, game?.expand?.activeBoard);
+		this.characters = new CharactersStore(this, game?.expand?.['characters(game)']);
+		this.tokens = new TokensStore(this, game?.expand?.activeBoard?.expand?.['token(board)']);
+		this.actionItems = new ActionItemsStore(
+			this,
+			game?.expand?.activeBoard?.expand?.['actionItem(board)']
+		);
+		this.stats = new StatsStore(this, game?.expand?.['stats(game)']);
 		// Must appear after StatsStore construction
-		this.modifiers = new ModifiersStore(this, args.modifiers);
+		this.modifiers = new ModifiersStore(
+			this,
+			game?.expand?.['stats(game)']?.flatMap((stats) => stats?.expand?.['modifiers(stats)'] ?? [])
+		);
 		this.isDm = createIsDm(this);
 		this.currentTurn = createCurrentTurn(this);
 
