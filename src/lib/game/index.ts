@@ -76,6 +76,7 @@ export class GameStores {
 	}
 
 	async init() {
+		console.info('Init called for GameStores');
 		const promises: Promise<unknown>[] = [];
 		this.forEach((key) => {
 			if (this[key] instanceof Store) {
@@ -86,6 +87,7 @@ export class GameStores {
 	}
 
 	async deinit() {
+		console.info('Deinit called for GameStores');
 		const promises: Promise<unknown>[] = [];
 		this.forEach((key) => {
 			if (this[key] instanceof Store) {

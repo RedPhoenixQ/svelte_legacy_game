@@ -5,11 +5,13 @@
 	import * as Resizable from '$lib/components/ui/resizable';
 	import { GameStores } from '$lib/game';
 	import Combat from './Combat.svelte';
+	import { browser } from '$app/environment';
 
 	export let data;
 	$: console.debug('page data', data);
-	$: stores = new GameStores(data, true);
-	$: ({ game, characters, board, tokens, actionItems, stats, currentTurn, firstActionItem, isDm } = stores);
+	$: stores = new GameStores(data, browser);
+	$: ({ game, characters, board, tokens, actionItems, stats, currentTurn, firstActionItem, isDm } =
+		stores);
 
 	onMount(() => {
 		stores.init().catch(console.error);
