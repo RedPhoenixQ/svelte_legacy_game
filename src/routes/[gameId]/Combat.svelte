@@ -90,7 +90,7 @@
 				<Menubar.Content>
 					<Menubar.Item
 						on:click={() => {
-							trpc($page).combat.testAction.mutate({ gameId: board.game }).then(console.warn);
+							trpc($page).combat.testAction.mutate().then(console.warn);
 						}}
 					>
 						Test modifiers
