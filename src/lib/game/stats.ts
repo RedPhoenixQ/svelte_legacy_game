@@ -87,7 +87,7 @@ export class StatsStore extends Store<StatsMap> implements Synced<StatsResponse>
 
 export class Stats implements StatsResponse {
 	#inner!: StatsResponse;
-	#modifiers: Partial<Record<ModifiableAttribute, ModifierValues>> = {};
+	#modifiers: Partial<Record<ModifiableAttribute, Record<'pre' | 'post', ModifierValues>>> = {};
 
 	collectionName = 'stats' as const;
 	game!: string;
@@ -116,7 +116,10 @@ export class Stats implements StatsResponse {
 	#updateModifier(attribute: ModifiableAttribute) {
 		const mod = this.#modifiers[attribute];
 		if (!mod) return;
-		this[attribute] = this.#inner[attribute] * (1 + mod.multiplier) + mod.flat;
+		this[attribute] =
+			(this.#inner[attribute] * (1 + mod.pre.multiplier) + mod.pre.flat) *
+				(1 + mod.post.multiplier) +
+			mod.post.flat;
 	}
 
 	applyModifiers() {
@@ -131,16 +134,24 @@ export class Stats implements StatsResponse {
 	}
 
 	addModifier(modifier: ModifiersResponse, update = true) {
-		const mod = this.#modifiers[modifier.attribute];
-		if (mod) {
-			mod.multiplier += modifier.multiplier;
-			mod.flat += modifier.flat;
-		} else {
-			this.#modifiers[modifier.attribute] = {
-				multiplier: modifier.multiplier,
-				flat: modifier.flat
+		let mod = this.#modifiers[modifier.attribute];
+		if (!mod) {
+			mod = {
+				pre: {
+					multiplier: 0,
+					flat: 0
+				},
+				post: {
+					multiplier: 0,
+					flat: 0
+				}
 			};
+			this.#modifiers[modifier.attribute] = mod;
 		}
+		const selected = modifier.applyPost ? mod.post : mod.pre;
+		selected.multiplier += modifier.multiplier;
+		selected.flat += modifier.flat;
+
 		if (update) this.#updateModifier(modifier.attribute);
 	}
 
@@ -150,8 +161,10 @@ export class Stats implements StatsResponse {
 			console.warn('Attempting to remove modifier that does not exist', modifier);
 			return;
 		}
-		mod.multiplier -= modifier.multiplier;
-		mod.flat -= modifier.flat;
+		const selected = modifier.applyPost ? mod.post : mod.pre;
+		selected.multiplier -= modifier.multiplier;
+		selected.flat -= modifier.flat;
+
 		this.#updateModifier(modifier.attribute);
 	}
 }

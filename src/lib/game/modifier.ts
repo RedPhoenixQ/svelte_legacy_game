@@ -115,6 +115,7 @@ export class Modifier implements ModifiersResponse {
 	attribute!: 'hp' | 'maxHp';
 	multiplier!: number;
 	flat!: number;
+	applyPost!: boolean;
 	id!: string;
 	created!: string;
 	updated!: string;

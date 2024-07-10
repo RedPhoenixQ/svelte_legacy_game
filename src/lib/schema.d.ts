@@ -597,6 +597,7 @@ export interface ModifiersResponse extends BaseCollectionResponse {
 	attribute: 'hp' | 'maxHp';
 	multiplier: number;
 	flat: number;
+	applyPost: boolean;
 }
 
 export interface ModifiersCreate extends BaseCollectionCreate {
@@ -604,6 +605,7 @@ export interface ModifiersCreate extends BaseCollectionCreate {
 	attribute: 'hp' | 'maxHp';
 	multiplier?: number;
 	flat?: number;
+	applyPost?: boolean;
 }
 
 export interface ModifiersUpdate extends BaseCollectionUpdate {
@@ -615,6 +617,7 @@ export interface ModifiersUpdate extends BaseCollectionUpdate {
 	flat?: number;
 	'flat+'?: number;
 	'flat-'?: number;
+	applyPost?: boolean;
 }
 
 export interface ModifiersCollection {
