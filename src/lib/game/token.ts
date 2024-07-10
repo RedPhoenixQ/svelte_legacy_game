@@ -1,5 +1,5 @@
 import type { TokenResponse } from '$lib/schema';
-import { get, writable, type Writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
@@ -9,18 +9,19 @@ import { Box } from 'detect-collisions';
 export type TokenMap = Map<string, Token>;
 
 export class TokensStore implements Writable<TokenMap> {
-	stores!: GameStores;
+	#stores: GameStores;
+	/**A reference to the same object that is in the store for direct use. If this is modified the
+	 * store must be updated to alert subscribers of changes manually */
+	val: TokenMap;
 
 	subscribe!: Writable<TokenMap>['subscribe'];
 	set!: Writable<TokenMap>['set'];
 	update!: Writable<TokenMap>['update'];
 
-	get() {
-		return get(this);
-	}
-
-	constructor(tokens: TokenMap) {
-		Object.assign(this, writable(tokens));
+	constructor(stores: GameStores, tokens: TokenResponse[] = []) {
+		this.#stores = stores;
+		this.val = TokensStore.fromResponse(tokens);
+		Object.assign(this, writable(this.val));
 	}
 
 	static fromResponse(tokens: TokenResponse[] = []): TokenMap {
@@ -29,52 +30,43 @@ export class TokensStore implements Writable<TokenMap> {
 
 	#unsub!: UnsubscribeFunc;
 	async init() {
-		const board = this.stores.board.get();
-		if (!board) return;
+		if (!this.#stores.board.val) return;
 
-		for (const token of this.get().values()) {
-			board.insert(token.collider);
+		for (const token of this.val.values()) {
+			this.#stores.board.val.insert(token.collider);
 		}
 
 		this.#unsub = await pb.from('token').subscribe('*', this.handleChange.bind(this), {
 			query: {
-				filter: eq('board.id', board.id)
+				filter: eq('board.id', this.#stores.board.val.id)
 			}
 		});
 	}
 
 	handleChange({ action, record }: RecordSubscription<TokenResponse>) {
 		console.debug('sub token', action, record);
-		const board = this.stores.board.get();
-		if (!board) return;
+		if (!this.#stores.board.val) return;
 
-		if (action === 'delete') {
-			this.update(($tokens) => {
-				const token = $tokens.get(record.id);
-				if (!token) return $tokens;
-				board.remove(token.collider);
-				$tokens.delete(record.id);
-				return $tokens;
-			});
-		} else if (action === 'create') {
-			this.update(($tokens) => {
-				const token = new Token(record);
-				$tokens.set(record.id, token);
-				board.insert(token.collider);
-				return $tokens;
-			});
+		if (action === 'update') {
+			const token = this.val.get(record.id);
+			if (token) {
+				if (token.updated >= record.updated) return;
+				token.assign(record);
+			} else {
+				this.val.set(record.id, new Token(record));
+			}
+		} else if (action === 'delete') {
+			const token = this.val.get(record.id);
+			if (!token) return this.val;
+			this.#stores.board.val.remove(token.collider);
+			this.val.delete(record.id);
 		} else {
-			this.update(($tokens) => {
-				const token = $tokens.get(record.id);
-				if (token) {
-					if (token.updated >= record.updated) return $tokens;
-					token.assign(record);
-				} else {
-					$tokens.set(record.id, new Token(record));
-				}
-				return $tokens;
-			});
+			const token = new Token(record);
+			this.val.set(record.id, token);
+			this.#stores.board.val.insert(token.collider);
 		}
+
+		this.set(this.val);
 	}
 
 	async deinit() {

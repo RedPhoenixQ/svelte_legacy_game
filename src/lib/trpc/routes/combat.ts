@@ -10,11 +10,9 @@ export const combat = t.router({
 		.mutation(async ({ input: { gameId } }) => {
 			const stores = getGame(gameId);
 
-			const actionItems = stores.actionItems.get();
+			console.debug(stores.actionItems.val);
 
-			console.debug(actionItems);
-
-			const first = actionItems.items?.[0];
+			const first = stores.actionItems.val.items?.[0];
 
 			// TODO: Handle when it is not the players turn;
 			if (!first) throw new Error('No actionItems exists');

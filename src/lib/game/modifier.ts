@@ -1,5 +1,5 @@
 import type { ModifiersResponse } from '$lib/schema';
-import { get, writable, type Writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
@@ -16,20 +16,22 @@ export type ModifierMap = {
 };
 
 export class ModifiersStore implements Writable<ModifierMap> {
-	stores!: GameStores;
+	#stores: GameStores;
+	/**A reference to the same object that is in the store for direct use. If this is modified the
+	 * store must be updated to alert subscribers of changes manually */
 	val: ModifierMap;
 
 	subscribe!: Writable<ModifierMap>['subscribe'];
 	set!: Writable<ModifierMap>['set'];
 	update!: Writable<ModifierMap>['update'];
 
-	get() {
-		return get(this);
-	}
-
-	constructor(modifiers: ModifierMap) {
-		this.val = modifiers;
+	/**Must be called after StatsStore is created */
+	constructor(stores: GameStores, modifiers: ModifiersResponse[] = []) {
+		this.#stores = stores;
+		this.val = ModifiersStore.fromResponse(modifiers);
 		Object.assign(this, writable(this.val));
+
+		this.updateStats();
 	}
 
 	static fromResponse(modifiers: ModifiersResponse[] = []): ModifierMap {
@@ -52,7 +54,7 @@ export class ModifiersStore implements Writable<ModifierMap> {
 
 	updateStats() {
 		for (const [id, modifiers] of this.val.stats.entries()) {
-			const stats = this.stores.stats.val.stats.get(id);
+			const stats = this.#stores.stats.val.stats.get(id);
 			if (!stats) {
 				console.warn('No stats object for modifiers', modifiers);
 				continue;
@@ -63,17 +65,16 @@ export class ModifiersStore implements Writable<ModifierMap> {
 			}
 			stats.applyModifiers();
 		}
-		this.stores.stats.update((val) => val);
+		this.#stores.stats.update((val) => val);
 	}
 
 	#unsub!: UnsubscribeFunc;
 	async init() {
-		const game = this.stores.game.get();
-		if (!game) return;
+		if (!this.#stores.game.val) return;
 
 		this.#unsub = await pb.from('modifiers').subscribe('*', this.handleChange.bind(this), {
 			query: {
-				filter: eq('stats.game.id', game.id)
+				filter: eq('stats.game.id', this.#stores.game.val.id)
 			}
 		});
 	}
@@ -81,7 +82,7 @@ export class ModifiersStore implements Writable<ModifierMap> {
 	/** NOTE: On action === 'delete' record may contain only id */
 	handleChange({ action, record }: RecordSubscription<ModifiersResponse>) {
 		console.debug('sub modifier', action, record);
-		const stats = this.stores.stats.val.stats.get(record.stats);
+		const stats = this.#stores.stats.val.stats.get(record.stats);
 
 		if (action === 'update') {
 			const modifier = this.val.modifiers.get(record.id);
@@ -114,8 +115,8 @@ export class ModifiersStore implements Writable<ModifierMap> {
 				console.warn('Recived delete for record that does not exist', record);
 			}
 		}
-		this.update((val) => val);
-		if (stats) this.stores.stats.update((val) => val);
+		this.set(this.val);
+		if (stats) this.#stores.stats.set(this.#stores.stats.val);
 	}
 
 	async deinit() {

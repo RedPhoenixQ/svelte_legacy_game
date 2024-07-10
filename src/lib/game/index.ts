@@ -43,25 +43,16 @@ export class GameStores {
 		},
 		debug?: boolean
 	) {
-		this.game = GameStore.fromResponse(args.game);
-		this.board = BoardStore.fromResponse(args.activeBoard);
-		this.characters = CharactersStore.fromResponse(args.characters);
-		this.tokens = new TokensStore(TokensStore.fromResponse(args.tokens));
-		this.actionItems = new ActionItemsStore(ActionItemsStore.fromResponse(args.actionItems));
-		this.stats = new StatsStore(StatsStore.fromResponse(args.stats));
-		this.modifiers = new ModifiersStore(ModifiersStore.fromResponse(args.modifiers));
+		this.game = new GameStore(this, args.game);
+		this.board = new BoardStore(this, args.activeBoard);
+		this.characters = new CharactersStore(this, args.characters);
+		this.tokens = new TokensStore(this, args.tokens);
+		this.actionItems = new ActionItemsStore(this, args.actionItems);
+		this.stats = new StatsStore(this, args.stats);
+		// Must appear after StatsStore construction
+		this.modifiers = new ModifiersStore(this, args.modifiers);
 		this.isDm = createIsDm(this);
 		this.currentTurn = createCurrentTurn(this);
-
-		this.game.stores = this;
-		this.board.stores = this;
-		this.characters.stores = this;
-		this.tokens.stores = this;
-		this.actionItems.stores = this;
-		this.stats.stores = this;
-		this.modifiers.stores = this;
-
-		this.modifiers.updateStats();
 
 		if (debug) {
 			this.game.subscribe(($game) => console.debug('game', $game));

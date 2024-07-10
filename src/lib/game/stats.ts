@@ -1,5 +1,5 @@
 import type { ModifiersResponse, StatsResponse } from '$lib/schema';
-import { get, writable, type Writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
@@ -16,18 +16,19 @@ export type StatsMap = {
 };
 
 export class StatsStore implements Writable<StatsMap> {
-	stores!: GameStores;
+	#stores!: GameStores;
+	/**A reference to the same object that is in the store for direct use. If this is modified the
+	 * store must be updated to alert subscribers of changes manually */
+	val: StatsMap;
 
 	subscribe!: Writable<StatsMap>['subscribe'];
 	set!: Writable<StatsMap>['set'];
 	update!: Writable<StatsMap>['update'];
 
-	get() {
-		return get(this);
-	}
-
-	constructor(statsMap: StatsMap) {
-		Object.assign(this, writable(statsMap));
+	constructor(stores: GameStores, stats: StatsResponse[] = []) {
+		this.#stores = stores;
+		this.val = StatsStore.fromResponse(stats);
+		Object.assign(this, writable(this.val));
 	}
 
 	static fromResponse(statsList: StatsResponse[] = []): StatsMap {
@@ -51,12 +52,9 @@ export class StatsStore implements Writable<StatsMap> {
 
 	#unsub!: UnsubscribeFunc;
 	async init() {
-		const game = this.stores.game.get();
-		if (!game) throw new Error('No game present in init');
-
 		this.#unsub = await pb.from('stats').subscribe('*', this.handleChange.bind(this), {
 			query: {
-				filter: eq('game.id', game.id)
+				filter: eq('game.id', this.#stores.game.val.id)
 			}
 		});
 	}
@@ -70,39 +68,32 @@ export class StatsStore implements Writable<StatsMap> {
 			return;
 		}
 
-		if (action === 'delete') {
-			this.update(($statsMap) => {
-				$statsMap.stats.delete(record.id);
-				$statsMap[relatedTo].delete(record[relatedTo]);
-				return $statsMap;
-			});
-		} else if (action === 'create') {
-			this.update(($statsMap) => {
-				const stats = new Stats(record);
-				$statsMap.stats.set(record.id, stats);
-				$statsMap[relatedTo].set(record[relatedTo], stats);
-				return $statsMap;
-			});
-		} else {
-			this.update(($statsMap) => {
-				const stats = $statsMap.stats.get(record.id);
-				if (stats) {
-					if (stats.updated >= record.updated) return $statsMap;
-					if (stats[relatedTo] !== record[relatedTo]) {
-						console.warn('Stats should not change what they are related to');
-						$statsMap.character.delete(stats.character);
-						$statsMap.token.delete(stats.token);
-						$statsMap[relatedTo].set(record[relatedTo], stats);
-					}
-					stats.assign(record);
-				} else {
-					const stats = new Stats(record);
-					$statsMap.stats.set(record.id, stats);
-					$statsMap[relatedTo].set(record[relatedTo], stats);
+		if (action === 'update') {
+			const stats = this.val.stats.get(record.id);
+			if (stats) {
+				if (stats.updated >= record.updated) return this.val;
+				if (stats[relatedTo] !== record[relatedTo]) {
+					console.warn('Stats should not change what they are related to');
+					this.val.character.delete(stats.character);
+					this.val.token.delete(stats.token);
+					this.val[relatedTo].set(record[relatedTo], stats);
 				}
-				return $statsMap;
-			});
+				stats.assign(record);
+			} else {
+				const stats = new Stats(record);
+				this.val.stats.set(record.id, stats);
+				this.val[relatedTo].set(record[relatedTo], stats);
+			}
+		} else if (action === 'delete') {
+			this.val.stats.delete(record.id);
+			this.val[relatedTo].delete(record[relatedTo]);
+		} else {
+			const stats = new Stats(record);
+			this.val.stats.set(record.id, stats);
+			this.val[relatedTo].set(record[relatedTo], stats);
 		}
+
+		this.set(this.val);
 	}
 
 	async deinit() {
