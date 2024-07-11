@@ -111,4 +111,19 @@ export class ActionItems {
 	sort() {
 		this.items.sort((a, b) => a.actionValue - b.actionValue);
 	}
+
+	findFirstSafeActionValue(after: number) {
+		let newValue = after;
+		for (let i = 0; i < 100; i++) {
+			// NOTE: This is slow but should rarely be called more than once
+			const item = this.items.findLast((item) => item.actionValue <= newValue);
+			if (!item || item.actionValue !== newValue) {
+				// The values are not the same, it's safe
+				return newValue;
+			}
+			// Add a small offset to try again
+			newValue = after + Math.random() * 0.001;
+		}
+		throw new Error('Failed to find a safe action value');
+	}
 }

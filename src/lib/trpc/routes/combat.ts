@@ -1,6 +1,5 @@
 import { serverPb } from '$lib/pb.server';
 import { gameProcedure, t } from '../t';
-import { ClientResponseError } from 'pocketbase';
 import { TRPCError } from '@trpc/server';
 
 export const combat = t.router({
@@ -13,7 +12,7 @@ export const combat = t.router({
 		if (!first) throw new Error('No actionItems exists');
 
 		// TODO: Base this on character attributes (speed)
-		let delta = 10;
+		const delta = 10;
 
 		if (first.modifiers.length) {
 			try {
@@ -31,32 +30,11 @@ export const combat = t.router({
 				console.error('Error handling modifier action Item', err);
 			}
 		} else {
-			let success = false;
-			for (let i = 0; i < 30; i++) {
-				try {
-					const record = await serverPb
-						.from('actionItem')
-						.update(first.id, { 'actionValue+': delta });
-					stores.actionItems.handleChange({ action: 'update', record });
-					success = true;
-					break;
-				} catch (err) {
-					// Retry the next action value until a unique value is found
-					// Unique value are required to guarrantee that sorting is the same on all clients
-					if (err instanceof ClientResponseError) {
-						if (err.response.data.actionValue.code !== 'validation_not_unique') {
-							console.debug('update error', err);
-							throw err;
-						}
-						delta += 0.0001;
-					}
-				}
-			}
-			if (!success) {
-				throw new Error('Could not find available actionValue', {
-					cause: { item: first, finalDelta: delta }
-				});
-			}
+			const actionValue = stores.actionItems.val.findFirstSafeActionValue(
+				first.actionValue + delta
+			);
+			const record = await serverPb.from('actionItem').update(first.id, { actionValue });
+			stores.actionItems.handleChange({ action: 'update', record });
 		}
 
 		// Move combat time forward
@@ -85,10 +63,11 @@ export const combat = t.router({
 			stores.modifiers.handleChange({ action: 'create', record });
 		}
 
-		serverPb.from('actionItem').create({
+		const record = await serverPb.from('actionItem').create({
 			board: stores.board.val.id,
 			modifiers: newMods.map(({ id }) => id),
-			actionValue: stores.board.val.time + 15
+			actionValue: stores.actionItems.val.findFirstSafeActionValue(stores.board.val.time + 15)
 		});
+		stores.actionItems.handleChange({ action: 'create', record });
 	})
 });
