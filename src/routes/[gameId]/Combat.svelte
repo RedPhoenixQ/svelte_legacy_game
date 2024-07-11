@@ -3,7 +3,7 @@
 	import type { Board } from '$lib/game/board';
 	import type { CharactersMap } from '$lib/game/character';
 	import type { TokenMap } from '$lib/game/token';
-	import type { ActionItems, CurrentTurn } from '$lib/game/actionItem';
+	import type { ActionItems } from '$lib/game/actionItem';
 	import * as Resizable from '$lib/components/ui/resizable';
 	import ActionButtons from './ActionButtons.svelte';
 	import ActionList from './ActionList.svelte';
@@ -24,11 +24,13 @@
 	export let actionItems: ActionItems;
 	export let characters: CharactersMap;
 	export let statsMap: StatsMap;
-	export let firstActionItem: ActionItemResponse;
-	export let currentTurn: CurrentTurn;
+	export let firstActionItem: ActionItemResponse | undefined;
 	export let isDm = false;
 
-	$: isUsersTurn = currentTurn?.character?.owner === $user?.id;
+	$: currentToken = firstActionItem?.token ? tokens.get(firstActionItem.token) : undefined
+	$: currentCharacter = currentToken?.character ? characters.get(currentToken.character) : undefined
+
+	$: isUsersTurn = !!currentCharacter && currentCharacter?.owner === $user?.id;
 
 	let selectedAttack:
 		| {
@@ -37,8 +39,8 @@
 		  }
 		| undefined;
 
-		// eslint-disable-next-line  @typescript-eslint/no-unused-expressions
-	$: firstActionItem, selectedAttack = undefined;
+	// eslint-disable-next-line  @typescript-eslint/no-unused-expressions
+	$: firstActionItem, (selectedAttack = undefined);
 </script>
 
 <Resizable.PaneGroup direction="horizontal" autoSaveId="combatLayout">
@@ -57,9 +59,9 @@
 	<Resizable.Pane defaultSize={75} minSize={20} class="relative">
 		<BoardComp {board} {characters} moveAll={isDm} {tokens} let:width let:height>
 			<AimCanvas {board} {width} {height}>
-				{#if isUsersTurn && currentTurn?.token && selectedAttack}
+				{#if isUsersTurn && currentToken && selectedAttack}
 					<Aim
-						origin={currentTurn.token}
+						origin={currentToken}
 						angle={0}
 						shape={selectedAttack.shape}
 						movableOrigin={!selectedAttack.centered}

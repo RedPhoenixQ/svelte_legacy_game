@@ -1,4 +1,4 @@
-import { writable, type Readable, type Writable } from 'svelte/store';
+import { writable, type Readable, type Unsubscriber, type Writable } from 'svelte/store';
 import type { RecordSubscription, UnsubscribeFunc } from 'pocketbase';
 import type { GameStores } from '.';
 
@@ -23,7 +23,7 @@ export class Store<T> implements Readable<T> {
 		this.#set = set;
 	}
 
-	protected unsub?: UnsubscribeFunc = undefined;
+	protected unsub?: Unsubscriber | UnsubscribeFunc = undefined;
 	async init() {
 		console.warn('Unimplemented init function', this);
 	}

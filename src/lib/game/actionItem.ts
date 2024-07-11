@@ -1,5 +1,4 @@
 import type { ActionItemResponse } from '$lib/schema';
-import { derived, readable } from 'svelte/store';
 import type { RecordSubscription } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
@@ -41,8 +40,7 @@ export class ActionItemsStore extends Store<ActionItems> implements Synced<Actio
 		this.syncStore();
 	}
 }
-
-export type CurrentTurn =
+export type CurrentTurnInner =
 	| {
 			item: ActionItemResponse;
 			token?: Token;
@@ -50,30 +48,20 @@ export type CurrentTurn =
 	  }
 	| undefined;
 
-export function createFirstActionItem(stores: GameStores) {
-	let current = stores.actionItems.val.items[0];
-	return readable(current, (set) => {
-		return stores.actionItems.subscribe(($actionItems) => {
-			const first = $actionItems.items[0];
-			if (first !== current) {
-				current = first;
-				set(current);
-			}
-		});
-	});
-}
+/** MUST be created after actionItems */
+export class FirstActionItemStore extends Store<ActionItemResponse | undefined> {
+	constructor(stores: GameStores) {
+		super(stores, undefined);
+		this.#onChange();
+	}
 
-/** MUST be created after firstActionItem */
-export function createCurrentTurn(stores: GameStores) {
-	return derived(
-		[stores.firstActionItem, stores.characters, stores.tokens],
-		([$first, $characters, $tokens]) => {
-			if (!$first) return;
-			const token = $tokens.get($first.token);
-			const character = token?.character ? $characters.get(token.character) : undefined;
-			return { item: $first, token, character };
-		}
-	);
+	#onChange() {
+		return this.stores.actionItems.val.items.at(0);
+	}
+
+	async init() {
+		this.unsub = this.stores.actionItems.subscribe(this.#onChange.bind(this));
+	}
 }
 
 export class ActionItems {

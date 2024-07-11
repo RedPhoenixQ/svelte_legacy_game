@@ -1,5 +1,5 @@
 import { type Readable } from 'svelte/store';
-import { ActionItemsStore, createCurrentTurn, createFirstActionItem } from './actionItem';
+import { ActionItemsStore, FirstActionItemStore } from './actionItem';
 import { BoardStore } from './board';
 import { CharactersStore } from './character';
 import { GameStore, createIsDm } from './game';
@@ -19,8 +19,7 @@ export class GameStores {
 	stats: StatsStore;
 	modifiers: ModifiersStore;
 	isDm: ReturnType<typeof createIsDm>;
-	firstActionItem: ReturnType<typeof createFirstActionItem>;
-	currentTurn: ReturnType<typeof createCurrentTurn>;
+	firstActionItem: FirstActionItemStore;
 
 	constructor(
 		game: SelectExpanded<
@@ -61,8 +60,7 @@ export class GameStores {
 			game?.expand?.['stats(game)']?.flatMap((stats) => stats?.expand?.['modifiers(stats)'] ?? [])
 		);
 		this.isDm = createIsDm(this);
-		this.firstActionItem = createFirstActionItem(this);
-		this.currentTurn = createCurrentTurn(this);
+		this.firstActionItem = new FirstActionItemStore(this);
 
 		if (debug) {
 			this.forEach((key) => this[key].subscribe((value) => console.debug(key, value)));
