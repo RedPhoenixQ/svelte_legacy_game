@@ -13,7 +13,7 @@ export const dice = t.router({
 		.mutation(async ({ ctx, input }) => {
 			const roll = Math.floor(Math.random() * input.sides) + 1;
 
-			const diceRoll = await serverPb.from('diceRoll').create({
+			const diceRoll = await serverPb.from('diceRolls').create({
 				game: input.game,
 				rolledBy: ctx.user.id,
 				sides: input.sides,

@@ -1,4 +1,4 @@
-import type { BoardResponse } from '$lib/schema';
+import type { BoardsResponse } from '$lib/schema';
 import type { RecordSubscription } from 'pocketbase';
 import { TokensStore } from './token';
 import { ActionItemsStore } from './actionItem';
@@ -11,22 +11,22 @@ export type BoardStoreInner = Board | undefined;
 
 // FIXME: Make into map of all board for the game and a separate store or accesor for activeBoard.
 //				Currently this store only represents game.activeBoard
-export class BoardStore extends Store<BoardStoreInner> implements Synced<BoardResponse> {
-	constructor(stores: GameStores, board?: BoardResponse) {
+export class BoardStore extends Store<BoardStoreInner> implements Synced<BoardsResponse> {
+	constructor(stores: GameStores, board?: BoardsResponse) {
 		super(stores, BoardStore.fromResponse(board));
 	}
 
-	static fromResponse(board?: BoardResponse) {
+	static fromResponse(board?: BoardsResponse) {
 		return board ? new Board(board) : undefined;
 	}
 
 	async init() {
 		if (!this.val) return;
-		this.unsub = await pb.from('board').subscribe(this.val.id, this.handleChange.bind(this));
+		this.unsub = await pb.from('boards').subscribe(this.val.id, this.handleChange.bind(this));
 	}
 
-	handleChange({ action, record }: RecordSubscription<BoardResponse>) {
-		console.debug('sub board', action, record);
+	handleChange({ action, record }: RecordSubscription<BoardsResponse>) {
+		console.debug('sub boards', action, record);
 
 		if (this.val) {
 			if (this.val.updated >= record.updated) return;
@@ -51,18 +51,18 @@ export class BoardStore extends Store<BoardStoreInner> implements Synced<BoardRe
 		}
 
 		try {
-			const boardResponse = await pb.from('board').getOne(boardId, {
+			const boardResponse = await pb.from('boards').getOne(boardId, {
 				select: {
 					expand: {
-						'token(board)': true,
-						'actionItem(board)': true
+						'tokens(board)': true,
+						'actionItems(board)': true
 					}
 				}
 			});
-			this.stores.tokens.val = TokensStore.fromResponse(boardResponse.expand?.['token(board)']);
+			this.stores.tokens.val = TokensStore.fromResponse(boardResponse.expand?.['tokens(board)']);
 			this.stores.tokens.syncStore();
 			this.stores.actionItems.val = ActionItemsStore.fromResponse(
-				boardResponse.expand?.['actionItem(board)']
+				boardResponse.expand?.['actionItems(board)']
 			);
 			this.stores.actionItems.syncStore();
 			this.val = new Board(boardResponse);
@@ -76,8 +76,8 @@ export class BoardStore extends Store<BoardStoreInner> implements Synced<BoardRe
 	}
 }
 
-export class Board extends System implements BoardResponse {
-	collectionName = 'board' as const;
+export class Board extends System implements BoardsResponse {
+	collectionName = 'boards' as const;
 	game!: string;
 	background!: string;
 	gridSize!: number;
@@ -89,13 +89,13 @@ export class Board extends System implements BoardResponse {
 	updated!: string;
 	collectionId!: string;
 
-	constructor(board: BoardResponse) {
+	constructor(board: BoardsResponse) {
 		// TODO: Handle adding eventual walls and other static objects on the board to the collision system
 		super();
 		this.assign(board);
 	}
 
-	assign(board: BoardResponse) {
+	assign(board: BoardsResponse) {
 		Object.assign(this, board);
 	}
 }

@@ -16,7 +16,7 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import { trpc } from '$lib/trpc/client';
 	import { page } from '$app/stores';
-	import type { ActionItemResponse } from '$lib/schema';
+	import type { ActionItemsResponse } from '$lib/schema';
 	import AimCanvas from '$lib/components/board/AimCanvas.svelte';
 
 	export let board: Board;
@@ -24,7 +24,7 @@
 	export let actionItems: ActionItems;
 	export let characters: CharactersMap;
 	export let statsMap: StatsMap;
-	export let firstActionItem: ActionItemResponse | undefined;
+	export let firstActionItem: ActionItemsResponse | undefined;
 	export let isDm = false;
 
 	$: currentToken = firstActionItem?.token ? tokens.get(firstActionItem.token) : undefined;

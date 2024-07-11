@@ -14,7 +14,7 @@ export const combat = t.router({
 
 		if (first.modifiers.length) {
 			try {
-				await serverPb.from('actionItem').delete(first.id);
+				await serverPb.from('actionItems').delete(first.id);
 				stores.actionItems.handleChange({ action: 'delete', record: first });
 				await Promise.all(first.modifiers.map((id) => serverPb.from('modifiers').delete(id)));
 			} catch (err) {
@@ -24,12 +24,12 @@ export const combat = t.router({
 			const actionValue = stores.actionItems.val.findFirstSafeActionValue(
 				first.actionValue + delta
 			);
-			const record = await serverPb.from('actionItem').update(first.id, { actionValue });
+			const record = await serverPb.from('actionItems').update(first.id, { actionValue });
 			stores.actionItems.handleChange({ action: 'update', record });
 		}
 
 		// Move combat time forward
-		const newBoard = await serverPb.from('board').update(first.board, { time: first.actionValue });
+		const newBoard = await serverPb.from('boards').update(first.board, { time: first.actionValue });
 		stores.board.handleChange({ action: 'update', record: newBoard });
 		return first.actionValue;
 	}),
@@ -54,7 +54,7 @@ export const combat = t.router({
 			stores.modifiers.handleChange({ action: 'create', record });
 		}
 
-		const record = await serverPb.from('actionItem').create({
+		const record = await serverPb.from('actionItems').create({
 			board: stores.board.val.id,
 			modifiers: newMods.map(({ id }) => id),
 			actionValue: stores.actionItems.val.findFirstSafeActionValue(stores.board.val.time + 15)

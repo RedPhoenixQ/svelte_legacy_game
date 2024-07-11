@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import type { DiceRollResponse } from '$lib/schema';
+	import type { DiceRollsResponse } from '$lib/schema';
 	import { trpc } from '$lib/trpc/client';
 
 	async function roll() {
@@ -10,7 +10,7 @@
 		});
 	}
 
-	let lastRoll: DiceRollResponse | undefined;
+	let lastRoll: DiceRollsResponse | undefined;
 
 	let sides = 20;
 </script>

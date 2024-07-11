@@ -1,4 +1,4 @@
-import type { TokenResponse } from '$lib/schema';
+import type { TokensResponse } from '$lib/schema';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
@@ -8,12 +8,12 @@ import type { RecordSubscription } from 'pocketbase';
 
 export type TokenMap = Map<string, Token>;
 
-export class TokensStore extends Store<TokenMap> implements Synced<TokenResponse> {
-	constructor(stores: GameStores, tokens: TokenResponse[] = []) {
+export class TokensStore extends Store<TokenMap> implements Synced<TokensResponse> {
+	constructor(stores: GameStores, tokens: TokensResponse[] = []) {
 		super(stores, TokensStore.fromResponse(tokens));
 	}
 
-	static fromResponse(tokens: TokenResponse[] = []): TokenMap {
+	static fromResponse(tokens: TokensResponse[] = []): TokenMap {
 		return new Map(tokens.map((token) => [token.id, new Token(token)]));
 	}
 
@@ -24,14 +24,14 @@ export class TokensStore extends Store<TokenMap> implements Synced<TokenResponse
 			this.stores.board.val.insert(token.collider);
 		}
 
-		this.unsub = await pb.from('token').subscribe('*', this.handleChange.bind(this), {
+		this.unsub = await pb.from('tokens').subscribe('*', this.handleChange.bind(this), {
 			query: {
 				filter: eq('board.id', this.stores.board.val.id)
 			}
 		});
 	}
 
-	handleChange({ action, record }: RecordSubscription<TokenResponse>) {
+	handleChange({ action, record }: RecordSubscription<TokensResponse>) {
 		console.debug('sub token', action, record);
 		if (!this.stores.board.val) return;
 
@@ -60,8 +60,8 @@ export class TokensStore extends Store<TokenMap> implements Synced<TokenResponse
 
 export const TOKEN_SIZE = 50 as const;
 
-export class Token implements TokenResponse {
-	collectionName = 'token' as const;
+export class Token implements TokensResponse {
+	collectionName = 'tokens' as const;
 	board!: string;
 	character!: string;
 	x!: number;
@@ -77,12 +77,12 @@ export class Token implements TokenResponse {
 		return this.#collider;
 	}
 
-	constructor(token: TokenResponse) {
+	constructor(token: TokensResponse) {
 		this.#collider = new Box(token, TOKEN_SIZE, TOKEN_SIZE, { isCentered: true });
 		this.assign(token);
 	}
 
-	assign(token: TokenResponse) {
+	assign(token: TokensResponse) {
 		Object.assign(this, token);
 		this.#collider.setPosition(token.x, token.y, true);
 	}

@@ -15,7 +15,7 @@
 		}
 		const form = event.target as HTMLFormElement;
 
-		pb.from('chat').create({
+		pb.from('messages').create({
 			game: gameId,
 			sender: pb.authStore.model!.id,
 			content: value

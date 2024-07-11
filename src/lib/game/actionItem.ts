@@ -1,4 +1,4 @@
-import type { ActionItemResponse } from '$lib/schema';
+import type { ActionItemsResponse } from '$lib/schema';
 import type { RecordSubscription } from 'pocketbase';
 import { eq } from 'typed-pocketbase';
 import { pb } from '$lib/pb';
@@ -7,27 +7,27 @@ import { Store, type Synced } from './store';
 import type { Character } from './character';
 import type { Token } from './token';
 
-export class ActionItemsStore extends Store<ActionItems> implements Synced<ActionItemResponse> {
-	constructor(stores: GameStores, actionItems: ActionItemResponse[] = []) {
+export class ActionItemsStore extends Store<ActionItems> implements Synced<ActionItemsResponse> {
+	constructor(stores: GameStores, actionItems: ActionItemsResponse[] = []) {
 		super(stores, ActionItemsStore.fromResponse(actionItems));
 	}
 
-	static fromResponse(actionItems: ActionItemResponse[] = []): ActionItems {
+	static fromResponse(actionItems: ActionItemsResponse[] = []): ActionItems {
 		return new ActionItems(actionItems);
 	}
 
 	async init() {
 		if (!this.stores.board.val) return;
 
-		this.unsub = await pb.from('actionItem').subscribe('*', this.handleChange.bind(this), {
+		this.unsub = await pb.from('actionItems').subscribe('*', this.handleChange.bind(this), {
 			query: {
 				filter: eq('board.id', this.stores.board.val.id)
 			}
 		});
 	}
 
-	handleChange({ action, record }: RecordSubscription<ActionItemResponse>) {
-		console.debug('sub actionItem', action, record);
+	handleChange({ action, record }: RecordSubscription<ActionItemsResponse>) {
+		console.debug('sub actionItems', action, record);
 
 		if (action === 'update') {
 			this.val.update(record);
@@ -42,14 +42,14 @@ export class ActionItemsStore extends Store<ActionItems> implements Synced<Actio
 }
 export type CurrentTurnInner =
 	| {
-			item: ActionItemResponse;
+			item: ActionItemsResponse;
 			token?: Token;
 			character?: Character;
 	  }
 	| undefined;
 
 /** MUST be created after actionItems */
-export class FirstActionItemStore extends Store<ActionItemResponse | undefined> {
+export class FirstActionItemStore extends Store<ActionItemsResponse | undefined> {
 	constructor(stores: GameStores) {
 		super(stores, undefined);
 		this.#onChange();
@@ -65,15 +65,15 @@ export class FirstActionItemStore extends Store<ActionItemResponse | undefined> 
 }
 
 export class ActionItems {
-	items: ActionItemResponse[];
+	items: ActionItemsResponse[];
 	#ids: Set<string>;
 
-	constructor(actionItems: ActionItemResponse[]) {
+	constructor(actionItems: ActionItemsResponse[]) {
 		this.#ids = new Set(actionItems.map((item) => item.id));
 		this.items = actionItems;
 	}
 
-	add(item: ActionItemResponse) {
+	add(item: ActionItemsResponse) {
 		if (this.#ids.has(item.id)) {
 			this.update(item);
 		}
@@ -87,7 +87,7 @@ export class ActionItems {
 		this.items = this.items.filter((item) => item.id !== id);
 	}
 
-	update(item: ActionItemResponse) {
+	update(item: ActionItemsResponse) {
 		const index = this.items.findIndex(({ id }) => id === item.id);
 		if (index < 0) {
 			// Delete because we now know that the id is not the the array. This

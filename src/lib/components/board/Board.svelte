@@ -24,11 +24,11 @@
 
 	const updatePos = throttled((token: Token, pos: Vector) => {
 		token.collider.setPosition(pos.x, pos.y, true);
-		pb.from('token').update(token.id, pos);
+		pb.from('tokens').update(token.id, pos);
 	});
 	const updateRotation = throttled((token: Token, angle: number) => {
 		token.collider.setAngle(angle, true);
-		pb.from('token').update(token.id, { angle });
+		pb.from('tokens').update(token.id, { angle });
 	});
 </script>
 

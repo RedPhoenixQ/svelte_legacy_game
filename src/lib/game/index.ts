@@ -30,8 +30,8 @@ export class GameStores {
 					players: true;
 					activeBoard: {
 						expand: {
-							'token(board)': true;
-							'actionItem(board)': true;
+							'tokens(board)': true;
+							'actionItems(board)': true;
 						};
 					};
 					'characters(game)': true;
@@ -48,10 +48,10 @@ export class GameStores {
 		this.game = new GameStore(this, game);
 		this.board = new BoardStore(this, game?.expand?.activeBoard);
 		this.characters = new CharactersStore(this, game?.expand?.['characters(game)']);
-		this.tokens = new TokensStore(this, game?.expand?.activeBoard?.expand?.['token(board)']);
+		this.tokens = new TokensStore(this, game?.expand?.activeBoard?.expand?.['tokens(board)']);
 		this.actionItems = new ActionItemsStore(
 			this,
-			game?.expand?.activeBoard?.expand?.['actionItem(board)']
+			game?.expand?.activeBoard?.expand?.['actionItems(board)']
 		);
 		this.stats = new StatsStore(this, game?.expand?.['stats(game)']);
 		// Must appear after StatsStore construction

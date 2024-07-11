@@ -162,8 +162,8 @@ export interface UsersCollection {
 		'games(dms)': GamesCollection[];
 		'games(players)': GamesCollection[];
 		'characters(owner)': CharactersCollection[];
-		'chat(sender)': ChatCollection[];
-		'diceRoll(rolledBy)': DiceRollCollection[];
+		'messages(sender)': MessagesCollection[];
+		'diceRolls(rolledBy)': DiceRollsCollection[];
 	};
 }
 
@@ -205,11 +205,11 @@ export interface GamesCollection {
 	relations: {
 		dms: UsersCollection[];
 		players: UsersCollection[];
-		activeBoard: BoardCollection;
+		activeBoard: BoardsCollection;
 		'characters(game)': CharactersCollection[];
-		'chat(game)': ChatCollection[];
-		'diceRoll(game)': DiceRollCollection[];
-		'board(game)': BoardCollection[];
+		'messages(game)': MessagesCollection[];
+		'diceRolls(game)': DiceRollsCollection[];
+		'boards(game)': BoardsCollection[];
 		'stats(game)': StatsCollection[];
 	};
 }
@@ -290,63 +290,63 @@ export interface CharactersCollection {
 		game: GamesCollection;
 		owner: UsersCollection;
 		actions: ActionsCollection[];
-		'token(character)': TokenCollection[];
+		'tokens(character)': TokensCollection[];
 		'stats(character)': StatsCollection[];
 	};
 }
 
-// ===== chat =====
+// ===== messages =====
 
-export interface ChatResponse extends BaseCollectionResponse {
-	collectionName: 'chat';
+export interface MessagesResponse extends BaseCollectionResponse {
+	collectionName: 'messages';
 	game: string;
 	sender: string;
 	content: string;
 }
 
-export interface ChatCreate extends BaseCollectionCreate {
+export interface MessagesCreate extends BaseCollectionCreate {
 	game?: string;
 	sender?: string;
 	content?: string;
 }
 
-export interface ChatUpdate extends BaseCollectionUpdate {
+export interface MessagesUpdate extends BaseCollectionUpdate {
 	game?: string;
 	sender?: string;
 	content?: string;
 }
 
-export interface ChatCollection {
+export interface MessagesCollection {
 	type: 'base';
 	collectionId: string;
-	collectionName: 'chat';
-	response: ChatResponse;
-	create: ChatCreate;
-	update: ChatUpdate;
+	collectionName: 'messages';
+	response: MessagesResponse;
+	create: MessagesCreate;
+	update: MessagesUpdate;
 	relations: {
 		game: GamesCollection;
 		sender: UsersCollection;
 	};
 }
 
-// ===== diceRoll =====
+// ===== diceRolls =====
 
-export interface DiceRollResponse extends BaseCollectionResponse {
-	collectionName: 'diceRoll';
+export interface DiceRollsResponse extends BaseCollectionResponse {
+	collectionName: 'diceRolls';
 	game: string;
 	rolledBy: string;
 	sides: number;
 	roll: number;
 }
 
-export interface DiceRollCreate extends BaseCollectionCreate {
+export interface DiceRollsCreate extends BaseCollectionCreate {
 	game: string;
 	rolledBy: string;
 	sides: number;
 	roll?: number;
 }
 
-export interface DiceRollUpdate extends BaseCollectionUpdate {
+export interface DiceRollsUpdate extends BaseCollectionUpdate {
 	game?: string;
 	rolledBy?: string;
 	sides?: number;
@@ -357,23 +357,23 @@ export interface DiceRollUpdate extends BaseCollectionUpdate {
 	'roll-'?: number;
 }
 
-export interface DiceRollCollection {
+export interface DiceRollsCollection {
 	type: 'base';
 	collectionId: string;
-	collectionName: 'diceRoll';
-	response: DiceRollResponse;
-	create: DiceRollCreate;
-	update: DiceRollUpdate;
+	collectionName: 'diceRolls';
+	response: DiceRollsResponse;
+	create: DiceRollsCreate;
+	update: DiceRollsUpdate;
 	relations: {
 		game: GamesCollection;
 		rolledBy: UsersCollection;
 	};
 }
 
-// ===== board =====
+// ===== boards =====
 
-export interface BoardResponse extends BaseCollectionResponse {
-	collectionName: 'board';
+export interface BoardsResponse extends BaseCollectionResponse {
+	collectionName: 'boards';
 	game: string;
 	background: string;
 	gridSize: number;
@@ -382,7 +382,7 @@ export interface BoardResponse extends BaseCollectionResponse {
 	time: number;
 }
 
-export interface BoardCreate extends BaseCollectionCreate {
+export interface BoardsCreate extends BaseCollectionCreate {
 	game: string;
 	background: File | null;
 	gridSize: number;
@@ -391,7 +391,7 @@ export interface BoardCreate extends BaseCollectionCreate {
 	time?: number;
 }
 
-export interface BoardUpdate extends BaseCollectionUpdate {
+export interface BoardsUpdate extends BaseCollectionUpdate {
 	game?: string;
 	background?: File | null;
 	gridSize?: number;
@@ -408,25 +408,25 @@ export interface BoardUpdate extends BaseCollectionUpdate {
 	'time-'?: number;
 }
 
-export interface BoardCollection {
+export interface BoardsCollection {
 	type: 'base';
 	collectionId: string;
-	collectionName: 'board';
-	response: BoardResponse;
-	create: BoardCreate;
-	update: BoardUpdate;
+	collectionName: 'boards';
+	response: BoardsResponse;
+	create: BoardsCreate;
+	update: BoardsUpdate;
 	relations: {
 		'games(activeBoard)': GamesCollection[];
 		game: GamesCollection;
-		'token(board)': TokenCollection[];
-		'actionItem(board)': ActionItemCollection[];
+		'tokens(board)': TokensCollection[];
+		'actionItems(board)': ActionItemsCollection[];
 	};
 }
 
-// ===== token =====
+// ===== tokens =====
 
-export interface TokenResponse extends BaseCollectionResponse {
-	collectionName: 'token';
+export interface TokensResponse extends BaseCollectionResponse {
+	collectionName: 'tokens';
 	board: string;
 	character: string;
 	x: number;
@@ -434,7 +434,7 @@ export interface TokenResponse extends BaseCollectionResponse {
 	angle: number;
 }
 
-export interface TokenCreate extends BaseCollectionCreate {
+export interface TokensCreate extends BaseCollectionCreate {
 	board: string;
 	character?: string;
 	x?: number;
@@ -442,7 +442,7 @@ export interface TokenCreate extends BaseCollectionCreate {
 	angle?: number;
 }
 
-export interface TokenUpdate extends BaseCollectionUpdate {
+export interface TokensUpdate extends BaseCollectionUpdate {
 	board?: string;
 	character?: string;
 	x?: number;
@@ -456,25 +456,25 @@ export interface TokenUpdate extends BaseCollectionUpdate {
 	'angle-'?: number;
 }
 
-export interface TokenCollection {
+export interface TokensCollection {
 	type: 'base';
 	collectionId: string;
-	collectionName: 'token';
-	response: TokenResponse;
-	create: TokenCreate;
-	update: TokenUpdate;
+	collectionName: 'tokens';
+	response: TokensResponse;
+	create: TokensCreate;
+	update: TokensUpdate;
 	relations: {
-		board: BoardCollection;
+		board: BoardsCollection;
 		character: CharactersCollection;
-		'actionItem(token)': ActionItemCollection[];
+		'actionItems(token)': ActionItemsCollection[];
 		'stats(token)': StatsCollection[];
 	};
 }
 
-// ===== actionItem =====
+// ===== actionItems =====
 
-export interface ActionItemResponse extends BaseCollectionResponse {
-	collectionName: 'actionItem';
+export interface ActionItemsResponse extends BaseCollectionResponse {
+	collectionName: 'actionItems';
 	tempName: string;
 	actionValue: number;
 	board: string;
@@ -482,7 +482,7 @@ export interface ActionItemResponse extends BaseCollectionResponse {
 	modifiers: Array<string>;
 }
 
-export interface ActionItemCreate extends BaseCollectionCreate {
+export interface ActionItemsCreate extends BaseCollectionCreate {
 	tempName?: string;
 	actionValue?: number;
 	board: string;
@@ -490,7 +490,7 @@ export interface ActionItemCreate extends BaseCollectionCreate {
 	modifiers?: MaybeArray<string>;
 }
 
-export interface ActionItemUpdate extends BaseCollectionUpdate {
+export interface ActionItemsUpdate extends BaseCollectionUpdate {
 	tempName?: string;
 	actionValue?: number;
 	'actionValue+'?: number;
@@ -502,16 +502,16 @@ export interface ActionItemUpdate extends BaseCollectionUpdate {
 	'modifiers-'?: MaybeArray<string>;
 }
 
-export interface ActionItemCollection {
+export interface ActionItemsCollection {
 	type: 'base';
 	collectionId: string;
-	collectionName: 'actionItem';
-	response: ActionItemResponse;
-	create: ActionItemCreate;
-	update: ActionItemUpdate;
+	collectionName: 'actionItems';
+	response: ActionItemsResponse;
+	create: ActionItemsCreate;
+	update: ActionItemsUpdate;
 	relations: {
-		board: BoardCollection;
-		token: TokenCollection;
+		board: BoardsCollection;
+		token: TokensCollection;
 		modifiers: ModifiersCollection[];
 	};
 }
@@ -584,7 +584,7 @@ export interface StatsCollection {
 	relations: {
 		game: GamesCollection;
 		character: CharactersCollection;
-		token: TokenCollection;
+		token: TokensCollection;
 		'modifiers(stats)': ModifiersCollection[];
 	};
 }
@@ -628,7 +628,7 @@ export interface ModifiersCollection {
 	create: ModifiersCreate;
 	update: ModifiersUpdate;
 	relations: {
-		'actionItem(modifiers)': ActionItemCollection[];
+		'actionItems(modifiers)': ActionItemsCollection[];
 		stats: StatsCollection;
 	};
 }
@@ -640,11 +640,11 @@ export type Schema = {
 	games: GamesCollection;
 	test1: Test1Collection;
 	characters: CharactersCollection;
-	chat: ChatCollection;
-	diceRoll: DiceRollCollection;
-	board: BoardCollection;
-	token: TokenCollection;
-	actionItem: ActionItemCollection;
+	messages: MessagesCollection;
+	diceRolls: DiceRollsCollection;
+	boards: BoardsCollection;
+	tokens: TokensCollection;
+	actionItems: ActionItemsCollection;
 	actions: ActionsCollection;
 	stats: StatsCollection;
 	modifiers: ModifiersCollection;

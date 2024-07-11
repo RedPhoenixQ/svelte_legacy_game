@@ -1,23 +1,23 @@
 <script lang="ts">
 	import { pb } from '$lib/pb';
 	import { onMount } from 'svelte';
-	import type { ChatResponse } from '$lib/schema';
+	import type { MessagesResponse } from '$lib/schema';
 
 	export let gameId: string;
-	let messages: ChatResponse[] = [];
+	let messages: MessagesResponse[] = [];
 
 	function sortMessages() {
 		messages.sort((a, b) => new Date(b.created).valueOf() - new Date(a.created).valueOf());
 	}
 
 	onMount(async () => {
-		const list = await pb.from('chat').getList(0, 20, {
+		const list = await pb.from('messages').getList(0, 20, {
 			filter: ['game', '=', gameId],
 			sort: '-created'
 		});
 		messages = list.items;
 
-		pb.from('chat').subscribe(
+		pb.from('messages').subscribe(
 			'*',
 			({ action, record }) => {
 				console.log(action, record);

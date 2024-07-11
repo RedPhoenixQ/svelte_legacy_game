@@ -16,8 +16,8 @@ export async function load({ params, locals, fetch }) {
 					players: true,
 					activeBoard: {
 						expand: {
-							'token(board)': true,
-							'actionItem(board)': true
+							'tokens(board)': true,
+							'actionItems(board)': true
 						}
 					},
 					'characters(game)': true,
