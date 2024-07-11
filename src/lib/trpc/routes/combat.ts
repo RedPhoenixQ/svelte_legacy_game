@@ -4,8 +4,6 @@ import { TRPCError } from '@trpc/server';
 
 export const combat = t.router({
 	endTurn: gameProcedure.mutation(async ({ ctx: { stores } }) => {
-		console.debug(stores.actionItems.val);
-
 		const first = stores.actionItems.val.items?.[0];
 
 		// TODO: Handle when it is not the players turn;
@@ -18,14 +16,7 @@ export const combat = t.router({
 			try {
 				await serverPb.from('actionItem').delete(first.id);
 				stores.actionItems.handleChange({ action: 'delete', record: first });
-				const deleteMods = [];
-				for (const id of first.modifiers) {
-					deleteMods.push(serverPb.from('modifiers').delete(id));
-				}
-				await Promise.all(deleteMods);
-				// for (const id of first.modifiers) {
-				// 	stores.modifiers.remove(id);
-				// }
+				await Promise.all(first.modifiers.map((id) => serverPb.from('modifiers').delete(id)));
 			} catch (err) {
 				console.error('Error handling modifier action Item', err);
 			}
