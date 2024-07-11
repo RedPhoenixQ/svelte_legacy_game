@@ -10,8 +10,7 @@
 	export let data;
 	$: console.debug('page data', data);
 	$: stores = new GameStores(data, browser);
-	$: ({ game, characters, board, tokens, actionItems, stats, firstActionItem, isDm } =
-		stores);
+	$: ({ game, characters, board, tokens, actionItems, stats, firstActionItem, isDm } = stores);
 
 	onMount(() => {
 		stores.init().catch(console.error);

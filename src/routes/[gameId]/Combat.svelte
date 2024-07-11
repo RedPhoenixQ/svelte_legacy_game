@@ -27,8 +27,10 @@
 	export let firstActionItem: ActionItemResponse | undefined;
 	export let isDm = false;
 
-	$: currentToken = firstActionItem?.token ? tokens.get(firstActionItem.token) : undefined
-	$: currentCharacter = currentToken?.character ? characters.get(currentToken.character) : undefined
+	$: currentToken = firstActionItem?.token ? tokens.get(firstActionItem.token) : undefined;
+	$: currentCharacter = currentToken?.character
+		? characters.get(currentToken.character)
+		: undefined;
 
 	$: isUsersTurn = !!currentCharacter && currentCharacter?.owner === $user?.id;
 
