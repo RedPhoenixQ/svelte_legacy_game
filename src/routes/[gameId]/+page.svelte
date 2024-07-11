@@ -8,6 +8,7 @@
 	import { browser } from '$app/environment';
 
 	export let data;
+	$: users = new Map([...(data.expand?.players ?? []), ...(data.expand?.dms ?? [])].map(user => [user.id, user]))
 	$: console.debug('page data', data);
 	$: stores = new GameStores(data, browser);
 	$: ({ game, characters, board, tokens, actionItems, stats, firstActionItem, isDm } = stores);
@@ -50,7 +51,7 @@
 			style="grid-template-rows: auto minmax(0, 1fr);"
 		>
 			<RollDice />
-			<Chat gameId={$game.id} />
+			<Chat gameId={$game.id} {users} />
 		</Resizable.Pane>
 	</Resizable.PaneGroup>
 </main>
