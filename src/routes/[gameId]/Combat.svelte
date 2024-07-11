@@ -47,7 +47,7 @@
 	<Resizable.Pane collapsible defaultSize={25} minSize={10}>
 		<Resizable.PaneGroup direction="vertical" autoSaveId="combatSidebarLayout">
 			<Resizable.Pane defaultSize={60}>
-				<ActionList {actionItems} {characters} {tokens} />
+				<ActionList {actionItems} {characters} {tokens} currentTime={board.time} />
 			</Resizable.Pane>
 			<Resizable.Handle withHandle />
 			<Resizable.Pane collapsible defaultSize={40} minSize={20}>

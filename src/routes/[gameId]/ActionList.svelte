@@ -9,6 +9,7 @@
 	export let actionItems: ActionItems;
 	export let characters: CharactersMap;
 	export let tokens: TokenMap;
+	export let currentTime: number;
 </script>
 
 <ol class="p-4">
@@ -37,7 +38,7 @@
 					{item.tempName}:
 				</span>
 			{/if}
-			{item.actionValue}
+			{Math.round(item.actionValue - currentTime)}
 			<button
 				on:click={() => {
 					item.actionValue++;
