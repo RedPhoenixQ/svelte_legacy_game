@@ -3,6 +3,8 @@ import { getContext, setContext } from 'svelte';
 import { writable, type Writable } from 'svelte/store';
 import Movable from './Movable.svelte';
 import PanZoom from './PanZoom.svelte';
+import type { Body } from 'detect-collisions';
+import type { Board } from '$lib/game/board';
 
 export { PanZoom, Movable };
 
@@ -21,19 +23,50 @@ export type AttackShape =
 	| { type: 'circle'; radius: number }
 	| { type: 'sector'; radius: number; arc: number };
 
+export type AimBodies = Set<Body>;
+
+const AIM_BODIES_CONTEXT_KEY = Symbol('aimCanvasBodies');
+
+export function initAimBodiesCtx(board: Board) {
+	const bodies = new Set<Body>();
+	const { subscribe, set } = writable(bodies);
+	const store = {
+		subscribe,
+		add(body: Body) {
+			bodies.add(body);
+			board.insert(body);
+			set(bodies);
+		},
+		remove(body: Body) {
+			bodies.delete(body);
+			board.remove(body);
+			set(bodies);
+		},
+		update() {
+			set(bodies);
+		}
+	};
+	setContext(AIM_BODIES_CONTEXT_KEY, store);
+	return store;
+}
+
+export function getAimBodiesCtx() {
+	return getContext(AIM_BODIES_CONTEXT_KEY) as ReturnType<typeof initAimBodiesCtx>;
+}
+
 export type PanZoomInner = { element: HTMLElement; instance: PZ };
 
 export type PanZoomStore = Writable<PanZoomInner>;
 
-const CONTEXT_KEY = Symbol('panzoom');
+const PANZOOM_CONTEXT_KEY = Symbol('panzoom');
 
 export function getPanZoomCtx(): PanZoomStore {
-	return getContext(CONTEXT_KEY);
+	return getContext(PANZOOM_CONTEXT_KEY);
 }
 
 export function initPanZoomCtx(): PanZoomStore {
 	const store: PanZoomStore = writable();
-	setContext(CONTEXT_KEY, store);
+	setContext(PANZOOM_CONTEXT_KEY, store);
 	return store;
 }
 

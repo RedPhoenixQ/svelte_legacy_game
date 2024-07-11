@@ -2,21 +2,18 @@
 	import { Box, Circle, ensureVectorPoint, type Vector } from 'detect-collisions';
 	import Movable from './Movable.svelte';
 	import { onMount } from 'svelte';
-	import type { Board } from '$lib/game/board';
 	import { throttled } from '$lib/utils';
 	import { Sector } from '$lib/helpers/sector';
-	import type { AttackShape } from '.';
-
-	export let board: Board;
-	export let width: number;
-	export let height: number;
-	export let angle = 0;
+	import { getAimBodiesCtx, type AttackShape } from '.';
 
 	// TODO: Replace with game targering types when they are implemented
 	// export let centeredOnOrigin: boolean;
 	export let origin: Vector;
+	export let angle = 0;
 	export let shape: AttackShape;
 	export let movableOrigin = false;
+
+	const bodies = getAimBodiesCtx();
 
 	$: movableTarget = shape.type !== 'circle';
 
@@ -27,7 +24,7 @@
 	$: shape, createCollider();
 
 	function createCollider() {
-		if (collider) board.remove(collider);
+		if (collider) bodies.remove(collider);
 		switch (shape.type) {
 			case 'box':
 				collider = new Box(origin, shape.height, shape.width, {
@@ -51,19 +48,18 @@
 				});
 				break;
 		}
-		board.insert(collider);
+		bodies.add(collider);
 		resetTarget();
-		draw();
 	}
 
 	$: {
 		collider.setAngle(angle);
-		draw();
+		bodies.update();
 	}
 	$: {
 		collider.setPosition(origin.x, origin.y);
 		resetTarget();
-		draw();
+		bodies.update();
 	}
 
 	function resetTarget() {
@@ -80,56 +76,22 @@
 		collider.setAngle(angle);
 	}
 
-	function draw() {
-		if (!ctx) return;
-		ctx.clearRect(0, 0, width, height);
-		ctx.beginPath();
-		collider.draw(ctx);
-		ctx.stroke();
-		testCollisions();
-	}
-
-	function testCollisions() {
-		console.group('HIT TEST', collider);
-		ctx.save();
-		ctx.strokeStyle = 'Red';
-		ctx.beginPath();
-		board.checkOne(collider, (res) => {
-			if (res.a.isTrigger && res.b.isTrigger) return;
-			if (res.overlap > 0) {
-				console.log('Collision', res);
-				res.b.draw(ctx);
-			}
-		});
-		ctx.stroke();
-		ctx.restore();
-		console.groupEnd();
-	}
-
 	function onTarget(point: Vector) {
 		angleTowards(point);
-		draw();
+		bodies.update();
 	}
 	function onMove() {
 		resetTarget();
 		collider.updateBody();
-		draw();
+		bodies.update();
 	}
 	const onTargetSlow = throttled(onTarget, 32);
 	const onMoveSlow = throttled(onMove, 32);
 
-	let canvas: HTMLCanvasElement;
-	let ctx: CanvasRenderingContext2D;
 	onMount(() => {
-		ctx = canvas.getContext('2d')!;
-		ctx.strokeStyle = '#FFF';
-		ctx.lineWidth = 2;
-
 		resetTarget();
-		draw();
-
 		return () => {
-			board.remove(collider);
+			bodies.remove(collider);
 		};
 	});
 </script>
@@ -156,5 +118,3 @@
 		on:endMove={onMove}
 	/>
 {/if}
-<canvas {width} {height} class="pointer-events-none absolute inset-0 z-30" bind:this={canvas}
-></canvas>

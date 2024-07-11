@@ -17,6 +17,7 @@
 	import { trpc } from '$lib/trpc/client';
 	import { page } from '$app/stores';
 	import type { ActionItemResponse } from '$lib/schema';
+	import AimCanvas from '$lib/components/board/AimCanvas.svelte';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -36,11 +37,8 @@
 		  }
 		| undefined;
 
-		$: {
-			// eslint-disable-next-line  @typescript-eslint/no-unused-expressions
-			firstActionItem;
-			selectedAttack = undefined
-		}
+		// eslint-disable-next-line  @typescript-eslint/no-unused-expressions
+	$: firstActionItem, selectedAttack = undefined;
 </script>
 
 <Resizable.PaneGroup direction="horizontal" autoSaveId="combatLayout">
@@ -58,17 +56,16 @@
 	<Resizable.Handle withHandle />
 	<Resizable.Pane defaultSize={75} minSize={20} class="relative">
 		<BoardComp {board} {characters} moveAll={isDm} {tokens} let:width let:height>
-			{#if isUsersTurn && currentTurn?.token && selectedAttack}
-				<Aim
-					{board}
-					{width}
-					{height}
-					origin={currentTurn.token}
-					angle={0}
-					shape={selectedAttack.shape}
-					movableOrigin={!selectedAttack.centered}
-				/>
-			{/if}
+			<AimCanvas {board} {width} {height}>
+				{#if isUsersTurn && currentTurn?.token && selectedAttack}
+					<Aim
+						origin={currentTurn.token}
+						angle={0}
+						shape={selectedAttack.shape}
+						movableOrigin={!selectedAttack.centered}
+					/>
+				{/if}
+			</AimCanvas>
 
 			<svlete:fragment slot="token" let:token let:character>
 				{@const stats = character
