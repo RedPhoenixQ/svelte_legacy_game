@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { flip } from 'svelte/animate';
-	import { expoInOut } from 'svelte/easing';
+	import { cubicInOut } from 'svelte/easing';
 	import TokenImg from '$lib/components/board/TokenImg.svelte';
 	import type { ActionItems } from '$lib/game/actionItem';
 	import type { CharactersMap } from '$lib/game/character';
@@ -22,7 +22,7 @@
 				? 'mb-4 ring-2 ring-indigo-300 shadow-md shadow-indigo-300 z-10 relative '
 				: ''}"
 			style:scale={isFirst ? '110%' : ''}
-			animate:flip={{ duration: 1000, easing: expoInOut }}
+			animate:flip={{ duration: 500, easing: cubicInOut }}
 		>
 			<button
 				on:click={() => {
