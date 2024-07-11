@@ -25,12 +25,6 @@
 			style:scale={isFirst ? '110%' : ''}
 			animate:flip={{ duration: 500, easing: cubicInOut }}
 		>
-			<button
-				on:click={() => {
-					item.actionValue--;
-					actionItems = actionItems;
-				}}>-</button
-			>
 			{#if character}
 				<TokenImg {character} class="size-16" />
 			{:else}
@@ -39,12 +33,6 @@
 				</span>
 			{/if}
 			{Math.round(item.actionValue - currentTime)}
-			<button
-				on:click={() => {
-					item.actionValue++;
-					actionItems = actionItems;
-				}}>+</button
-			>
 		</li>
 	{/each}
 </ol>
