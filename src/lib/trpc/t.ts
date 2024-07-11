@@ -1,4 +1,4 @@
-import { getGame } from '$lib/game/games.server';
+import { ServerGame } from '$lib/game/games.server';
 import type { Context } from '$lib/trpc/context';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { GAME_ID_HEADER } from './client';
@@ -25,11 +25,11 @@ export const gameProcedure = authedProcedure.use(async ({ ctx, next }) => {
 			message: `Missing header ${GAME_ID_HEADER} for game prodecure`
 		});
 	}
-	const stores = getGame(game_id);
+	const stores = ServerGame.getGame(game_id);
 	if (!stores) {
 		throw new TRPCError({
 			code: 'INTERNAL_SERVER_ERROR',
-			message: `Missing header ${GAME_ID_HEADER} for game prodecure`
+			message: `Game was not active or could not be started on the server`
 		});
 	}
 	return next({

@@ -7,23 +7,19 @@ if (!browser) {
 	global.EventSource = EventSource;
 }
 
-export const games = new Map<string, GameStores>();
-
-// TODO: Handle removing games at some point (calling deinit())
-
-export function startGame(gameId: string, ...data: ConstructorParameters<typeof GameStores>) {
-	if (games.has(gameId)) return;
-
-	const game = new GameStores(...data);
-	game.init();
-	games.set(gameId, game);
-}
-
-export function getGame(gameId: string) {
-	const game = games.get(gameId);
-	// TODO: Try to start the game serverside before exiting
-	if (!game) {
-		throw new Error('Game did not exits');
+export class ServerGame extends GameStores {
+	// TODO: Handle removing games at some point (calling deinit())
+	static #instances = new Map<string, ServerGame>();
+	static getGame(id: string): ServerGame | undefined {
+		return ServerGame.#instances.get(id);
 	}
-	return game;
+
+	constructor(game: ConstructorParameters<typeof GameStores>[0]) {
+		const cached = ServerGame.#instances.get(game.id);
+		if (cached) return cached;
+		super(game, false);
+		this.init()
+			.then(() => ServerGame.#instances.set(game.id, this))
+			.catch((err) => console.error('ServerGame failed to init:', err));
+	}
 }

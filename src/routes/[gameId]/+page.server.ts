@@ -1,14 +1,15 @@
-import { startGame } from '$lib/game/games.server.js';
+import { ServerGame } from '$lib/game/games.server.js';
 import { authError } from '$lib/error.js';
 import { error } from '@sveltejs/kit';
 
-export async function load({ params, locals }) {
+export async function load({ params, locals, fetch }) {
 	if (!locals.pb.authStore.isValid) {
 		authError('You must be logged in to play a game');
 	}
 
 	try {
 		const game = await locals.pb.from('games').getOne(params.gameId, {
+			fetch,
 			select: {
 				expand: {
 					dms: true,
@@ -29,7 +30,7 @@ export async function load({ params, locals }) {
 			}
 		});
 
-		startGame(params.gameId, game);
+		new ServerGame(game);
 
 		return game;
 	} catch (err) {
