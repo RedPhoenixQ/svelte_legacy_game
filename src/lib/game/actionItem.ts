@@ -56,7 +56,18 @@ export class FirstActionItemStore extends Store<ActionItemsResponse | undefined>
 	}
 
 	#onChange() {
-		return this.stores.actionItems.val.items.at(0);
+		const first = this.stores.actionItems.val.items[0];
+		if (
+			// One of them is undefined
+			typeof first !== typeof this.val ||
+			// First is still the same id
+			(first?.id === this.val?.id &&
+				// First has been updated
+				first.updated !== this.val.updated)
+		) {
+			this.val = first;
+			this.syncStore();
+		}
 	}
 
 	async init() {
