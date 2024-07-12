@@ -75,7 +75,14 @@
 				{:else}
 					<span>{msg.sender}</span>
 				{/if}
-				<RelativeTime class="ml-auto text-sm opacity-75" locale="en" date={new Date(msg.created)} />
+				{#if msg.updated !== msg.created}
+					<span class="text-sm italic opacity-75">edited</span>
+				{/if}
+				<RelativeTime
+					class="ml-auto text-sm opacity-75"
+					locale="en"
+					date={new Date(msg.updated)}
+				/>
 			</div>
 			{msg.content}
 		</li>
