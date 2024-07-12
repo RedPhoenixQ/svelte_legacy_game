@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { AutoclearMap } from '$lib/helpers/autoclearMap';
 import { GameStores } from '.';
 import EventSource from 'eventsource';
 
@@ -8,8 +9,11 @@ if (!browser) {
 }
 
 export class ServerGame extends GameStores {
-	// TODO: Handle removing games at some point (calling deinit())
-	static #instances = new Map<string, ServerGame>();
+	static #instances = new AutoclearMap<string, ServerGame>({
+		onDelete(_key, value) {
+			value.deinit();
+		}
+	});
 	static getGame(id: string): ServerGame | undefined {
 		return ServerGame.#instances.get(id);
 	}
