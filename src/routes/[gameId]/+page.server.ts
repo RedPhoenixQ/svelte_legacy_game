@@ -8,30 +8,8 @@ export async function load({ params, locals, fetch }) {
 	}
 
 	try {
-		const game = await locals.pb.from('games').getOne(params.gameId, {
-			fetch,
-			select: {
-				expand: {
-					dms: true,
-					players: true,
-					activeBoard: {
-						expand: {
-							'tokens(board)': true,
-							'actionItems(board)': true
-						}
-					},
-					'characters(game)': true,
-					'stats(game)': {
-						expand: {
-							'modifiers(stats)': true
-						}
-					}
-				}
-			}
-		});
-
+		const game = await ServerGame.fetchGame(params.gameId, locals.pb, { fetch });
 		new ServerGame(game);
-
 		return game;
 	} catch (err) {
 		console.error(err);
