@@ -17,17 +17,20 @@ export class ServerGame extends GameStores {
 			value.deinit();
 		}
 	});
-	static getGame(id: string): ServerGame | undefined {
-		return ServerGame.#instances.get(id);
-	}
 
 	constructor(game: ConstructorParameters<typeof GameStores>[0]) {
 		const cached = ServerGame.#instances.get(game.id);
 		if (cached) return cached;
 		super(game, false);
-		this.init()
-			.then(() => ServerGame.#instances.set(game.id, this))
-			.catch((err) => console.error('ServerGame failed to init:', err));
+		ServerGame.#instances.set(game.id, this);
+		this.init().catch((err) => {
+			ServerGame.#instances.delete(game.id);
+			console.error('ServerGame failed to init:', err);
+		});
+	}
+
+	static getGame(id: string): ServerGame | undefined {
+		return ServerGame.#instances.get(id);
 	}
 
 	static async fetchGame(gameId: string, client: TypedPocketBase<Schema>, options?: SendOptions) {
