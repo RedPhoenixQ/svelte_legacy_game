@@ -2,6 +2,7 @@
 	import { pb } from '$lib/pb';
 	import { onMount } from 'svelte';
 	import type { MessagesResponse, UsersResponse } from '$lib/schema';
+	import RelativeTime from 'svelte-relative-time';
 
 	export let gameId: string;
 	export let users: Map<string, UsersResponse>;
@@ -74,7 +75,7 @@
 				{:else}
 					<span>{msg.sender}</span>
 				{/if}
-				<span class="ml-auto text-sm opacity-75">{new Date(msg.created).toLocaleString()}</span>
+				<RelativeTime class="ml-auto text-sm opacity-75" locale="en" date={new Date(msg.created)} />
 			</div>
 			{msg.content}
 		</li>
