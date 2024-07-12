@@ -18,19 +18,31 @@ export const authedProcedure = t.procedure.use((opt) => {
 });
 
 export const gameProcedure = authedProcedure.use(async ({ ctx, next }) => {
-	const game_id = ctx.event.request.headers.get(GAME_ID_HEADER);
-	if (!game_id) {
+	const gameId = ctx.event.request.headers.get(GAME_ID_HEADER);
+	if (!gameId) {
 		throw new TRPCError({
 			code: 'BAD_REQUEST',
 			message: `Missing header ${GAME_ID_HEADER} for game prodecure`
 		});
 	}
-	const stores = ServerGame.getGame(game_id);
-	if (!stores) {
-		throw new TRPCError({
-			code: 'INTERNAL_SERVER_ERROR',
-			message: `Game was not active or could not be started on the server`
-		});
+	let stores = ServerGame.getGame(gameId);
+	if (stores) {
+		if (!stores.hasAccessToGame(ctx.user.id) && !ctx.user.isAdmin) {
+			throw new TRPCError({
+				code: 'UNAUTHORIZED',
+				message: `You do not have access to this game`
+			});
+		}
+	} else {
+		try {
+			stores = new ServerGame(await ServerGame.fetchGame(gameId, ctx.event.locals.pb));
+		} catch (err) {
+			throw new TRPCError({
+				code: 'INTERNAL_SERVER_ERROR',
+				message: `Game could not be started`,
+				cause: err
+			});
+		}
 	}
 	return next({
 		ctx: {

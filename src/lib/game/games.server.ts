@@ -56,4 +56,8 @@ export class ServerGame extends GameStores {
 			}
 		});
 	}
+
+	hasAccessToGame(userId: string) {
+		return this.game.val.players.includes(userId) || this.game.val.dms.includes(userId);
+	}
 }
