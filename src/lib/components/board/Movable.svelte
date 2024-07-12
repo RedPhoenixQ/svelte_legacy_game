@@ -41,13 +41,15 @@
 	let canceled = false;
 	let prevPos: XYPos = { x: 0, y: 0 };
 	let rotateCurrentPos: XYPos = { x: 0, y: 0 };
+	// NOTE: currentPos should never references the position object. This would cause drift when moving and position being changed from the outside
 	let currentPos: XYPos = { ...position };
 	let x = tweened(position.x, { easing: cubicInOut, duration: 0 });
 	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
 	let deg = rad2deg(angle);
 
 	$: if (!moving) {
-		currentPos = position;
+		currentPos.x = position.x;
+		currentPos.y = position.y;
 		x.set(position.x, { duration });
 		y.set(position.y, { duration });
 	}
@@ -92,7 +94,6 @@
 	}
 	function handlePointerUp(event: PointerEvent) {
 		if (!hasClicked) return;
-		console.debug(event);
 
 		clearTimeout(longPressTimeout);
 		if (rotating) {
@@ -123,7 +124,6 @@
 	}
 	function handlePointerMove(event: PointerEvent) {
 		if (!hasClicked) return;
-		console.debug(event);
 
 		const transform = $panzoom.instance.getTransform();
 
