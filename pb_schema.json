@@ -1,0 +1,960 @@
+[
+  {
+    "id": "_pb_users_auth_",
+    "name": "users",
+    "type": "auth",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "users_name",
+        "name": "name",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "users_avatar",
+        "name": "avatar",
+        "type": "file",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "mimeTypes": [
+            "image/jpeg",
+            "image/png",
+            "image/svg+xml",
+            "image/gif",
+            "image/webp"
+          ],
+          "thumbs": null,
+          "maxSelect": 1,
+          "maxSize": 5242880,
+          "protected": false
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "id = @request.auth.id",
+    "viewRule": "id = @request.auth.id",
+    "createRule": "",
+    "updateRule": "id = @request.auth.id",
+    "deleteRule": "id = @request.auth.id",
+    "options": {
+      "allowEmailAuth": true,
+      "allowOAuth2Auth": true,
+      "allowUsernameAuth": true,
+      "exceptEmailDomains": null,
+      "manageRule": null,
+      "minPasswordLength": 8,
+      "onlyEmailDomains": null,
+      "onlyVerified": false,
+      "requireEmail": false
+    }
+  },
+  {
+    "id": "tpu65jlqen25ghf",
+    "name": "actionItems",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "owh6rqvy",
+        "name": "tempName",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "rchrpwfq",
+        "name": "actionValue",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      },
+      {
+        "system": false,
+        "id": "s7wmr43h",
+        "name": "board",
+        "type": "relation",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "p82qbksjdz84lef",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "4jldsfnj",
+        "name": "token",
+        "type": "relation",
+        "required": false,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "collectionId": "rfpdhmr8xix8x8x",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "lu8tclen",
+        "name": "modifiers",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "ezlrbb299ydpxdw",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": null,
+          "displayFields": null
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_habDDZJ` ON `actionItems` (\n  `board`,\n  `actionValue`\n)"
+    ],
+    "listRule": "@request.auth.id != '' && (\n  board.game.players.id ?= @request.auth.id \n  || board.game.dms.id ?= @request.auth.id\n)",
+    "viewRule": "@request.auth.id != '' && (\n  board.game.players.id ?= @request.auth.id \n  || board.game.dms.id ?= @request.auth.id\n)",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "id": "utj5wbvri82rpps",
+    "name": "actions",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "vfjl5xbw",
+        "name": "name",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "id": "p82qbksjdz84lef",
+    "name": "boards",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "rmi8lbys",
+        "name": "game",
+        "type": "relation",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "plrg8ombutyhfdf",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "gsstyf3s",
+        "name": "background",
+        "type": "file",
+        "required": true,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "mimeTypes": [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+            "image/svg+xml"
+          ],
+          "thumbs": [],
+          "maxSelect": 1,
+          "maxSize": 5242880,
+          "protected": false
+        }
+      },
+      {
+        "system": false,
+        "id": "3isofyja",
+        "name": "gridSize",
+        "type": "number",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": 10,
+          "max": null,
+          "noDecimal": true
+        }
+      },
+      {
+        "system": false,
+        "id": "jqat50sk",
+        "name": "width",
+        "type": "number",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": true
+        }
+      },
+      {
+        "system": false,
+        "id": "gzpgmkra",
+        "name": "height",
+        "type": "number",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": true
+        }
+      },
+      {
+        "system": false,
+        "id": "dxquauqw",
+        "name": "time",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != '' && game.dms.id ?= @request.auth.id",
+    "viewRule": "@request.auth.id != '' && (\n  game.players.id ?= @request.auth.id \n  || game.dms.id ?= @request.auth.id\n)",
+    "createRule": "@request.auth.id != '' && game.dms.id ?= @request.auth.id",
+    "updateRule": "@request.auth.id != '' && game.dms.id ?= @request.auth.id",
+    "deleteRule": "@request.auth.id != '' && game.dms.id ?= @request.auth.id",
+    "options": {}
+  },
+  {
+    "id": "h9gyuozrtv44jl0",
+    "name": "characters",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "2tlsxlxh",
+        "name": "game",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "plrg8ombutyhfdf",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "rbppegas",
+        "name": "owner",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "_pb_users_auth_",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "gfuurknv",
+        "name": "name",
+        "type": "text",
+        "required": true,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "hplm7z0r",
+        "name": "token",
+        "type": "file",
+        "required": false,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "mimeTypes": [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+            "image/svg+xml"
+          ],
+          "thumbs": [],
+          "maxSelect": 1,
+          "maxSize": 5242880,
+          "protected": false
+        }
+      },
+      {
+        "system": false,
+        "id": "m8cozq5z",
+        "name": "art",
+        "type": "file",
+        "required": true,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "mimeTypes": [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+            "image/svg+xml"
+          ],
+          "thumbs": [],
+          "maxSelect": 1,
+          "maxSize": 5242880,
+          "protected": false
+        }
+      },
+      {
+        "system": false,
+        "id": "wf0j7kgq",
+        "name": "race",
+        "type": "select",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 1,
+          "values": [
+            "khaviri",
+            "dwarf",
+            "elf",
+            "half-elf",
+            "moon-elf",
+            "sun-elf",
+            "sea-elf",
+            "human"
+          ]
+        }
+      },
+      {
+        "system": false,
+        "id": "thcgny6b",
+        "name": "actions",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "utj5wbvri82rpps",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": null,
+          "displayFields": null
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != '' && (\n  game.players.id ?= @request.auth.id \n  || game.dms.id ?= @request.auth.id\n)",
+    "viewRule": "@request.auth.id != '' && (\n  game.players.id ?= @request.auth.id \n  || game.dms.id ?= @request.auth.id\n)",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "id": "dhu3gvzbmdsidws",
+    "name": "diceRolls",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "krsfiv31",
+        "name": "game",
+        "type": "relation",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "plrg8ombutyhfdf",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "bk79vob0",
+        "name": "rolledBy",
+        "type": "relation",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "_pb_users_auth_",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "id4y5xbf",
+        "name": "sides",
+        "type": "number",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": true
+        }
+      },
+      {
+        "system": false,
+        "id": "qvpdqpau",
+        "name": "roll",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": true
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "id": "plrg8ombutyhfdf",
+    "name": "games",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "e1sexrll",
+        "name": "dms",
+        "type": "relation",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "_pb_users_auth_",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": null,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "nstprdug",
+        "name": "players",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "_pb_users_auth_",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": null,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "uo8plrgd",
+        "name": "name",
+        "type": "text",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "5mbcjcth",
+        "name": "activeBoard",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "p82qbksjdz84lef",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != \"\" && (\n  players.id ?= @request.auth.id\n  || dms.id ?= @request.auth.id\n)",
+    "viewRule": "@request.auth.id != \"\" && (\n  players.id ?= @request.auth.id\n  || dms.id ?= @request.auth.id\n)",
+    "createRule": "@request.auth.id != \"\"",
+    "updateRule": "@request.auth.id != \"\" && dms.id ?= @request.auth.id",
+    "deleteRule": "@request.auth.id != \"\" && dms.id ?= @request.auth.id",
+    "options": {}
+  },
+  {
+    "id": "8ul4y9p8lr6hwhq",
+    "name": "messages",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "ulkttt2k",
+        "name": "game",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "plrg8ombutyhfdf",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "mn3sflfd",
+        "name": "sender",
+        "type": "relation",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "_pb_users_auth_",
+          "cascadeDelete": false,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "s18tbh2z",
+        "name": "content",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != '' && (\n  game.players.id ?= @request.auth.id \n  || game.dms.id ?= @request.auth.id\n)",
+    "viewRule": "@request.auth.id != '' && (\n  game.players.id ?= @request.auth.id \n  || game.dms.id ?= @request.auth.id\n)",
+    "createRule": "",
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "id": "ezlrbb299ydpxdw",
+    "name": "modifiers",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "edvcitwx",
+        "name": "stats",
+        "type": "relation",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "p45a5yxfnt86mhl",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "orkchc4y",
+        "name": "attribute",
+        "type": "select",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 1,
+          "values": [
+            "hp",
+            "maxHp"
+          ]
+        }
+      },
+      {
+        "system": false,
+        "id": "s86oxu8y",
+        "name": "multiplier",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      },
+      {
+        "system": false,
+        "id": "owsfxdjw",
+        "name": "flat",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      },
+      {
+        "system": false,
+        "id": "xnk64voj",
+        "name": "applyPost",
+        "type": "bool",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {}
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != '' && (\n  stats.game.players.id ?= @request.auth.id \n  || stats.game.dms.id ?= @request.auth.id\n)",
+    "viewRule": "@request.auth.id != '' && (\n  stats.game.players.id ?= @request.auth.id \n  || stats.game.dms.id ?= @request.auth.id\n)",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "id": "p45a5yxfnt86mhl",
+    "name": "stats",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "wecpmyad",
+        "name": "game",
+        "type": "relation",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "collectionId": "plrg8ombutyhfdf",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "0cilmdd5",
+        "name": "character",
+        "type": "relation",
+        "required": false,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "collectionId": "h9gyuozrtv44jl0",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "qknoloyb",
+        "name": "token",
+        "type": "relation",
+        "required": false,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "collectionId": "rfpdhmr8xix8x8x",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "v70khmfz",
+        "name": "hp",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      },
+      {
+        "system": false,
+        "id": "0nyr0cpm",
+        "name": "maxHp",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_5Zgj86b` ON `stats` (\n  `character`,\n  `token`\n)"
+    ],
+    "listRule": "@request.auth.id != '' && (\n  character.game.players.id ?= @request.auth.id \n  || character.game.dms.id ?= @request.auth.id\n  || token.board.game.players.id ?= @request.auth.id \n  || token.board.game.dms.id ?= @request.auth.id\n)",
+    "viewRule": "@request.auth.id != '' && (\n  character.game.players.id ?= @request.auth.id \n  || character.game.dms.id ?= @request.auth.id\n  || token.board.game.players.id ?= @request.auth.id \n  || token.board.game.dms.id ?= @request.auth.id\n)",
+    "createRule": "@request.auth.id != '' && (\n  (character = '' && token != '' && character.game.id = game.id)\n  || (character != '' && token = '' && token.board.game.id = game.id)\n) && (\n  character.owner.id = @request.auth.id\n  || token.character.owner.id = @request.auth.id\n  || character.game.dms.id ?= @request.auth.id\n  || token.board.game.dms.id ?= @request.auth.id\n)",
+    "updateRule": "@request.auth.id != '' && (\n  character.owner.id = @request.auth.id\n  || token.character.owner.id = @request.auth.id\n  || character.game.dms.id ?= @request.auth.id\n  || token.board.game.dms.id ?= @request.auth.id\n)",
+    "deleteRule": null,
+    "options": {}
+  },
+  {
+    "id": "x8ew1bk5aalgj2u",
+    "name": "test1",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "iyibjczq",
+        "name": "text",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "kqgmhers",
+        "name": "number",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "",
+    "updateRule": "",
+    "deleteRule": "",
+    "options": {}
+  },
+  {
+    "id": "rfpdhmr8xix8x8x",
+    "name": "tokens",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "e68rqqlu",
+        "name": "board",
+        "type": "relation",
+        "required": true,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "collectionId": "p82qbksjdz84lef",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "g5fl8kco",
+        "name": "character",
+        "type": "relation",
+        "required": false,
+        "presentable": true,
+        "unique": false,
+        "options": {
+          "collectionId": "h9gyuozrtv44jl0",
+          "cascadeDelete": true,
+          "minSelect": null,
+          "maxSelect": 1,
+          "displayFields": null
+        }
+      },
+      {
+        "system": false,
+        "id": "vyuj2ktd",
+        "name": "x",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      },
+      {
+        "system": false,
+        "id": "9ar7lzss",
+        "name": "y",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      },
+      {
+        "system": false,
+        "id": "xri3zsld",
+        "name": "angle",
+        "type": "number",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "noDecimal": false
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != '' && (\n  board.game.players.id ?= @request.auth.id \n  || board.game.dms.id ?= @request.auth.id\n)",
+    "viewRule": "@request.auth.id != '' && (\n  board.game.players.id ?= @request.auth.id \n  || board.game.dms.id ?= @request.auth.id\n)",
+    "createRule": "@request.auth.id != '' && (\n  board.game.players.id ?= @request.auth.id \n  || board.game.dms.id ?= @request.auth.id\n)",
+    "updateRule": "@request.auth.id != '' && (\n  board.game.players.id ?= @request.auth.id \n  || board.game.dms.id ?= @request.auth.id\n)",
+    "deleteRule": "@request.auth.id != '' && (\n  board.game.players.id ?= @request.auth.id \n  || board.game.dms.id ?= @request.auth.id\n)",
+    "options": {}
+  }
+]
