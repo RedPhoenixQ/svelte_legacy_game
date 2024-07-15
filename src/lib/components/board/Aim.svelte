@@ -36,6 +36,7 @@
 	}
 	$: {
 		collider.setPosition(origin.x, origin.y);
+		collider = collider;
 		resetTarget();
 		bodies.update();
 	}
@@ -56,9 +57,9 @@
 		angleTowards(point);
 		bodies.update();
 	}
-	function onMove() {
+	function onMove(point: Vector) {
+		collider.setPosition(point.x, point.y);
 		resetTarget();
-		collider.updateBody();
 		bodies.update();
 	}
 	const onTargetSlow = throttled(onTarget, 32);
@@ -90,7 +91,7 @@
 		class="z-40 size-8 rounded-full border-2 border-primary bg-green-700 bg-opacity-75"
 		preventRotate
 		bind:position={collider.pos}
-		on:move={onMoveSlow}
-		on:endMove={onMove}
+		on:move={({ detail }) => onMoveSlow(detail)}
+		on:endMove={({ detail }) => onMove(detail)}
 	/>
 {/if}
