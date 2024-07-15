@@ -3,7 +3,7 @@ import { getContext, setContext } from 'svelte';
 import { writable, type Writable } from 'svelte/store';
 import Movable from './Movable.svelte';
 import PanZoom from './PanZoom.svelte';
-import type { Body } from 'detect-collisions';
+import type { Body, Vector } from 'detect-collisions';
 import type { Board } from '$lib/game/board';
 
 export { PanZoom, Movable };
@@ -12,11 +12,6 @@ export const DEFAULT_GRID_SIZE = 50 as const;
 export const DEFAULT_GRID_SIZE_HALF = DEFAULT_GRID_SIZE / 2;
 export const ROTATION_SPAN_STEP = Math.PI / 6;
 export const ONE_AND_A_HALF_PI = Math.PI + Math.PI / 2;
-
-export type XYPos = {
-	x: number;
-	y: number;
-};
 
 export type AimBodies = Set<Body>;
 
@@ -69,7 +64,7 @@ export function pageToBoard(
 	{ instance, element }: PanZoomInner,
 	pageX: number,
 	pageY: number
-): XYPos {
+): Vector {
 	const transform = instance.getTransform();
 	const rect = element.getBoundingClientRect();
 

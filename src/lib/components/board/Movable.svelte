@@ -6,16 +6,15 @@
 		getPanZoomCtx,
 		ONE_AND_A_HALF_PI,
 		pageToBoard,
-		ROTATION_SPAN_STEP,
-		type XYPos
+		ROTATION_SPAN_STEP
 	} from '.';
 	import { tweened } from 'svelte/motion';
 	import { cubicInOut } from 'svelte/easing';
-	import { rad2deg } from 'detect-collisions';
+	import { rad2deg, type Vector } from 'detect-collisions';
 
 	let className: string = '';
 	export { className as class };
-	export let position: XYPos;
+	export let position: Vector;
 	export let angle = 0;
 	export let snapToGrid = true;
 	export let disabled = false;
@@ -27,9 +26,9 @@
 	const dispatch = createEventDispatcher<{
 		click: PointerEvent;
 		longPress: PointerEvent;
-		startMove: XYPos;
-		move: XYPos;
-		endMove: XYPos;
+		startMove: Vector;
+		move: Vector;
+		endMove: Vector;
 		rotate: number;
 		endRotate: number;
 	}>();
@@ -39,10 +38,10 @@
 	let moving = false;
 	let rotating = false;
 	let canceled = false;
-	let prevPos: XYPos = { x: 0, y: 0 };
-	let rotateCurrentPos: XYPos = { x: 0, y: 0 };
+	let prevPos: Vector = { x: 0, y: 0 };
+	let rotateCurrentPos: Vector = { x: 0, y: 0 };
 	// NOTE: currentPos should never references the position object. This would cause drift when moving and position being changed from the outside
-	let currentPos: XYPos = { ...position };
+	let currentPos: Vector = { ...position };
 	let x = tweened(position.x, { easing: cubicInOut, duration: 0 });
 	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
 	let deg = rad2deg(angle);
