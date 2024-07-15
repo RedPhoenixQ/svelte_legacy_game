@@ -46,13 +46,18 @@
 	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
 	let deg = rad2deg(angle);
 
-	$: if (!moving) {
-		currentPos.x = position.x;
-		currentPos.y = position.y;
-		x.set(position.x, { duration });
-		y.set(position.y, { duration });
-	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	$: position, updatePosition();
 	$: if (!rotating) deg = rad2deg(angle);
+
+	function updatePosition() {
+		if (!moving) {
+			currentPos.x = position.x;
+			currentPos.y = position.y;
+			x.set(position.x, { duration });
+			y.set(position.y, { duration });
+		}
+	}
 
 	function reset() {
 		hasClicked = false;
