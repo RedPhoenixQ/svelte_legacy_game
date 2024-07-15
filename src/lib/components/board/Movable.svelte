@@ -167,7 +167,6 @@
 			limitMovement(limitedPos);
 			currentPos.x = limitedPos.x;
 			currentPos.y = limitedPos.y;
-			console.log(mousePos, limitedPos, currentPos);
 			$x = currentPos.x;
 			$y = currentPos.y;
 			dispatch('move', { ...currentPos });
