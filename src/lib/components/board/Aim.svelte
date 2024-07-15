@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { Box, Circle, ensureVectorPoint, type Vector } from 'detect-collisions';
+	import { ensureVectorPoint, type Body, type Vector } from 'detect-collisions';
 	import Movable from './Movable.svelte';
 	import { onMount } from 'svelte';
 	import { throttled } from '$lib/utils';
-	import { Sector } from '$lib/helpers/sector';
 	import { getAimBodiesCtx } from '.';
 	import { createBodyFromShape, type AttackShape } from '$lib/helpers/targeting';
 
@@ -20,13 +19,13 @@
 
 	let targetPos = ensureVectorPoint(origin);
 
-	let collider: Box | Circle | Sector;
+	let collider: Body;
 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 	$: shape, createCollider();
 
 	function createCollider() {
 		if (collider) bodies.remove(collider);
-		collider = createBodyFromShape(shape, origin, angle);
+		collider = createBodyFromShape(shape, origin, { angle });
 		bodies.add(collider);
 		resetTarget();
 	}
@@ -43,9 +42,7 @@
 
 	function resetTarget() {
 		if (!movableTarget) return;
-		targetPos = ensureVectorPoint({ x: shape.type === 'box' ? shape.height : shape.radius, y: 0 })
-			.rotate(collider.angle)
-			.add(collider.pos);
+		targetPos = ensureVectorPoint({ x: 100, y: 0 }).rotate(collider.angle).add(collider.pos);
 	}
 
 	function angleTowards(point: Vector) {

@@ -1,32 +1,57 @@
-import { Box, Circle, ensureVectorPoint, type PotentialVector } from 'detect-collisions';
+import {
+	Box,
+	Circle,
+	ensureVectorPoint,
+	Polygon,
+	type BodyOptions,
+	type PotentialVector,
+	type Vector
+} from 'detect-collisions';
 import { Sector } from './sector';
 
 export type AttackShape =
 	| { type: 'box'; width: number; height: number }
 	| { type: 'circle'; radius: number }
-	| { type: 'sector'; radius: number; arc: number };
+	| { type: 'sector'; radius: number; arc: number }
+	| { type: 'polygon'; points: Vector[]; offset?: Vector; centered?: boolean };
 
-export function createBodyFromShape(shape: AttackShape, origin: PotentialVector, angle: number) {
+/**The returned body has isTrigger = true by default */
+export function createBodyFromShape(
+	shape: AttackShape,
+	origin: PotentialVector,
+	options?: BodyOptions
+) {
 	switch (shape.type) {
 		case 'box': {
-			const collider = new Box(origin, shape.height, shape.width, {
+			const body = new Box(origin, shape.height, shape.width, {
 				isCentered: true,
 				isTrigger: true,
-				angle
+				...options
 			});
-			collider.setOffset(ensureVectorPoint({ x: shape.height / 2, y: 0 }));
-			return collider;
+			body.setOffset(ensureVectorPoint({ x: shape.height / 2, y: 0 }));
+			return body;
 		}
 		case 'circle':
 			return new Circle(origin, shape.radius, {
 				isCentered: true,
 				isTrigger: true,
-				angle
+				...options
 			});
 		case 'sector':
 			return new Sector(origin, shape.radius, shape.arc, {
 				isTrigger: true,
-				angle
+				...options
 			});
+		case 'polygon': {
+			const body = new Polygon(origin, shape.points, {
+				isTrigger: true,
+				isCentered: shape.centered,
+				...options
+			});
+			if (shape.offset) {
+				body.setOffset(ensureVectorPoint(shape.offset));
+			}
+			return body;
+		}
 	}
 }
