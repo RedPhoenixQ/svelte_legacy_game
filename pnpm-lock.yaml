@@ -21,8 +21,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       detect-collisions:
-        specifier: https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation
-        version: https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation
+        specifier: ^9.9.3
+        version: 9.9.3
       eventsource:
         specifier: ^2.0.2
         version: 2.0.2
@@ -543,9 +543,6 @@ packages:
   '@types/pug@2.0.10':
     resolution: {integrity: sha512-Sk/uYFOBAB7mb74XcpizmH0KOR2Pv3D2Hmrh1Dmy5BmK3MpdSa5kqZcg6EKBdklU0bFXX9gCfzvpnyUehrPIuA==}
 
-  '@types/rbush@3.0.3':
-    resolution: {integrity: sha512-lX55lR0iYCgapxD3IrgujpQA1zDxwZI5qMRelKvmKAsSMplFVr7wmMpG7/6+Op2tjrgEex8o3vjg8CRDrRNYxg==}
-
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
@@ -788,9 +785,8 @@ packages:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
 
-  detect-collisions@https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation:
-    resolution: {tarball: https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation}
-    version: 9.8.1
+  detect-collisions@9.9.3:
+    resolution: {integrity: sha512-6tWhDWSaYZkhfP6AelHj4K8x3tmabqQfxfTnvU2hB5YXJeFR25hp6BF/2c4700niEtv6wkizZMuLEI75g4LjbA==}
 
   detect-indent@6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
@@ -1401,12 +1397,6 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
-
-  quickselect@2.0.0:
-    resolution: {integrity: sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw==}
-
-  rbush@3.0.1:
-    resolution: {integrity: sha512-XRaVO0YecOpEuIvbhbpTrZgoiI6xBlz6hnlr6EHhd+0x9ase6EmeN+hdwwUaJvLcsFFQ8iWVF1GAK1yB0BWi0w==}
 
   read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
@@ -2137,8 +2127,6 @@ snapshots:
 
   '@types/pug@2.0.10': {}
 
-  '@types/rbush@3.0.3': {}
-
   '@types/resolve@1.20.2': {}
 
   '@types/sat@0.0.35': {}
@@ -2389,12 +2377,10 @@ snapshots:
 
   dequal@2.0.3: {}
 
-  detect-collisions@https://github.com/RedPhoenixQ/detect-collisions/tarball/concave-rotation:
+  detect-collisions@9.9.3:
     dependencies:
-      '@types/rbush': 3.0.3
       '@types/sat': 0.0.35
       poly-decomp-es: 0.4.2
-      rbush: 3.0.1
       sat: 0.9.0
 
   detect-indent@6.1.0: {}
@@ -2981,12 +2967,6 @@ snapshots:
   punycode@2.3.1: {}
 
   queue-microtask@1.2.3: {}
-
-  quickselect@2.0.0: {}
-
-  rbush@3.0.1:
-    dependencies:
-      quickselect: 2.0.0
 
   read-cache@1.0.0:
     dependencies:
