@@ -67,6 +67,11 @@
 		{#each tokens as [id, token] (id)}
 			{@const character = characters.get(token.character)}
 			<Movable
+				limitMovement={(movingTo) => {
+					movingTo.x = Math.max(0, Math.min(movingTo.x, width));
+					movingTo.y = Math.max(0, Math.min(movingTo.y, height));
+					return movingTo;
+				}}
 				position={token}
 				angle={token.angle}
 				disabled={!moveAll && character?.owner !== $user?.id}
