@@ -18,11 +18,6 @@ export type XYPos = {
 	y: number;
 };
 
-export type AttackShape =
-	| { type: 'box'; width: number; height: number }
-	| { type: 'circle'; radius: number }
-	| { type: 'sector'; radius: number; arc: number };
-
 export type AimBodies = Set<Body>;
 
 const AIM_BODIES_CONTEXT_KEY = Symbol('aimCanvasBodies');

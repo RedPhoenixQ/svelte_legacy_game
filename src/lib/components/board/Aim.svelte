@@ -4,7 +4,8 @@
 	import { onMount } from 'svelte';
 	import { throttled } from '$lib/utils';
 	import { Sector } from '$lib/helpers/sector';
-	import { getAimBodiesCtx, type AttackShape } from '.';
+	import { getAimBodiesCtx } from '.';
+	import type { AttackShape } from '$lib/helpers/targeting';
 
 	// TODO: Replace with game targering types when they are implemented
 	// export let centeredOnOrigin: boolean;
