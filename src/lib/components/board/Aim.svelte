@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ensureVectorPoint, type Body, type Vector } from 'detect-collisions';
+	import { distance, ensureVectorPoint, type Body, type Vector } from 'detect-collisions';
 	import Movable from './Movable.svelte';
 	import { onMount } from 'svelte';
 	import { throttled } from '$lib/utils';
@@ -8,16 +8,25 @@
 
 	// TODO: Replace with game targering types when they are implemented
 	// export let centeredOnOrigin: boolean;
-	export let origin: Vector;
+	export let originX: number;
+	export let originY: number;
+	export let position: Vector;
 	export let angle = 0;
 	export let shape: AttackShape;
+	export let range = Infinity;
 	export let movableOrigin = false;
 
 	const bodies = getAimBodiesCtx();
 
 	$: movableTarget = shape.type !== 'circle';
 
-	let targetPos = ensureVectorPoint(origin);
+	const origin = ensureVectorPoint({ x: originX, y: originY });
+	$: {
+		origin.x = originX;
+		origin.y = originY;
+	}
+
+	let targetPos = ensureVectorPoint(position);
 
 	let collider: Body;
 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -25,7 +34,7 @@
 
 	function createCollider() {
 		if (collider) bodies.remove(collider);
-		collider = createBodyFromShape(shape, origin, { angle });
+		collider = createBodyFromShape(shape, position, { angle });
 		bodies.add(collider);
 		resetTarget();
 	}
@@ -35,7 +44,7 @@
 		bodies.update();
 	}
 	$: {
-		collider.setPosition(origin.x, origin.y);
+		collider.setPosition(position.x, position.y);
 		collider = collider;
 		resetTarget();
 		bodies.update();
@@ -90,7 +99,20 @@
 		duration={0}
 		class="z-40 size-8 rounded-full border-2 border-primary bg-green-700 bg-opacity-75"
 		preventRotate
-		bind:position={origin}
+		limitMovement={(movingTo) => {
+			if (distance(origin, movingTo) < range) {
+				return movingTo;
+			} else {
+				movingTo.sub(origin);
+				const radians = Math.atan2(movingTo.y, movingTo.x);
+				movingTo.x = Math.cos(radians);
+				movingTo.y = Math.sin(radians);
+				movingTo.scale(range);
+				movingTo.add(origin);
+				return movingTo;
+			}
+		}}
+		bind:position
 		on:move={({ detail }) => onMoveSlow(detail)}
 		on:endMove={({ detail }) => onMove(detail)}
 	/>

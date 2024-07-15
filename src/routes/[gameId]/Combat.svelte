@@ -38,6 +38,7 @@
 		| {
 				centered: boolean;
 				shape: AttackShape;
+				range?: number;
 		  }
 		| undefined;
 
@@ -63,8 +64,11 @@
 			<AimCanvas {board} {width} {height}>
 				{#if isUsersTurn && currentToken && selectedAttack}
 					<Aim
-						origin={currentToken}
+						originX={currentToken.x}
+						originY={currentToken.y}
+						position={currentToken}
 						angle={0}
+						range={selectedAttack.range}
 						shape={selectedAttack.shape}
 						movableOrigin={!selectedAttack.centered}
 					/>
