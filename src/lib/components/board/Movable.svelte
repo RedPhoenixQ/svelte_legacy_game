@@ -10,7 +10,7 @@
 	} from '.';
 	import { tweened } from 'svelte/motion';
 	import { cubicInOut } from 'svelte/easing';
-	import { rad2deg, type Vector } from 'detect-collisions';
+	import { rad2deg, type Vector, ensureVectorPoint, type SATVector } from 'detect-collisions';
 
 	let className: string = '';
 	export { className as class };
@@ -20,6 +20,8 @@
 	export let disabled = false;
 	export let preventRotate = false;
 	export let duration = 500;
+	/**This callback can modify the positition that the Movable will move to*/
+	export let limitMovement: (movingTo: SATVector) => void = (movingTo) => movingTo;
 
 	const panzoom = getPanZoomCtx();
 
@@ -40,6 +42,8 @@
 	let canceled = false;
 	let prevPos: Vector = { x: 0, y: 0 };
 	let rotateCurrentPos: Vector = { x: 0, y: 0 };
+	let mousePos: Vector = { ...position };
+	let limitedPos: SATVector = ensureVectorPoint(position);
 	// NOTE: currentPos should never references the position object. This would cause drift when moving and position being changed from the outside
 	let currentPos: Vector = { ...position };
 	let x = tweened(position.x, { easing: cubicInOut, duration: 0 });
@@ -119,6 +123,12 @@
 						DEFAULT_GRID_SIZE;
 			}
 
+			limitedPos.x = currentPos.x;
+			limitedPos.y = currentPos.y;
+			limitMovement(limitedPos);
+			currentPos.x = limitedPos.x;
+			currentPos.y = limitedPos.y;
+
 			$x = currentPos.x;
 			$y = currentPos.y;
 
@@ -143,16 +153,23 @@
 		} else {
 			clearTimeout(longPressTimeout);
 
-			currentPos.x += (event.pageX - prevPos.x) / transform.scale;
-			currentPos.y += (event.pageY - prevPos.y) / transform.scale;
-
-			$x = currentPos.x;
-			$y = currentPos.y;
-
 			if (!moving) {
 				moving = true;
+				mousePos.x = currentPos.x;
+				mousePos.y = currentPos.y;
 				dispatch('startMove', { ...currentPos });
 			}
+
+			mousePos.x += (event.pageX - prevPos.x) / transform.scale;
+			mousePos.y += (event.pageY - prevPos.y) / transform.scale;
+			limitedPos.x = mousePos.x;
+			limitedPos.y = mousePos.y;
+			limitMovement(limitedPos);
+			currentPos.x = limitedPos.x;
+			currentPos.y = limitedPos.y;
+			console.log(mousePos, limitedPos, currentPos);
+			$x = currentPos.x;
+			$y = currentPos.y;
 			dispatch('move', { ...currentPos });
 		}
 
