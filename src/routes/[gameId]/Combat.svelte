@@ -11,13 +11,13 @@
 	import { user } from '$lib/pb';
 	import * as Menubar from '$lib/components/ui/menubar';
 	import UseAttackMenu from './UseAttackMenuContent.svelte';
-	import type { AttackShape } from '$lib/components/board';
 	import type { StatsMap } from '$lib/game/stats';
 	import { Progress } from '$lib/components/ui/progress';
 	import { trpc } from '$lib/trpc/client';
 	import { page } from '$app/stores';
 	import type { ActionItemsResponse } from '$lib/schema';
 	import AimCanvas from '$lib/components/board/AimCanvas.svelte';
+	import type { AttackShape } from '$lib/helpers/targeting';
 
 	export let board: Board;
 	export let tokens: TokenMap;
