@@ -5,7 +5,7 @@
 	import { throttled } from '$lib/utils';
 	import { Sector } from '$lib/helpers/sector';
 	import { getAimBodiesCtx } from '.';
-	import type { AttackShape } from '$lib/helpers/targeting';
+	import { createBodyFromShape, type AttackShape } from '$lib/helpers/targeting';
 
 	// TODO: Replace with game targering types when they are implemented
 	// export let centeredOnOrigin: boolean;
@@ -26,29 +26,7 @@
 
 	function createCollider() {
 		if (collider) bodies.remove(collider);
-		switch (shape.type) {
-			case 'box':
-				collider = new Box(origin, shape.height, shape.width, {
-					isCentered: true,
-					isTrigger: true,
-					angle
-				});
-				collider.setOffset(ensureVectorPoint({ x: shape.height / 2, y: 0 }));
-				break;
-			case 'circle':
-				collider = new Circle(origin, shape.radius, {
-					isCentered: true,
-					isTrigger: true,
-					angle
-				});
-				break;
-			case 'sector':
-				collider = new Sector(origin, shape.radius, shape.arc, {
-					isTrigger: true,
-					angle
-				});
-				break;
-		}
+		collider = createBodyFromShape(shape, origin, angle);
 		bodies.add(collider);
 		resetTarget();
 	}
