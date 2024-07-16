@@ -24,6 +24,13 @@
 	let collider: Body;
 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 	$: shape, createCollider();
+	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	$: origin, resetPos();
+
+	function resetPos() {
+		position.x = origin.x;
+		position.y = origin.y;
+	}
 
 	function createCollider() {
 		if (collider) bodies.remove(collider);
