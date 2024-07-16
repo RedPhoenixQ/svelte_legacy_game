@@ -86,18 +86,16 @@ export const combat = t.router({
 			) {
 				throw new Error('The choosen point is out of range');
 			}
+			// TODO: Use common method to check action result for server/client parity
+
 			const collider = createBodyFromShape(attack.shape, input.position, { angle: input.angle });
 
 			stores.board.val.insert(collider);
 			try {
 				const hits: Token[] = [];
-				// TODO: Use common method on board to check collider collision for parity
-				stores.board.val.checkOne(collider, (res) => {
-					console.log('res', res.b);
-					if (res.a.isTrigger && res.b.isTrigger) return;
-					if (res.overlap > 0) {
-						hits.push(res.b);
-					}
+				stores.board.val.checkHitTokens(collider, (token) => {
+					console.log('hit token', token.id, token.pos);
+					hits.push(token);
 				});
 				console.log('Targets hit', hits);
 			} catch (err) {

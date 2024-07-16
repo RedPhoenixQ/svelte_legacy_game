@@ -29,12 +29,9 @@
 		ctx!.beginPath();
 		for (const body of $bodies) {
 			console.group('HIT TEST', body);
-			board.checkOne(body, (res) => {
-				if (res.a.isTrigger && res.b.isTrigger) return;
-				if (res.overlap > 0) {
-					console.log('Collision', res);
-					res.b.draw(ctx!);
-				}
+			board.checkHitTokens(body, (token, res) => {
+				console.log('Collision', token, res.overlap);
+				token.draw(ctx!);
 			});
 			console.groupEnd();
 		}
