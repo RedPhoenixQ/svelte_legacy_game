@@ -21,7 +21,7 @@ export class TokensStore extends Store<TokenMap> implements Synced<TokensRespons
 		if (!this.stores.board.val) return;
 
 		for (const token of this.val.values()) {
-			this.stores.board.val.insert(token.collider);
+			this.stores.board.val.insert(token);
 		}
 
 		this.unsub = await pb.from('tokens').subscribe('*', this.handleChange.bind(this), {
@@ -46,12 +46,12 @@ export class TokensStore extends Store<TokenMap> implements Synced<TokensRespons
 		} else if (action === 'delete') {
 			const token = this.val.get(record.id);
 			if (!token) return this.val;
-			this.stores.board.val.remove(token.collider);
+			this.stores.board.val.remove(token);
 			this.val.delete(record.id);
 		} else {
 			const token = new Token(record);
 			this.val.set(record.id, token);
-			this.stores.board.val.insert(token.collider);
+			this.stores.board.val.insert(token);
 		}
 
 		this.syncStore();
@@ -60,30 +60,26 @@ export class TokensStore extends Store<TokenMap> implements Synced<TokensRespons
 
 export const TOKEN_SIZE = 50 as const;
 
-export class Token implements TokensResponse {
+export class Token extends Box implements TokensResponse {
+	// x, y and angle is handled by Box
 	collectionName = 'tokens' as const;
 	board!: string;
 	character!: string;
-	x!: number;
-	y!: number;
-	angle!: number;
 	id!: string;
 	created!: string;
 	updated!: string;
 	collectionId!: string;
 
-	#collider: Box;
-	get collider() {
-		return this.#collider;
-	}
-
 	constructor(token: TokensResponse) {
-		this.#collider = new Box(token, TOKEN_SIZE, TOKEN_SIZE, { isCentered: true });
-		this.assign(token);
+		super(token, TOKEN_SIZE, TOKEN_SIZE, { isCentered: true, angle: token.angle });
+		Object.assign(this, token);
 	}
 
 	assign(token: TokensResponse) {
 		Object.assign(this, token);
-		this.#collider.setPosition(token.x, token.y, true);
+		this.setPosition(token.x, token.y, false);
+		this.setAngle(token.angle, false);
+		// NOTE: This will also handle angle which is assigned to above
+		this.updateBody();
 	}
 }
