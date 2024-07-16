@@ -1,11 +1,12 @@
 import type { BoardsResponse } from '$lib/schema';
 import type { RecordSubscription } from 'pocketbase';
-import { TokensStore } from './token';
+import { Token, TokensStore } from './token';
 import { ActionItemsStore } from './actionItem';
 import { pb } from '$lib/pb';
 import type { GameStores } from '.';
 import { Store, type Synced } from './store';
-import { System } from 'detect-collisions';
+import { Response, System } from 'detect-collisions';
+import type { AttackBody } from '$lib/helpers/targeting';
 
 export type BoardStoreInner = Board | undefined;
 
@@ -99,5 +100,13 @@ export class Board extends System<SystemBody> implements BoardsResponse {
 
 	assign(board: BoardsResponse) {
 		Object.assign(this, board);
+	}
+
+	checkHitTokens(collider: AttackBody, callback: (token: Token, res: Response) => void) {
+		this.checkOne(collider, (res) => {
+			if (res.b instanceof Token && res.overlap > 0) {
+				callback(res.b, res);
+			}
+		});
 	}
 }
