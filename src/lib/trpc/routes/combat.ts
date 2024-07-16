@@ -1,6 +1,9 @@
+import { createBodyFromShape } from '$lib/helpers/targeting';
 import { serverPb } from '$lib/pb.server';
+import { distance, ensureVectorPoint } from 'detect-collisions';
 import { gameProcedure, t } from '../t';
 import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
 
 export const combat = t.router({
 	endTurn: gameProcedure.mutation(async ({ ctx: { stores } }) => {
@@ -33,6 +36,75 @@ export const combat = t.router({
 		stores.board.handleChange({ action: 'update', record: newBoard });
 		return first.actionValue;
 	}),
+	testTakeActionMovableBox: gameProcedure
+		.input(
+			z.discriminatedUnion('type', [
+				z.object({
+					type: z.literal('aimed'),
+					actionId: z.string(),
+					position: z.object({ x: z.number(), y: z.number() }),
+					angle: z.number()
+				}),
+				z.object({
+					type: z.literal('selected'),
+					actionId: z.string(),
+					selectedTokenIds: z.string().array()
+				})
+			])
+		)
+		.mutation(async ({ ctx: { stores }, input }) => {
+			if (!stores.board.val) {
+				throw new Error('No active board');
+			}
+
+			const first = stores.actionItems.val.items[0];
+			if (!first || !first.token) {
+				throw new Error('No token/player is currently taking a turn');
+			}
+
+			const attackingToken = stores.tokens.val.get(first.token);
+			const attack = {
+				centered: false,
+				range: 400,
+				shape: {
+					type: 'box',
+					width: 200,
+					height: 100
+				}
+			} as const;
+			console.debug('takeAction input', input);
+			if (input.type === 'selected') {
+				throw new Error('Does not handle selected targeting');
+			}
+
+			// Check range
+			if (
+				attack.range &&
+				distance(ensureVectorPoint(attackingToken), ensureVectorPoint(input.position)) >
+					attack.range
+			) {
+				throw new Error('The choosen point is out of range');
+			}
+			const collider = createBodyFromShape(attack.shape, input.position, { angle: input.angle });
+
+			stores.board.val.insert(collider);
+			try {
+				const hits = [];
+				// TODO: Use common method on board to check collider collision for parity
+				stores.board.val.checkOne(collider, (res) => {
+					console.log('res', res.b);
+					if (res.a.isTrigger && res.b.isTrigger) return;
+					if (res.overlap > 0) {
+						hits.push(res.b.pos);
+					}
+				});
+				console.log('Targets hit', hits);
+			} catch (err) {
+				throw new Error('Something whent wrong', { cause: err });
+			} finally {
+				stores.board.val.remove(collider);
+			}
+		}),
 	testAction: gameProcedure.mutation(async ({ ctx: { stores } }) => {
 		if (!stores.board.val) {
 			throw new TRPCError({ code: 'BAD_REQUEST', message: 'There is no active board' });

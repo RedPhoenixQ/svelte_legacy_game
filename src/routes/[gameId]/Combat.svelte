@@ -72,8 +72,8 @@
 	<Resizable.Handle withHandle />
 	<Resizable.Pane defaultSize={75} minSize={20} class="relative">
 		<BoardComp {board} {characters} moveAll={isDm} {tokens} let:width let:height>
-			<AimCanvas {board} {width} {height}>
-				{#if isUsersTurn && currentToken && selectedAttack}
+			{#if isUsersTurn && currentToken && selectedAttack}
+				<AimCanvas {board} {width} {height}>
 					<Aim
 						origin={currentToken}
 						bind:position={selectedAttack.instance.position}
@@ -82,9 +82,22 @@
 						shape={selectedAttack.attack.shape}
 						movableOrigin={!selectedAttack.attack.centered}
 					/>
-				{/if}
-				<button on:click={() => console.log('LOG', selectedAttack)}>LOG</button>
-			</AimCanvas>
+					<button
+						on:click={async () => {
+							console.log('LOG', selectedAttack);
+							if (!selectedAttack?.instance) return;
+							console.warn(
+								'Action res',
+								await trpc($page).combat.testTakeActionMovableBox.mutate({
+									actionId: 'test',
+									type: 'aimed',
+									...selectedAttack.instance
+								})
+							);
+						}}>LOG</button
+					>
+				</AimCanvas>
+			{/if}
 
 			<svlete:fragment slot="token" let:token let:character>
 				{@const stats = character
