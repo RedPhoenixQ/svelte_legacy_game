@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AttackShape } from '$lib/components/board';
+	import type { AttackShape } from '$lib/helpers/targeting';
 	import { createEventDispatcher } from 'svelte';
 	import * as Menubar from '$lib/components/ui/menubar';
 
