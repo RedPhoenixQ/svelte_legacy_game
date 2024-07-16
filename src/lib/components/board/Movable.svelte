@@ -42,10 +42,10 @@
 	let canceled = false;
 	let prevPos: Vector = { x: 0, y: 0 };
 	let rotateCurrentPos: Vector = { x: 0, y: 0 };
-	let mousePos: Vector = { ...position };
+	let mousePos: Vector = { x: position.x, y: position.y };
 	let limitedPos: SATVector = ensureVectorPoint(position);
 	// NOTE: currentPos should never references the position object. This would cause drift when moving and position being changed from the outside
-	let currentPos: Vector = { ...position };
+	let currentPos: Vector = { x: position.x, y: position.y };
 	let x = tweened(position.x, { easing: cubicInOut, duration: 0 });
 	let y = tweened(position.y, { easing: cubicInOut, duration: 0 });
 	let deg = rad2deg(angle);
