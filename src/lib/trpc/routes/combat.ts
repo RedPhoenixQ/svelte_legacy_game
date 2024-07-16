@@ -4,6 +4,7 @@ import { distance, ensureVectorPoint } from 'detect-collisions';
 import { gameProcedure, t } from '../t';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
+import type { Token } from '$lib/game/token';
 
 export const combat = t.router({
 	endTurn: gameProcedure.mutation(async ({ ctx: { stores } }) => {
@@ -89,13 +90,13 @@ export const combat = t.router({
 
 			stores.board.val.insert(collider);
 			try {
-				const hits = [];
+				const hits: Token[] = [];
 				// TODO: Use common method on board to check collider collision for parity
 				stores.board.val.checkOne(collider, (res) => {
 					console.log('res', res.b);
 					if (res.a.isTrigger && res.b.isTrigger) return;
 					if (res.overlap > 0) {
-						hits.push(res.b.pos);
+						hits.push(res.b);
 					}
 				});
 				console.log('Targets hit', hits);
