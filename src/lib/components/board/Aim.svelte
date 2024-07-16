@@ -8,8 +8,7 @@
 
 	// TODO: Replace with game targering types when they are implemented
 	// export let centeredOnOrigin: boolean;
-	export let originX: number;
-	export let originY: number;
+	export let origin: Vector;
 	export let position: Vector;
 	export let angle = 0;
 	export let shape: AttackShape;
@@ -19,12 +18,6 @@
 	const bodies = getAimBodiesCtx();
 
 	$: movableTarget = shape.type !== 'circle';
-
-	const origin = ensureVectorPoint({ x: originX, y: originY });
-	$: {
-		origin.x = originX;
-		origin.y = originY;
-	}
 
 	let targetPos = ensureVectorPoint(position);
 
@@ -45,7 +38,6 @@
 	}
 	$: {
 		collider.setPosition(position.x, position.y);
-		collider = collider;
 		resetTarget();
 		bodies.update();
 	}
@@ -55,21 +47,14 @@
 		targetPos = ensureVectorPoint({ x: 100, y: 0 }).rotate(collider.angle).add(collider.pos);
 	}
 
-	function angleTowards(point: Vector) {
+	function onTarget(point: Vector) {
 		const vec = ensureVectorPoint(point);
 		const dir = vec.sub(collider.pos);
-		const angle = Math.atan2(dir.y, dir.x);
-		collider.setAngle(angle);
-	}
-
-	function onTarget(point: Vector) {
-		angleTowards(point);
-		bodies.update();
+		angle = Math.atan2(dir.y, dir.x);
 	}
 	function onMove(point: Vector) {
-		collider.setPosition(point.x, point.y);
-		resetTarget();
-		bodies.update();
+		position.x = point.x;
+		position.y = point.y;
 	}
 	const onTargetSlow = throttled(onTarget, 32);
 	const onMoveSlow = throttled(onMove, 32);
@@ -100,14 +85,17 @@
 		class="z-40 size-8 rounded-full border-2 border-primary bg-green-700 bg-opacity-75"
 		preventRotate
 		limitMovement={(movingTo) => {
+			if (range === undefined) return;
 			if (distance(origin, movingTo) < range) {
 				return movingTo;
 			} else {
+				// @ts-expect-error: Only x and y is used for sub
 				movingTo.sub(origin);
 				const radians = Math.atan2(movingTo.y, movingTo.x);
 				movingTo.x = Math.cos(radians);
 				movingTo.y = Math.sin(radians);
 				movingTo.scale(range);
+				// @ts-expect-error: Only x and y is used for add
 				movingTo.add(origin);
 				return movingTo;
 			}

@@ -18,6 +18,7 @@
 	import type { ActionItemsResponse } from '$lib/schema';
 	import AimCanvas from '$lib/components/board/AimCanvas.svelte';
 	import type { AttackShape } from '$lib/helpers/targeting';
+	import type { Vector } from 'detect-collisions';
 
 	export let board: Board;
 	export let tokens: TokenMap;
@@ -36,14 +37,24 @@
 
 	let selectedAttack:
 		| {
-				centered: boolean;
-				shape: AttackShape;
-				range?: number;
+				attack: {
+					centered: boolean;
+					shape: AttackShape;
+					range?: number;
+				};
+				instance: {
+					position: Vector;
+					angle: number;
+				};
 		  }
 		| undefined;
 
 	// eslint-disable-next-line  @typescript-eslint/no-unused-expressions
-	$: firstActionItem, (selectedAttack = undefined);
+	$: firstActionItem, clearSelected();
+
+	function clearSelected() {
+		selectedAttack = undefined;
+	}
 </script>
 
 <Resizable.PaneGroup direction="horizontal" autoSaveId="combatLayout">
@@ -64,15 +75,15 @@
 			<AimCanvas {board} {width} {height}>
 				{#if isUsersTurn && currentToken && selectedAttack}
 					<Aim
-						originX={currentToken.x}
-						originY={currentToken.y}
-						position={currentToken}
-						angle={0}
-						range={selectedAttack.range}
-						shape={selectedAttack.shape}
-						movableOrigin={!selectedAttack.centered}
+						origin={currentToken}
+						bind:position={selectedAttack.instance.position}
+						bind:angle={selectedAttack.instance.angle}
+						range={selectedAttack.attack.range}
+						shape={selectedAttack.attack.shape}
+						movableOrigin={!selectedAttack.attack.centered}
 					/>
 				{/if}
+				<button on:click={() => console.log('LOG', selectedAttack)}>LOG</button>
 			</AimCanvas>
 
 			<svlete:fragment slot="token" let:token let:character>
@@ -96,7 +107,18 @@
 		<Menubar.Menubar class="absolute left-2 top-2">
 			<Menubar.Menu>
 				<Menubar.Trigger disabled={!isUsersTurn}>Attack</Menubar.Trigger>
-				<UseAttackMenu on:useAttack={({ detail }) => (selectedAttack = detail)} />
+				<UseAttackMenu
+					on:useAttack={({ detail }) => {
+						if (!currentToken) return;
+						selectedAttack = {
+							attack: detail,
+							instance: {
+								position: { x: currentToken?.x, y: currentToken?.y },
+								angle: 0
+							}
+						};
+					}}
+				/>
 			</Menubar.Menu>
 			<Menubar.Menu>
 				<Menubar.Trigger>Test</Menubar.Trigger>
