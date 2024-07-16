@@ -76,7 +76,9 @@ export class BoardStore extends Store<BoardStoreInner> implements Synced<BoardsR
 	}
 }
 
-export class Board extends System implements BoardsResponse {
+type SystemBody = AttackBody | Token;
+
+export class Board extends System<SystemBody> implements BoardsResponse {
 	collectionName = 'boards' as const;
 	game!: string;
 	background!: string;

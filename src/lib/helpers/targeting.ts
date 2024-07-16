@@ -5,9 +5,12 @@ import {
 	Polygon,
 	type BodyOptions,
 	type PotentialVector,
-	type Vector
+	type Vector,
+	type Body
 } from 'detect-collisions';
 import { Sector } from './sector';
+
+export type AttackBody = Body | Sector;
 
 export type AttackShape =
 	| { type: 'box'; width: number; height: number }
