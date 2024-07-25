@@ -5,6 +5,7 @@ console.log("Debug log of env cred", POCKETBASE_EMAIL, POCKETBASE_PASSWORD?.slic
 
 async function getAdminAuth() {
 	if (pb.authStore.isValid) return;
+	console.log("pb inside getadminauth", pb, pb.url)
 	await pb.admins.authWithPassword(POCKETBASE_EMAIL, POCKETBASE_PASSWORD);
 }
 
