@@ -3,6 +3,8 @@ import { TypedPocketBase } from 'typed-pocketbase';
 import type { Schema, UsersResponse } from './schema';
 import { writable } from 'svelte/store';
 
+console.log("Pocketbase url", PUBLIC_PB_URL)
+
 export const pb = new TypedPocketBase<Schema>(PUBLIC_PB_URL);
 
 export const user = writable(pb.authStore.model as UsersResponse | null);
